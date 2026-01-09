@@ -2,12 +2,16 @@ package com.example.habit.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.withTransform
 import com.example.plant.PlantConfig
+import com.example.plant.utils.PlantData
 import com.example.plant.utils.PlantRendererImpl
 import com.example.plant.utils.Randomizer
 
@@ -18,60 +22,62 @@ fun PlantCanvas(
     config: PlantConfig,
     modifier: Modifier = Modifier
 ) {
+    val plantRenderer = remember { PlantRendererImpl() }
+    var plantData by remember(config.lSystemSentence, variability) {
+        mutableStateOf<PlantData?>(null)
+    }
+
     Canvas(modifier) {
-//        drawRect(
-//            brush = Brush.linearGradient(
-//                0.0f to config.backgroundColorTop,
-//                1.0f to config.backgroundColorBottom,
-//                start = Offset(0f, 0f),
-//                end = Offset(0f, size.height * 0.7f)
-//            ),
-//            size = size
-//        )
         val canvasCenterX = size.width / 2f
-        val canvasBottomY = size.height
-        val worldWidth = 800f
-        val scaleFactor = size.width / worldWidth
+        val canvaBottomY = size.height
 
-        PlantRendererImpl().drawPlant(
-            drawScope = this,
-            offset = Offset(canvasCenterX, canvasBottomY),
-            progress = 1f,
-            cellSize = Size(worldWidth, size.height / scaleFactor),
-            variability = variability,
-            lSystemSentence = config.lSystemSentence,
-            plantConfig = config,
-            randomizer = randomizer
-        )
-
-        // TODO: Realize render with transforming only canvas
-        withTransform({
-            translate(left = canvasCenterX, top = canvasBottomY)
-            scale(scaleX = scaleFactor, scaleY = scaleFactor)
-        }) {
-            drawLine(
-                color = Color.Magenta,
-                start = Offset(0f, 100f),
-                end = Offset(10f, 500f),
-                strokeWidth = 4f
-            )
-            PlantRendererImpl().drawPlant(
-                drawScope = this,
-                offset = Offset(0f, 0f),
+        if (plantData == null) {
+            val data = plantRenderer.generatePlantData(
+                offset = Offset(canvasCenterX, canvaBottomY),
                 progress = 1f,
-                cellSize = Size(worldWidth, size.height / scaleFactor),
                 variability = variability,
                 lSystemSentence = config.lSystemSentence,
                 plantConfig = config,
                 randomizer = randomizer
             )
+            plantData = data
         }
 
-        // : Draw dot in Bottom Center for testing
-        drawCircle(
-            color = Color.Red,
-            radius = 8f,
-            center = Offset(canvasCenterX, canvasBottomY)
-        )
+        plantData?.let { data ->
+
+            val padding = 10f
+
+            val plantBounds = data.bounds
+            val plantWidth = plantBounds.width
+            val plantHeight = plantBounds.height
+
+            val canvasWidth = size.width - padding
+            val canvasHeight = size.height - padding
+
+            val scaleFactor = minOf(canvasWidth / plantWidth, canvasHeight / plantHeight)
+
+
+            withTransform({
+                scale(
+                    scaleX = scaleFactor,
+                    scaleY = scaleFactor,
+                    pivot = Offset(canvasCenterX, canvaBottomY)
+                )
+                translate(left = canvasCenterX - (data.bounds.center.x))
+            }) {
+                plantRenderer.drawPlantData(
+                    drawScope = this,
+                    plantData = data,
+                    plantConfig = config
+                )
+
+                // FIXME: Remove after debug
+                drawRect(
+                    color = Color.Green.copy(alpha = 0.3f),
+                    topLeft = data.bounds.topLeft,
+                    size = data.bounds.size
+                )
+            }
+        }
     }
 }

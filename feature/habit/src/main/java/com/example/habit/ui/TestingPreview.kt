@@ -1,9 +1,14 @@
 package com.example.habit.ui
 
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.example.habit.models.PlantState
 import com.example.plant.BranchConfig
 import com.example.plant.GenerationConfig
 import com.example.plant.LeafConfig
@@ -26,11 +31,10 @@ fun DefaultLSystemView() {
         presetIndex = 0,
         iterations = 4,
         variability = 0.55f,
-        seed = 27
+        seed = 65
     )
-    val randomizer = Randomizer(generationConfig.seed)
 
-    val generator = LSystemGenerator(randomizer)
+    val generator = LSystemGenerator(Randomizer(generationConfig.seed))
     val sentence = generator.generateSentence(
         generationConfig.presetIndex,
         generationConfig.iterations,
@@ -58,18 +62,36 @@ fun DefaultLSystemView() {
         ),
         isAnimated = false,
     )
-    PlantCanvas(randomizer, generationConfig.variability, config, Modifier.fillMaxSize())
 
-//    PlantItem(
-//        modifier = Modifier.fillMaxSize(),
-//        randomizer = randomizer,
-//        variability = generationConfig.variability,
-//        plantState = PlantState(
-//            lSystemSentence = sentence,
-//            label = "Example",
-//            plantConfig = config
-//        ),
-//        onAnimate = {},
-//        onNextStage = {}
-//    )
+    Scaffold { paddingValues ->
+        Row(Modifier.padding(paddingValues), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            PlantItem(
+                modifier = Modifier.weight(1f),
+                randomizer = Randomizer(generationConfig.seed),
+                variability = generationConfig.variability,
+                plantState = PlantState(
+                    lSystemSentence = sentence,
+                    label = "Example",
+                    plantConfig = config
+                ),
+                onAnimate = {},
+                onNextStage = {}
+            )
+
+            PlantItem(
+                modifier = Modifier.weight(1f),
+                randomizer = Randomizer(generationConfig.seed),
+                variability = generationConfig.variability,
+                plantState = PlantState(
+                    lSystemSentence = sentence,
+                    label = "Example",
+                    plantConfig = config
+                ),
+                onAnimate = {},
+                onNextStage = {}
+            )
+        }
+    }
+
+
 }
