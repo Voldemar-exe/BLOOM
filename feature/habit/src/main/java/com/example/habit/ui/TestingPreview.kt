@@ -1,22 +1,26 @@
 package com.example.habit.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.habit.PlantViewModel
 import com.example.habit.models.PlantState
-import com.example.plant.BranchConfig
-import com.example.plant.GenerationConfig
-import com.example.plant.LeafConfig
-import com.example.plant.LeafType
-import com.example.plant.PlantConfig
-import com.example.plant.PlantTheme
-import com.example.plant.utils.LSystemGenerator
-import com.example.plant.utils.Randomizer
 
 fun parseColor(hex: String): Color {
     val colorLong = hex.removePrefix("#").toLong(16)
@@ -25,73 +29,62 @@ fun parseColor(hex: String): Color {
 }
 
 // Example usage in a Composable
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun DefaultLSystemView() {
-    val generationConfig = GenerationConfig(
-        presetIndex = 0,
-        iterations = 4,
-        variability = 0.55f,
-        seed = 65
-    )
 
-    val generator = LSystemGenerator(Randomizer(generationConfig.seed))
-    val sentence = generator.generateSentence(
-        generationConfig.presetIndex,
-        generationConfig.iterations,
-        generationConfig.variability
-    )
+    val viewModel = PlantViewModel()
 
-    val config = PlantConfig(
-        lSystemSentence = sentence,
-        leaves = LeafConfig(
-            type = LeafType.TYPE2,
-            length = 8.5f,
-            width = 12.5f
-        ),
-        branches = BranchConfig(
-            length = 15.5f,
-            angle = 27.1f,
-            width = 38.8f,
-            widthFalloff = 0.56f,
-            minWidth = 2.7f
-        ),
-        theme = PlantTheme(
-            branchColor = parseColor("#504534"),
-            leafColor = parseColor("#ff8fe7"),
-            leafAlpha = 0.76f
-        ),
-        isAnimated = false,
-    )
+    var shownPlantCard: PlantState? by remember { mutableStateOf(null) }
 
     Scaffold { paddingValues ->
-        Row(Modifier.padding(paddingValues), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            PlantItem(
-                modifier = Modifier.weight(1f),
-                randomizer = Randomizer(generationConfig.seed),
-                variability = generationConfig.variability,
-                plantState = PlantState(
-                    lSystemSentence = sentence,
-                    label = "Example",
-                    plantConfig = config
-                ),
-                onAnimate = {},
-                onNextStage = {}
-            )
-
-            PlantItem(
-                modifier = Modifier.weight(1f),
-                randomizer = Randomizer(generationConfig.seed),
-                variability = generationConfig.variability,
-                plantState = PlantState(
-                    lSystemSentence = sentence,
-                    label = "Example",
-                    plantConfig = config
-                ),
-                onAnimate = {},
-                onNextStage = {}
-            )
+        SharedTransitionLayout(Modifier.consumeWindowInsets(paddingValues)) {
+            AnimatedContent(
+                shownPlantCard,
+                label = "from grid to card"
+            ) { targetState ->
+                if (targetState == null) {
+                    with(this@SharedTransitionLayout) {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            items(viewModel.plants.value.size) { index ->
+                                val plant = viewModel.plants.value[index]
+                                PlantItem(
+                                    modifier = Modifier
+                                        .sharedBounds(
+                                            rememberSharedContentState(key = "plant${plant.id}"),
+                                            this@AnimatedContent
+                                        )
+                                        .aspectRatio(0.8f)
+                                        .heightIn(max = 200.dp),
+                                    plantState = plant,
+                                    onAnimate = {},
+                                    onNextStage = {},
+                                    onItemExpand = { shownPlantCard = plant }
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    with(this@SharedTransitionLayout) {
+                        PlantItem(
+                            modifier = Modifier
+                                .sharedBounds(
+                                    rememberSharedContentState(key = "plant${targetState.id}"),
+                                    this@AnimatedContent
+                                )
+                                .aspectRatio(0.8f),
+                            plantState = targetState,
+                            onAnimate = {},
+                            onNextStage = {},
+                            onItemExpand = { shownPlantCard = null }
+                        )
+                    }
+                }
+            }
         }
     }
-
-
 }

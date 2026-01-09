@@ -1,10 +1,10 @@
 package com.example.habit.ui
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,15 +17,11 @@ import com.example.plant.utils.Randomizer
 @Composable
 fun PlantItem(
     modifier: Modifier = Modifier,
-    randomizer: Randomizer,
-    variability: Float,
     plantState: PlantState,
     onAnimate: () -> Unit,
-    onNextStage: () -> Unit
+    onNextStage: () -> Unit,
+    onItemExpand: () -> Unit
 ) {
-    val cellWidth = 200.dp
-    val cellHeight = 200.dp
-
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -35,13 +31,15 @@ fun PlantItem(
         Text(text = plantState.label)
 
         PlantCanvas(
-            randomizer = randomizer,
-            variability = variability,
-            config = plantState.plantConfig,
             modifier = Modifier
-                .width(cellWidth)
-                .height(cellHeight)
+                .fillMaxSize()
                 .border(1.dp, Color.Gray)
+                .clickable { onItemExpand() },
+            randomizer = Randomizer(plantState.generationConfig.seed),
+            variability = plantState.generationConfig.variability,
+            config = plantState.plantConfig,
+            onAnimate = onAnimate,
+            onNextStage = onNextStage
         )
     }
 }

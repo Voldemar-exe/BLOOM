@@ -17,6 +17,8 @@ import com.example.plant.utils.Randomizer
 
 @Composable
 fun PlantCanvas(
+    modifier: Modifier = Modifier,
+    innerCanvasPadding: Float = 10f,
     randomizer: Randomizer,
     variability: Float,
     config: PlantConfig,
@@ -45,14 +47,12 @@ fun PlantCanvas(
 
         plantData?.let { data ->
 
-            val padding = 10f
-
             val plantBounds = data.bounds
             val plantWidth = plantBounds.width
             val plantHeight = plantBounds.height
 
-            val canvasWidth = size.width - padding
-            val canvasHeight = size.height - padding
+            val canvasWidth = size.width - innerCanvasPadding
+            val canvasHeight = size.height - innerCanvasPadding
 
             val scaleFactor = minOf(canvasWidth / plantWidth, canvasHeight / plantHeight)
 
