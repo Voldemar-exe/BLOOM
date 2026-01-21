@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -21,7 +22,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "BLOOM"
 include(":app")
-include(":core:common")
 include(":core:database")
 include(":core:network")
 include(":core:data")

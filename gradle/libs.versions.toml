@@ -1,16 +1,26 @@
 [versions]
-agp = "8.13.0"
-kotlin = "2.0.21"
+agp = "8.13.2"
+kotlin = "2.2.21"
 coreKtx = "1.10.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.8.0"
-composeBom = "2024.09.00"
+composeBom = "2026.01.00"
 jetbrainsKotlinJvm = "2.0.21"
+kotlinxSerializationJson = "1.8.0"
+androidxLifecycle = "2.8.7"
+
+# used directly in gradle plugins
+androidx-compose-compiler = "1.5.10"
+compile-sdk = "36"
+min-sdk = "26"
+target-sdk = "36"
+jvm = "17"
 appcompat = "1.6.1"
-material = "1.10.0"
+material = "1.13.0"
+material3Android = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -29,6 +39,13 @@ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-te
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+androidx-lifecycle-viewModel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
+
+# project internal convention plugin
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
+compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
+kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -36,4 +53,17 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
+# project internal convention plugins
+bloom-android-application = { id = "bloom.android.application", version = "unspecified" }
+bloom-android-application-compose = { id = "bloom.android.application.compose", version = "unspecified" }
+bloom-android-feature = { id = "bloom.android.feature", version = "unspecified" }
+bloom-android-library = { id = "bloom.android.library", version = "unspecified" }
+bloom-android-library-compose = { id = "bloom.android.library.compose", version = "unspecified" }
+bloom-android-hilt = { id = "bloom.android.hilt", version = "unspecified" }
+bloom-android-room = { id = "bloom.android.room", version = "unspecified" }
+bloom-feature-ui = { id = "bloom.feature.ui", version = "unspecified" }
+bloom-feature-domain = { id = "bloom.feature.domain", version = "unspecified" }
+bloom-feature-data = { id = "bloom.feature.data", version = "unspecified" }
+bloom-feature-nav = { id = "bloom.feature.nav", version = "unspecified" }
