@@ -1,3 +1,4 @@
+
 import com.example.bloom.applicationExtension
 import com.example.bloom.configureJUnit
 import com.example.bloom.configureKotlin
@@ -27,6 +28,8 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             dependencies {
                 "implementation"(libs.findLibrary("androidx-core-ktx").get())
                 "implementation"(libs.findLibrary("androidx-activity-compose").get())
+
+                "implementation"(libs.findLibrary("timber").get())
                 "implementation"(project(":feature:habit"))
             }
             configureJUnit()

@@ -3,9 +3,17 @@ package com.example.plant.utils
 import com.example.plant.LSystemFormula
 import com.example.plant.Rule
 
-class LSystemGenerator(
+interface LSystemGenerator {
+    fun generateSentence(
+        presetId: Int,
+        iterations: Int,
+        variability: Float
+    ): String
+}
+
+class LSystemGeneratorImpl(
     private val randomizer: Randomizer
-) {
+) : LSystemGenerator {
     fun selectRule(matchingRules: List<Rule>): Rule? {
         val chance = randomizer.nextFloat()
         var total = 0.0
@@ -30,12 +38,12 @@ class LSystemGenerator(
         return newSentence.toString()
     }
 
-    fun generateSentence(
-        presetIndex: Int,
+    override fun generateSentence(
+        presetId: Int,
         iterations: Int,
-        variability: Float // TODO: Maybe add chances for generation
+        variability: Float // TODO: Maybe add chances
     ): String {
-        val preset = presets[presetIndex]
+        val preset = presets[presetId]
         var sentence = preset.axiom
         val rules = preset.rules
         repeat(iterations) {
@@ -51,6 +59,27 @@ class LSystemGenerator(
                 rules = listOf(
                     Rule(1.0, 'F', "FF"),
                     Rule(1.0, 'X', "F+[-F-XF-X][+FF][--XF[+X]][++F-X]")
+                )
+            ),
+            LSystemFormula(
+                axiom = "X",
+                rules = listOf(
+                    Rule(1.0, 'F', "FF"),
+                    Rule(1.0, 'X', "F[+X]F[-X]+X")
+                )
+            ),
+            LSystemFormula(
+                axiom = "X",
+                rules = listOf(
+                    Rule(1.0, 'F', "FF"),
+                    Rule(1.0, 'X', "F[+X][-X]FX")
+                )
+            ),
+            LSystemFormula(
+                axiom = "X",
+                rules = listOf(
+                    Rule(1.0, 'X', "F-[+X]+F[+FX]-X"), // [X]
+                    Rule(1.0, 'F', "FF")
                 )
             )
         )

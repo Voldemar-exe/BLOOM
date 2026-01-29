@@ -7,21 +7,19 @@ data class PlantConfig(
     val lSystemSentence: String,
     val leaves: LeafConfig,
     val branches: BranchConfig,
-    val theme: PlantTheme,
-    val isAnimated: Boolean
+    val renderConfig: RenderConfig
 )
 
 data class GenerationConfig(
-    val presetIndex: Int,
+    val presetId: Int,
     val iterations: Int,
     val variability: Float,
     val seed: Long
 )
 
 data class LeafConfig(
-    val type: LeafType,
     val length: Float,
-    val width: Float
+    val type: LeafType
 )
 // TODO: After confirming all forms change names
 enum class LeafType {
@@ -29,15 +27,15 @@ enum class LeafType {
 }
 
 data class BranchConfig(
-    val length: Float,
-    val angle: Float,
-    val width: Float,
+    val baseLength: Float,
+    val baseAngle: Float,
+    val baseWidth: Float,
     val widthFalloff: Float,
     val minWidth: Float
 )
 
 // TODO: Thought about background colorizing
-data class PlantTheme(
+data class RenderConfig(
     val branchColor: Color,
     val leafColor: Color,
     val leafAlpha: Float

@@ -11,6 +11,7 @@ composeBom = "2026.01.00"
 jetbrainsKotlinJvm = "2.0.21"
 kotlinxSerializationJson = "1.8.0"
 androidxLifecycle = "2.8.7"
+timberVer = "5.0.1"
 
 # used directly in gradle plugins
 androidx-compose-compiler = "1.5.10"
@@ -41,6 +42,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 androidx-lifecycle-viewModel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
+timber = {group = "com.jakewharton.timber", name = "timber", version.ref = "timberVer"}
 
 # project internal convention plugin
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }

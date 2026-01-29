@@ -18,9 +18,9 @@ import com.example.plant.utils.Randomizer
 fun PlantItem(
     modifier: Modifier = Modifier,
     plantState: PlantState,
-    onAnimate: () -> Unit,
-    onNextStage: () -> Unit,
-    onItemExpand: () -> Unit
+    onAnimate: () -> Unit = {},
+    onNextStage: () -> Unit = {},
+    onItemClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier,
@@ -34,7 +34,7 @@ fun PlantItem(
             modifier = Modifier
                 .fillMaxSize()
                 .border(1.dp, Color.Gray)
-                .clickable { onItemExpand() },
+                .clickable { onItemClick() },
             randomizer = Randomizer(plantState.generationConfig.seed),
             variability = plantState.generationConfig.variability,
             config = plantState.plantConfig,
