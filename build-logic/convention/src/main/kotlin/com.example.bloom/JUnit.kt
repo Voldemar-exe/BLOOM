@@ -1,6 +1,5 @@
 package com.example.bloom
 
-import libs
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 

@@ -7,11 +7,14 @@ junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.8.0"
-composeBom = "2026.01.00"
+composeBom = "2026.01.01"
 jetbrainsKotlinJvm = "2.0.21"
 kotlinxSerializationJson = "1.8.0"
 androidxLifecycle = "2.8.7"
 timberVer = "5.0.1"
+nav3Core = "1.0.0"
+lifecycleViewmodelNav3 = "2.10.0"
+ksp = "2.3.4"
 
 # used directly in gradle plugins
 androidx-compose-compiler = "1.5.10"
@@ -22,6 +25,7 @@ jvm = "17"
 appcompat = "1.6.1"
 material = "1.13.0"
 material3Android = "1.2.0"
+hilt = "2.59.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,6 +47,14 @@ material = { group = "com.google.android.material", name = "material", version.r
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 androidx-lifecycle-viewModel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
 timber = {group = "com.jakewharton.timber", name = "timber", version.ref = "timberVer"}
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
+androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+hilt-core = { group = "com.google.dagger", name = "hilt-core", version.ref = "hilt" }
+kotlin-metadata = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlin" }
 
 # project internal convention plugin
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -56,6 +68,8 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 # project internal convention plugins
 bloom-android-application = { id = "bloom.android.application", version = "unspecified" }
@@ -63,7 +77,7 @@ bloom-android-application-compose = { id = "bloom.android.application.compose", 
 bloom-android-feature = { id = "bloom.android.feature", version = "unspecified" }
 bloom-android-library = { id = "bloom.android.library", version = "unspecified" }
 bloom-android-library-compose = { id = "bloom.android.library.compose", version = "unspecified" }
-bloom-android-hilt = { id = "bloom.android.hilt", version = "unspecified" }
+bloom-hilt = { id = "bloom.hilt", version = "unspecified" }
 bloom-android-room = { id = "bloom.android.room", version = "unspecified" }
 bloom-feature-ui = { id = "bloom.feature.ui", version = "unspecified" }
 bloom-feature-domain = { id = "bloom.feature.domain", version = "unspecified" }

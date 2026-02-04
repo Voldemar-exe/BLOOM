@@ -45,5 +45,9 @@ gradlePlugin {
             id = "bloom.android.feature"
             implementationClass = "AndroidFeatureConventionPlugin"
         }
+        register("hilt") {
+            id = "bloom.hilt"
+            implementationClass = "HiltConventionPlugin"
+        }
     }
 }

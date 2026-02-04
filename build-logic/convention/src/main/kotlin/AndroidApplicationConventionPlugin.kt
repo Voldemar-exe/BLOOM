@@ -1,8 +1,8 @@
-
 import com.example.bloom.applicationExtension
 import com.example.bloom.configureJUnit
 import com.example.bloom.configureKotlin
 import com.example.bloom.configureKotlinAndroid
+import com.example.bloom.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
