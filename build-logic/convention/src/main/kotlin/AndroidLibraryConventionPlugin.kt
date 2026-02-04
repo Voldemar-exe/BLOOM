@@ -2,17 +2,20 @@ import com.example.bloom.configureJUnit
 import com.example.bloom.configureKotlin
 import com.example.bloom.configureKotlinAndroid
 import com.example.bloom.libraryExtension
+import com.example.bloom.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.dependencies
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
-            pluginManager.run {
-                apply("com.android.library")
-                apply("org.jetbrains.kotlin.android")
-            }
+            apply(plugin = "com.android.library")
+            apply(plugin = "bloom.hilt")
+            apply(plugin = "org.jetbrains.kotlin.android")
+            apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
 
             requireNotNull(libraryExtension).apply {
                 buildFeatures {
@@ -21,6 +24,10 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
                 configureKotlin()
                 configureKotlinAndroid(this)
+            }
+
+            dependencies {
+                "implementation"(libs.findLibrary("kotlinx.serialization.json").get())
             }
 
             configureJUnit()

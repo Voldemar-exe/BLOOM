@@ -1,8 +1,10 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.example.bloom.configureAndroidCompose
+import com.example.bloom.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 
 class AndroidApplicationComposeConventionPlugin : Plugin<Project> {
@@ -13,6 +15,12 @@ class AndroidApplicationComposeConventionPlugin : Plugin<Project> {
 
             val extension = extensions.getByType<ApplicationExtension>()
             configureAndroidCompose(extension)
+            
+            dependencies {
+                "implementation"(libs.findLibrary("androidx-compose-ui").get())
+                "implementation"(libs.findLibrary("androidx-compose-ui-graphics").get())
+                "implementation"(libs.findLibrary("androidx-compose-material3").get())
+            }
         }
     }
 }
