@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "com.example.bloom.feature.stats"
 }
+
+dependencies {
+    api(project(":core:navigation"))
+}

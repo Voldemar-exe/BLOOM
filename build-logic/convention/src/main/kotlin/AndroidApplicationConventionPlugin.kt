@@ -28,7 +28,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             dependencies {
                 "implementation"(libs.findLibrary("androidx-core-ktx").get())
                 "implementation"(libs.findLibrary("androidx-activity-compose").get())
-
+                "implementation"(libs.findLibrary("androidx-navigation3-ui").get())
                 "implementation"(libs.findLibrary("timber").get())
                 "implementation"(project(":feature:habit"))
             }

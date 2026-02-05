@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "com.example.bloom.feature.task"
 }
+
+dependencies {
+    api(project(":core:navigation"))
+}
