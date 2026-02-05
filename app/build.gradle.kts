@@ -24,3 +24,13 @@ android {
         }
     }
 }
+
+dependencies {
+    implementation(project(":core:navigation"))
+
+    implementation(project(":feature:habit"))
+    implementation(project(":feature:task"))
+    implementation(project(":feature:stats"))
+    implementation(project(":feature:profile"))
+    implementation(project(":feature:auth"))
+}
