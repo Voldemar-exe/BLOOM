@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.habit.models.PlantState
 import com.example.plant.utils.Randomizer
 
@@ -20,26 +21,26 @@ fun PlantItem(
     plantState: PlantState,
     onAnimate: () -> Unit = {},
     onNextStage: () -> Unit = {},
-    onItemClick: () -> Unit = {}
+    onItemClick: () -> Unit = {},
 ) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
-
-        Text(text = plantState.label)
+        Text(text = plantState.label, fontSize = 28.sp)
 
         PlantCanvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .border(1.dp, Color.Gray)
-                .clickable { onItemClick() },
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .border(1.dp, Color.Gray)
+                    .clickable { onItemClick() },
             randomizer = Randomizer(plantState.generationConfig.seed),
             variability = plantState.generationConfig.variability,
             config = plantState.plantConfig,
             onAnimate = onAnimate,
-            onNextStage = onNextStage
+            onNextStage = onNextStage,
         )
     }
 }

@@ -7,36 +7,33 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import com.example.plant.RenderConfig
 
 interface PlantRenderer {
-
     fun drawPlant(
         drawScope: DrawScope,
         plantPaths: PlantPaths,
-        renderConfig: RenderConfig
+        renderConfig: RenderConfig,
     )
 
     fun drawBranch(
         drawScope: DrawScope,
         branchPath: BranchPath,
-        color: Color
+        color: Color,
     )
 
     fun drawLeaf(
         drawScope: DrawScope,
         leaf: LeafPath,
-        color: Color
+        color: Color,
     )
 }
 
 class PlantRendererImpl : PlantRenderer {
-
     override fun drawPlant(
         drawScope: DrawScope,
         plantPaths: PlantPaths,
-        renderConfig: RenderConfig
+        renderConfig: RenderConfig,
     ) {
         val path = Path()
         val leafPath = Path()
-
 
         for (branch in plantPaths.branchesPaths.sortedBy { it.order }) {
             path.addPath(branch.path)
@@ -49,49 +46,29 @@ class PlantRendererImpl : PlantRenderer {
         }
 
         drawScope.drawPath(leafPath, renderConfig.leafColor)
-
-        // TESTING
-        /*for (branch in plantPaths.branchesPaths.sortedBy { it.order }) {
-            drawBranchAsPoints(drawScope, branch)
-        }*/
-
-        /*for (branches in plantPaths.branchesPaths.groupBy { it.order }) {
-            val branchPath = Path()
-            branches.value.forEach { branch ->
-                branchPath.addPath(branch.path)
-            }
-            drawScope.drawPath(branchPath, renderConfig.branchColor)
-        }*/
-
-        /*val colors = listOf(
-            Color.Red,
-            Color.Blue,
-            Color.Green,
-            Color.Yellow,
-            Color.Magenta,
-            Color.Cyan
-        )
-
-        for (branch in plantPaths.branchesPaths.sortedBy { it.order }) {
-            val color = colors.getOrNull(branch.order) ?: Color.Black
-            drawBranch(drawScope, branch, color)
-        }*/
     }
 
     override fun drawBranch(
         drawScope: DrawScope,
         branchPath: BranchPath,
-        color: Color
+        color: Color,
     ) {
         drawScope.drawPath(branchPath.path, color)
     }
 
-    private fun drawBranchAsPoints(
+    override fun drawLeaf(
         drawScope: DrawScope,
-        branchPath: BranchPath
+        leaf: LeafPath,
+        color: Color,
     ) {
-        val path = branchPath.path
+        drawScope.drawPath(leaf.path, color)
+    }
 
+    private fun drawPathAsPoints(
+        drawScope: DrawScope,
+        path: Path,
+        radius: Float = 2f,
+    ) {
         for (segment in path) {
             val type = segment.type
 
@@ -102,18 +79,10 @@ class PlantRendererImpl : PlantRenderer {
 
                 drawScope.drawCircle(
                     color = Color.Red,
-                    radius = 2f,
-                    center = point
+                    radius = radius,
+                    center = point,
                 )
             }
         }
-    }
-
-    override fun drawLeaf(
-        drawScope: DrawScope,
-        leaf: LeafPath,
-        color: Color
-    ) {
-        drawScope.drawPath(leaf.path, color)
     }
 }

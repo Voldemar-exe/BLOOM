@@ -5,8 +5,8 @@ import androidx.compose.ui.graphics.Color
 
 data class PlantConfig(
     val lSystemSentence: String,
-    val leaves: LeafConfig,
-    val branches: BranchConfig,
+    val leafConfig: LeafConfig,
+    val branchConfig: BranchConfig,
     val renderConfig: RenderConfig
 )
 

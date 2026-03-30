@@ -7,12 +7,12 @@ interface LSystemGenerator {
     fun generateSentence(
         presetId: Int,
         iterations: Int,
-        variability: Float
+        variability: Float,
     ): String
 }
 
 class LSystemGeneratorImpl(
-    private val randomizer: Randomizer
+    private val randomizer: Randomizer,
 ) : LSystemGenerator {
     fun selectRule(matchingRules: List<Rule>): Rule? {
         val chance = randomizer.nextFloat()
@@ -24,7 +24,10 @@ class LSystemGeneratorImpl(
         return matchingRules.lastOrNull()
     }
 
-    fun applyRulesToSentence(rules: List<Rule>, sentence: String): String {
+    fun applyRulesToSentence(
+        rules: List<Rule>,
+        sentence: String,
+    ): String {
         val newSentence = StringBuilder()
         for (c in sentence) {
             val matchingRules = rules.filter { it.charToReplace == c }
@@ -41,7 +44,7 @@ class LSystemGeneratorImpl(
     override fun generateSentence(
         presetId: Int,
         iterations: Int,
-        variability: Float // TODO: Maybe add chances
+        variability: Float, // TODO: Maybe add chances
     ): String {
         val preset = presets[presetId]
         var sentence = preset.axiom
@@ -53,35 +56,40 @@ class LSystemGeneratorImpl(
     }
 
     companion object {
-        val presets = listOf(
-            LSystemFormula(
-                axiom = "X",
-                rules = listOf(
-                    Rule(1.0, 'F', "FF"),
-                    Rule(1.0, 'X', "F+[-F-XF-X][+FF][--XF[+X]][++F-X]")
-                )
-            ),
-            LSystemFormula(
-                axiom = "X",
-                rules = listOf(
-                    Rule(1.0, 'F', "FF"),
-                    Rule(1.0, 'X', "F[+X]F[-X]+X")
-                )
-            ),
-            LSystemFormula(
-                axiom = "X",
-                rules = listOf(
-                    Rule(1.0, 'F', "FF"),
-                    Rule(1.0, 'X', "F[+X][-X]FX")
-                )
-            ),
-            LSystemFormula(
-                axiom = "X",
-                rules = listOf(
-                    Rule(1.0, 'X', "F-[+X]+F[+FX]-X"), // [X]
-                    Rule(1.0, 'F', "FF")
-                )
+        val presets =
+            listOf(
+                LSystemFormula(
+                    axiom = "X",
+                    rules =
+                        listOf(
+                            Rule(1.0, 'F', "FF"),
+                            Rule(1.0, 'X', "F+[-F-XF-X][+FF][--XF[+X]][++F-X]"),
+                        ),
+                ),
+                LSystemFormula(
+                    axiom = "X",
+                    rules =
+                        listOf(
+                            Rule(1.0, 'F', "FF"),
+                            Rule(1.0, 'X', "F[+X]F[-X]+X"),
+                        ),
+                ),
+                LSystemFormula(
+                    axiom = "X",
+                    rules =
+                        listOf(
+                            Rule(1.0, 'F', "FF"),
+                            Rule(1.0, 'X', "F[+X][-X]FX"),
+                        ),
+                ),
+                LSystemFormula(
+                    axiom = "X",
+                    rules =
+                        listOf(
+                            Rule(1.0, 'F', "FF"),
+                            Rule(1.0, 'X', "F-[+X]+F[+FX]-X"), // [X]
+                        ),
+                ),
             )
-        )
     }
 }
