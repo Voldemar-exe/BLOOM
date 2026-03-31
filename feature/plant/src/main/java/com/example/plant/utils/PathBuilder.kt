@@ -2,7 +2,6 @@ package com.example.plant.utils
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
-import com.example.plant.BranchConfig
 import com.example.plant.LeafType
 import java.lang.Math.toRadians
 import kotlin.math.cos
@@ -12,57 +11,52 @@ data class BranchPath(
     val id: Int,
     val path: Path,
     val parentId: Int?,
-    val order: Int
+    val order: Int,
 )
 
 data class LeafPath(
-    val path: Path
+    val path: Path,
 )
 
 data class PlantPaths(
     val branchesPaths: List<BranchPath>,
-    val leavesPaths: List<LeafPath>
+    val leavesPaths: List<LeafPath>,
 )
 
 interface PathBuilder {
-    fun buildPlant(
-        geometry: PlantGeometry,
-        branchConfig: BranchConfig
-    ): PlantPaths
+    fun buildPlant(geometry: PlantGeometry): PlantPaths
 }
 
 class PathBuilderImpl : PathBuilder {
-    override fun buildPlant(
-        geometry: PlantGeometry,
-        branchConfig: BranchConfig
-    ): PlantPaths {
+    override fun buildPlant(geometry: PlantGeometry): PlantPaths {
         buildBranchHierarchyCache(geometry.branches)
 
-        val branches: List<BranchPath> = geometry.branches.map { branch ->
-            val allBranchPoints =
-                buildFullPointList(branch, branch.parentId?.let { getBranch(it) })
+        val branches: List<BranchPath> =
+            geometry.branches.map { branch ->
+                val allBranchPoints =
+                    buildFullPointList(branch, branch.parentId?.let { getBranch(it) })
 
-            val branchPath = buildBranchPath(allBranchPoints)
+                val branchPath = buildBranchPath(allBranchPoints)
 
-            BranchPath(
-                id = branch.id,
-                path = branchPath,
-                parentId = branch.parentId,
-                order = branch.order
-            )
-        }
+                BranchPath(
+                    id = branch.id,
+                    path = branchPath,
+                    parentId = branch.parentId,
+                    order = branch.order,
+                )
+            }
 
         val leaves: List<LeafPath> = geometry.leaves.map { buildLeafPath(it) }
 
         return PlantPaths(
             branchesPaths = branches,
-            leavesPaths = leaves
+            leavesPaths = leaves,
         )
     }
 
     private fun buildFullPointList(
         branch: Branch,
-        parent: Branch?
+        parent: Branch?,
     ): List<BranchPoint> {
         return if (parent != null && branch.parentPointIndex != null) {
             val parentPoint = parent.points[branch.parentPointIndex]
@@ -72,15 +66,19 @@ class PathBuilderImpl : PathBuilder {
 
             val childStartPoint = parentPoint.copy(angle = branch.points.first().angle)
 
-            if (branch.points.size < 2) return listOf(
-                parentPoint,
-                childStartPoint,
-            ) + branch.points
+            if (branch.points.size < 2) {
+                return listOf(
+                    parentPoint,
+                    childStartPoint,
+                ) + branch.points
+            }
 
-            if (branch.points.size > 5) return listOf(
-                parentPoint,
-                childStartPoint
-            ) + branch.points.drop(2)
+            if (branch.points.size > 5) {
+                return listOf(
+                    parentPoint,
+                    childStartPoint,
+                ) + branch.points.drop(2)
+            }
 
             listOf(parentPoint, childStartPoint) + branch.points.drop(1)
         } else {
@@ -88,9 +86,7 @@ class PathBuilderImpl : PathBuilder {
         }
     }
 
-    fun buildBranchPath(
-        points: List<BranchPoint>
-    ): Path {
+    fun buildBranchPath(points: List<BranchPoint>): Path {
         if (points.isEmpty()) return Path()
 
         val leftBoundary = mutableListOf<Offset>()
@@ -105,15 +101,17 @@ class PathBuilderImpl : PathBuilder {
             val normalX = cos(angle + Math.PI / 2).toFloat()
             val normalY = -sin(angle + Math.PI / 2).toFloat()
 
-            val leftPoint = Offset(
-                center.x + normalX * radius,
-                center.y + normalY * radius
-            )
+            val leftPoint =
+                Offset(
+                    center.x + normalX * radius,
+                    center.y + normalY * radius,
+                )
 
-            val rightPoint = Offset(
-                center.x - normalX * radius,
-                center.y - normalY * radius
-            )
+            val rightPoint =
+                Offset(
+                    center.x - normalX * radius,
+                    center.y - normalY * radius,
+                )
 
             leftBoundary += leftPoint
             rightBoundary += rightPoint
@@ -144,14 +142,14 @@ class PathBuilderImpl : PathBuilder {
             branchById[branch.id] = branch
         }
 
-        branches.groupBy { it.parentId }
+        branches
+            .groupBy { it.parentId }
             .forEach { (parentId, children) ->
                 branchChildrenCache[parentId] = children.sortedBy { it.order }
             }
     }
 
-    fun getChildren(parentId: Int?): List<Branch> =
-        branchChildrenCache[parentId] ?: emptyList()
+    fun getChildren(parentId: Int?): List<Branch> = branchChildrenCache[parentId] ?: emptyList()
 
     fun getBranch(id: Int): Branch? = branchById[id]
 
@@ -162,7 +160,10 @@ class PathBuilderImpl : PathBuilder {
 
         val width = 0.75f * leaf.length
 
-        fun rotateAndTranslate(ptX: Float, ptY: Float): Offset {
+        fun rotateAndTranslate(
+            ptX: Float,
+            ptY: Float,
+        ): Offset {
             val rx = ptX * cosr - ptY * sinr
             val ry = ptX * sinr + ptY * cosr
             return leaf.position + Offset(rx, ry)
@@ -171,13 +172,21 @@ class PathBuilderImpl : PathBuilder {
         val path = Path()
         when (leaf.type) {
             LeafType.TYPE0 -> {
-                val points = listOf(
-                    0f to 0f, 1f to -1f, 0f to -4f, -1f to -1f, 0f to 0f
-                )
+                val points =
+                    listOf(
+                        0f to 0f,
+                        1f to -1f,
+                        0f to -4f,
+                        -1f to -1f,
+                        0f to 0f,
+                    )
                 points.forEachIndexed { index, (x, y) ->
                     val abs = rotateAndTranslate(x * width, y * leaf.length)
-                    if (index == 0) path.moveTo(abs.x, abs.y)
-                    else path.lineTo(abs.x, abs.y)
+                    if (index == 0) {
+                        path.moveTo(abs.x, abs.y)
+                    } else {
+                        path.lineTo(abs.x, abs.y)
+                    }
                 }
             }
 
@@ -187,20 +196,32 @@ class PathBuilderImpl : PathBuilder {
                     val px = 2 * width * cos(theta)
                     val py = -2 * leaf.length + 2 * leaf.length * sin(theta)
                     val abs = rotateAndTranslate(px, py)
-                    if (i == 0) path.moveTo(abs.x, abs.y)
-                    else path.lineTo(abs.x, abs.y)
+                    if (i == 0) {
+                        path.moveTo(abs.x, abs.y)
+                    } else {
+                        path.lineTo(abs.x, abs.y)
+                    }
                 }
             }
 
             LeafType.TYPE2 -> {
-
-                val points = listOf(
-                    0f to 0f, 1f to -1f, 1f to -4f, 0f to -5f, -1f to -4f, -1f to -1f, 0f to 0f
-                )
+                val points =
+                    listOf(
+                        0f to 0f,
+                        1f to -1f,
+                        1f to -4f,
+                        0f to -5f,
+                        -1f to -4f,
+                        -1f to -1f,
+                        0f to 0f,
+                    )
                 points.forEachIndexed { index, (x, y) ->
                     val abs = rotateAndTranslate(x * width, y * leaf.length)
-                    if (index == 0) path.moveTo(abs.x, abs.y)
-                    else path.lineTo(abs.x, abs.y)
+                    if (index == 0) {
+                        path.moveTo(abs.x, abs.y)
+                    } else {
+                        path.lineTo(abs.x, abs.y)
+                    }
                 }
 
                 /*path.reset()

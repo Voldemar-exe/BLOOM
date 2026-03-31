@@ -58,10 +58,10 @@ fun PlantCanvas(
         }
     }
 
-    val plantPaths by remember(plantGeometry, config.branchConfig) {
+    val plantPaths by remember(plantGeometry) {
         derivedStateOf {
             plantGeometry?.let { geometry ->
-                pathBuilder.buildPlant(geometry, config.branchConfig)
+                pathBuilder.buildPlant(geometry)
             }
         }
     }
