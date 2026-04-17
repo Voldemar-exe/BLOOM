@@ -2,8 +2,9 @@ package com.example.navigation
 
 import androidx.navigation3.runtime.NavKey
 
-class Navigator(val state: NavigationState) {
-
+class Navigator(
+    val state: NavigationState,
+) {
     fun navigate(key: NavKey) {
         when (key) {
             state.currentTopLevelKey -> clearSubStack()
@@ -14,11 +15,17 @@ class Navigator(val state: NavigationState) {
 
     fun goBack() {
         when (state.currentKey) {
-            state.startKey -> error("You cannot go back from the start route")
+            state.startKey -> {
+                error("You cannot go back from the start route")
+            }
+
             state.currentTopLevelKey -> {
                 state.topStack.removeLastOrNull()
             }
-            else -> state.currentSubStack.removeLastOrNull()
+
+            else -> {
+                state.currentSubStack.removeLastOrNull()
+            }
         }
     }
 

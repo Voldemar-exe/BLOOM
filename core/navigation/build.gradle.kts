@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.bloo.core.navigation"
+    namespace = "com.example.bloom.core.navigation"
 }
 
 dependencies {
