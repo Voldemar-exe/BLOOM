@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screen_title">Профиль</string>
+    <string name="customization_label">Кастомизация</string>
+    <string name="edit_parameters_label">Параметры привычек и задач</string>
+    <string name="change_avatar_label">Аватар</string>
+    <string name="change_theme_label">Тема</string>
+    <string name="gamification_label">Геймификация</string>
+    <string name="achievements_label">Достижения</string>
+    <string name="store_label">Магазин</string>
+    <string name="rating_label">Рейтинг</string>
+
+</resources>
