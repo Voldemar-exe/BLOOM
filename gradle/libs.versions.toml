@@ -1,18 +1,18 @@
 [versions]
 agp = "8.13.2"
-kotlin = "2.2.21"
-coreKtx = "1.10.1"
+kotlin = "2.3.20"
+coreKtx = "1.18.0"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
-lifecycleRuntimeKtx = "2.6.1"
-activityCompose = "1.8.0"
-composeBom = "2026.01.01"
-jetbrainsKotlinJvm = "2.0.21"
-kotlinxSerializationJson = "1.8.0"
-androidxLifecycle = "2.8.7"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
+lifecycleRuntimeKtx = "2.10.0"
+activityCompose = "1.13.0"
+composeBom = "2026.03.01"
+jetbrainsKotlinJvm = "2.3.20"
+kotlinxSerializationJson = "1.11.0"
+androidxLifecycle = "2.10.0"
 timberVer = "5.0.1"
-nav3Core = "1.0.0"
+nav3Core = "1.1.0"
 lifecycleViewmodelNav3 = "2.10.0"
 ksp = "2.3.4"
 
@@ -25,7 +25,8 @@ jvm = "17"
 appcompat = "1.6.1"
 material = "1.13.0"
 material3Android = "1.2.0"
-hilt = "2.59.1"
+koin = "4.2.1"
+koin-plugin = "1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,8 +48,6 @@ androidx-compose-foundation = { module = "androidx.compose.foundation:foundation
 androidx-compose-foundation-layout = { module = "androidx.compose.foundation:foundation-layout" }
 androidx-compose-material3-adaptive = { module = "androidx.compose.material3.adaptive:adaptive"}
 androidx-compose-material3-navigation-suite = { module = "androidx.compose.material3:material3-navigation-suite"}
-androidx-compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "activityCompose" }
-androidx-compose-ui-util = { module = "androidx.compose.ui:ui-util", version.ref = "activityCompose" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
@@ -57,11 +56,16 @@ timber = {group = "com.jakewharton.timber", name = "timber", version.ref = "timb
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
-hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
-hilt-core = { group = "com.google.dagger", name = "hilt-core", version.ref = "hilt" }
 kotlin-metadata = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlin" }
+
+# Koin
+koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin" }
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+koin-annotations = { group = "io.insert-koin", name = "koin-annotations", version.ref = "koin" }
+koin-android = { group = "io.insert-koin", name = "koin-android" }
+koin-compose = { group = "io.insert-koin", name = "koin-compose" }
+koin-compose-viewmodel = { group = "io.insert-koin", name = "koin-compose-viewmodel" }
+
 
 # project internal convention plugin
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -75,7 +79,7 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 # project internal convention plugins
@@ -84,7 +88,7 @@ bloom-android-application-compose = { id = "bloom.android.application.compose", 
 bloom-android-feature = { id = "bloom.android.feature", version = "unspecified" }
 bloom-android-library = { id = "bloom.android.library", version = "unspecified" }
 bloom-android-library-compose = { id = "bloom.android.library.compose", version = "unspecified" }
-bloom-hilt = { id = "bloom.hilt", version = "unspecified" }
+bloom-koin = { id = "bloom.koin", version = "unspecified" }
 bloom-android-room = { id = "bloom.android.room", version = "unspecified" }
 bloom-feature-ui = { id = "bloom.feature.ui", version = "unspecified" }
 bloom-feature-domain = { id = "bloom.feature.domain", version = "unspecified" }

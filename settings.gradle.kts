@@ -30,18 +30,20 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "BLOOM"
+
 include(":app")
 include(":core:database")
 include(":core:network")
 include(":core:data")
-include(":feature:auth")
-include(":feature:sync")
-include(":feature:notification")
-include(":feature:profile")
-include(":feature:gamification")
-include(":feature:habit")
-include(":feature:task")
-include(":feature:plant")
-include(":feature:stats")
 include(":core:navigation")
 include(":core:designsystem")
+include(":core:plant")
+include(":core:gamification")
+include(":core:notification")
+include(":core:sync")
+
+include(":feature:auth")
+include(":feature:profile")
+include(":feature:habit")
+include(":feature:task")
+include(":feature:stats")

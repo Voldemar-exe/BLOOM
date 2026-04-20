@@ -9,5 +9,5 @@ android {
 
 dependencies {
     api(project(":core:navigation"))
-    implementation(project(":feature:plant"))
+    implementation(project(":core:plant"))
 }
