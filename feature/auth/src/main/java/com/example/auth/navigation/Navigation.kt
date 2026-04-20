@@ -7,10 +7,10 @@ import com.example.navigation.Navigator
 import kotlinx.serialization.Serializable
 
 @Serializable
-object HabitNavKey : NavKey
+object AuthNavKey : NavKey
 
-fun EntryProviderScope<NavKey>.habitEntry(navigator: Navigator) {
-    entry<HabitNavKey> {
+fun EntryProviderScope<NavKey>.authEntry(navigator: Navigator) {
+    entry<AuthNavKey> {
         LoginScreen()
     }
 }

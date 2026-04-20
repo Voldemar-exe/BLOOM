@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_button">Войти</string>
+    <string name="login_to_register_text">Нет аккаунта?</string>
+    <string name="login_to_register_text_button">Создать аккаунт</string>
+    <string name="login_skip_button">Пропустить вход</string>
+    <string name="register_button">Зарегистрироваться</string>
+    <string name="register_to_login_text">Уже есть аккаунт?</string>
+    <string name="register_to_login_text_button">Войти в аккаунт</string>
+    <string name="login_label">Введите логин</string>
+    <string name="password_label">Введите пароль</string>
+    <string name="confirm_password_label">Повторите пароль</string>
+    <string name="email_label">Введите почту</string>
+
+</resources>
