@@ -10,4 +10,5 @@ android {
 dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:designsystem"))
+    "implementation"("androidx.compose.material3:material3:1.5.0-alpha17")
 }

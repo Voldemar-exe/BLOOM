@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.example.model.DayTimeInterval
 
 @Composable
-private fun DayTimeTabs(
+fun DayTimeTabs(
     selectedTab: DayTimeInterval,
     onTabClick: (DayTimeInterval) -> Unit,
     modifier: Modifier = Modifier,
