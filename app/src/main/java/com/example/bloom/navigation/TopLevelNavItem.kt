@@ -15,47 +15,53 @@ import com.example.profile.navigation.ProfileNavKey
 import com.example.stats.navigation.StatsNavKey
 import com.example.task.navigation.TaskNavKey
 
-
 data class TopLevelNavItem(
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
-    /*@StringRes*/ val iconTextId: String,
-    /*@StringRes*/ val titleTextId: String,
+    // @StringRes
+    val iconTextId: String,
+    // @StringRes
+    val titleTextId: String,
 )
 
 // TODO: Replace icons, replace with real StringRes
 
-val HABIT = TopLevelNavItem(
-    selectedIcon = Icons.Rounded.Home,
-    unselectedIcon = Icons.Outlined.Home,
-    iconTextId = "",
-    titleTextId = "Привычки",
-)
+val HABIT =
+    TopLevelNavItem(
+        selectedIcon = Icons.Rounded.Home,
+        unselectedIcon = Icons.Outlined.Home,
+        iconTextId = "",
+        titleTextId = "Привычки",
+    )
 
-val TASKS = TopLevelNavItem(
-    selectedIcon = Icons.Rounded.Menu,
-    unselectedIcon = Icons.Outlined.Menu,
-    iconTextId = "",
-    titleTextId = "Задачи"
-)
+val TASKS =
+    TopLevelNavItem(
+        selectedIcon = Icons.Rounded.Menu,
+        unselectedIcon = Icons.Outlined.Menu,
+        iconTextId = "",
+        titleTextId = "Задачи",
+    )
 
-val STATS = TopLevelNavItem(
-    selectedIcon = Icons.Rounded.Info,
-    unselectedIcon = Icons.Outlined.Info,
-    iconTextId = "",
-    titleTextId = "Статистика"
-)
+val STATS =
+    TopLevelNavItem(
+        selectedIcon = Icons.Rounded.Info,
+        unselectedIcon = Icons.Outlined.Info,
+        iconTextId = "",
+        titleTextId = "Статистика",
+    )
 
-val PROFILE = TopLevelNavItem(
-    selectedIcon = Icons.Rounded.Person,
-    unselectedIcon = Icons.Outlined.Person,
-    iconTextId = "",
-    titleTextId = "Профиль"
-)
+val PROFILE =
+    TopLevelNavItem(
+        selectedIcon = Icons.Rounded.Person,
+        unselectedIcon = Icons.Outlined.Person,
+        iconTextId = "",
+        titleTextId = "Профиль",
+    )
 
-val TOP_LEVEL_NAV_ITEMS = mapOf(
-    HabitNavKey to HABIT,
-    TaskNavKey to TASKS,
-    StatsNavKey to STATS,
-    ProfileNavKey to PROFILE
-)
+val TOP_LEVEL_NAV_ITEMS =
+    mapOf(
+        HabitNavKey to HABIT,
+        TaskNavKey to TASKS,
+        StatsNavKey to STATS,
+        ProfileNavKey to PROFILE,
+    )

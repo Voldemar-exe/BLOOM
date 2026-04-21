@@ -9,10 +9,10 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
 
 class AndroidApplicationConventionPlugin : Plugin<Project> {
-
     override fun apply(target: Project) {
         with(target) {
             apply(plugin = "com.android.application")
+            apply(plugin = "bloom.koin")
             apply(plugin = "org.jetbrains.kotlin.android")
 
             requireNotNull(applicationExtension).apply {
@@ -22,7 +22,12 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
                 configureKotlin()
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = libs.findVersion("target-sdk").get().toString().toInt()
+                defaultConfig.targetSdk =
+                    libs
+                        .findVersion("target-sdk")
+                        .get()
+                        .toString()
+                        .toInt()
             }
 
             dependencies {
@@ -30,7 +35,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 "implementation"(libs.findLibrary("androidx-activity-compose").get())
                 "implementation"(libs.findLibrary("androidx-navigation3-ui").get())
                 "implementation"(libs.findLibrary("timber").get())
-                "implementation"(project(":feature:habit"))
             }
             configureJUnit()
         }

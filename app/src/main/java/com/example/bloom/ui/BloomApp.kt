@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.example.auth.navigation.authEntry
 import com.example.bloom.navigation.TOP_LEVEL_NAV_ITEMS
 import com.example.habit.navigation.HabitNavKey
 import com.example.habit.navigation.habitEntry
@@ -38,28 +39,30 @@ fun BloomApp() {
                         icon = {
                             Icon(
                                 if (selected) navItem.selectedIcon else navItem.unselectedIcon,
-                                contentDescription = navItem.iconTextId
+                                contentDescription = navItem.iconTextId,
                             )
                         },
                         label = { Text(navItem.titleTextId) },
                         selected = selected,
-                        onClick = { navigator.navigate(navKey) }
+                        onClick = { navigator.navigate(navKey) },
                     )
                 }
             }
-        }
+        },
     ) { paddingValues ->
 
         Box(modifier = Modifier.padding(paddingValues)) {
-            val entryProvider = entryProvider {
-                habitEntry(navigator)
-                taskEntry(navigator)
-                statsEntry(navigator)
-                profileEntry(navigator)
-            }
+            val entryProvider =
+                entryProvider {
+                    habitEntry(navigator)
+                    taskEntry(navigator)
+                    statsEntry(navigator)
+                    profileEntry(navigator)
+                    authEntry(navigator)
+                }
             NavDisplay(
                 entries = navigationState.toEntries(entryProvider),
-                onBack = { navigator.goBack() }
+                onBack = { navigator.goBack() },
             )
         }
     }

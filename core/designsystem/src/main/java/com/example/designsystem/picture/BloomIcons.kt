@@ -15,4 +15,6 @@ object BloomIcons {
     val Achievements = R.drawable.rewarded_ads_24px
     val Store = R.drawable.storefront_24px
     val RatingStar = R.drawable.award_star_24px
+    val CalendarMonth = R.drawable.calendar_month_24px
+    val Filter = R.drawable.filter_list_24px
 }

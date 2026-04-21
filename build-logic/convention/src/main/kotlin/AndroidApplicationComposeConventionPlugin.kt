@@ -15,7 +15,7 @@ class AndroidApplicationComposeConventionPlugin : Plugin<Project> {
 
             val extension = extensions.getByType<ApplicationExtension>()
             configureAndroidCompose(extension)
-            
+
             dependencies {
                 "implementation"(libs.findLibrary("androidx-compose-ui").get())
                 "implementation"(libs.findLibrary("androidx-compose-ui-graphics").get())
