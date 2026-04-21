@@ -13,6 +13,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
 
             dependencies {
                 "implementation"(project(":core:designsystem"))
+                "implementation"(project(":core:model"))
                 "implementation"(libs.findLibrary("androidx-lifecycle-viewModel-compose").get())
 //                "implementation"(libs.findLibrary("androidx.lifecycle.viewModelCompose").get())
 //                "implementation"(libs.findLibrary("androidx.navigation.compose").get())
