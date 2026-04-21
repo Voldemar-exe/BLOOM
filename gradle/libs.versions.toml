@@ -22,10 +22,11 @@ compile-sdk = "36"
 min-sdk = "26"
 target-sdk = "36"
 jvm = "17"
-appcompat = "1.6.1"
+appcompat = "1.7.1"
 material = "1.13.0"
 koin = "4.2.1"
 koin-plugin = "0.6.2"
+room = "2.8.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -64,12 +65,17 @@ koin-annotations = { group = "io.insert-koin", name = "koin-annotations", versio
 koin-android = { group = "io.insert-koin", name = "koin-android" }
 koin-compose = { group = "io.insert-koin", name = "koin-compose" }
 koin-compose-viewmodel = { group = "io.insert-koin", name = "koin-compose-viewmodel" }
-
+# Room
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 
 # project internal convention plugin
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -80,6 +86,7 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }
 
 # project internal convention plugins
 bloom-android-application = { id = "bloom.android.application", version = "unspecified" }
@@ -88,7 +95,7 @@ bloom-android-feature = { id = "bloom.android.feature", version = "unspecified" 
 bloom-android-library = { id = "bloom.android.library", version = "unspecified" }
 bloom-android-library-compose = { id = "bloom.android.library.compose", version = "unspecified" }
 bloom-koin = { id = "bloom.koin", version = "unspecified" }
-bloom-android-room = { id = "bloom.android.room", version = "unspecified" }
+bloom-room = { id = "bloom.room", version = "unspecified" }
 bloom-feature-ui = { id = "bloom.feature.ui", version = "unspecified" }
 bloom-feature-domain = { id = "bloom.feature.domain", version = "unspecified" }
 bloom-feature-data = { id = "bloom.feature.data", version = "unspecified" }

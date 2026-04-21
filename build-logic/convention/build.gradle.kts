@@ -20,6 +20,8 @@ kotlin {
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.compose.gradlePlugin)
+    compileOnly(libs.ksp.gradlePlugin)
+    compileOnly(libs.room.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
 }
 
@@ -44,6 +46,10 @@ gradlePlugin {
         register("androidFeature") {
             id = "bloom.android.feature"
             implementationClass = "AndroidFeatureConventionPlugin"
+        }
+        register("room") {
+            id = "bloom.room"
+            implementationClass = "AndroidRoomConventionPlugin"
         }
         register("koin") {
             id = "bloom.koin"
