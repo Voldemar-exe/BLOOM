@@ -12,14 +12,6 @@ sealed interface TaskAction {
     ) : TaskAction
 
     data class ToggleSubtask(
-        val id: Int,
+        val id: Long,
     ) : TaskAction
-
-    data object OnSearchClick : TaskAction
-
-    data object OnAddClick : TaskAction
-
-    data object OnDateClick : TaskAction
-
-    data object OnFilterClick : TaskAction
 }

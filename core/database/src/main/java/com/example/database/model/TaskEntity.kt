@@ -16,6 +16,7 @@ data class TaskEntity(
     val priority: Priority,
     val deadline: Long?,
     val tags: List<String>,
+    val isChecked: Boolean = false,
     val isArchived: Boolean,
     val isPaused: Boolean,
     val isMuted: Boolean,

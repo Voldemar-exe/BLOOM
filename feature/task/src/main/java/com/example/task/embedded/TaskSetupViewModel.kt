@@ -40,11 +40,11 @@ class TaskSetupViewModel(
             TaskSetupAction.OnTagsClick -> Timber.d("Open tags")
             is TaskSetupAction.SetRecurrenceType -> setRecurrence(action.type)
             is TaskSetupAction.ToggleDay -> toggleDay(action.dayIndex)
-            is TaskSetupAction.SetReminderTime -> { /* TODO */
+            is TaskSetupAction.SetReminderTime -> { // TODO
             }
 
             TaskSetupAction.ToggleEndDate -> _state.update { it.copy(hasEndDate = !it.hasEndDate) }
-            is TaskSetupAction.SetEndDate -> { /* TODO */
+            is TaskSetupAction.SetEndDate -> { // TODO
             }
 
             is TaskSetupAction.AddSubtask -> addSubtask(action.text)
@@ -88,10 +88,10 @@ class TaskSetupViewModel(
                 current.copy(
                     subtasks =
                         current.subtasks +
-                                Subtask(
-                                    taskId = _state.value.id,
-                                    title = text,
-                                ),
+                            Subtask(
+                                taskId = _state.value.id,
+                                title = text,
+                            ),
                 )
             } else {
                 current
@@ -106,7 +106,14 @@ class TaskSetupViewModel(
     }
 
     private fun toggleSubtask(index: Int) {
-        Timber.d("Toggle subtask at $index")
+        _state.update { current ->
+            current.copy(
+                subtasks =
+                    current.subtasks.mapIndexed { i, subtask ->
+                        if (i == index) subtask.copy(isChecked = !subtask.isChecked) else subtask
+                    },
+            )
+        }
     }
 
     private fun saveTask() {
@@ -153,10 +160,11 @@ class TaskSetupViewModel(
             id = currState.id,
             title = currState.title,
             description = currState.description,
-            priority = currState.priority,
             daysOfWeek = currState.daysOfWeek.toList(),
+            priority = currState.priority,
             deadline = currState.deadline,
             tags = currState.tags,
+            isChecked = currState.isChecked,
             isArchived = currState.isArchived,
             isPaused = currState.isPaused,
             isMuted = currState.isMuted,

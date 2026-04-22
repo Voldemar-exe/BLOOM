@@ -29,7 +29,11 @@ interface TaskRepository {
 
     suspend fun getTaskById(taskId: Long): Task?
 
+    suspend fun toggleTask(taskId: Long)
+
     suspend fun saveTask(task: Task): Long
+
+    suspend fun toggleSubtask(subtaskId: Long)
 
     suspend fun saveSubtask(subtask: Subtask)
 
@@ -63,7 +67,17 @@ internal class TaskRepositoryImpl(
             )
         }
 
+    override suspend fun toggleTask(taskId: Long) {
+        taskDao.toggleTaskWithSubtasks(taskId)
+    }
+
     override suspend fun getTaskById(taskId: Long): Task? = taskDao.getTaskById(taskId)?.asModel()
+
+    override suspend fun toggleSubtask(subtaskId: Long) {
+        subtaskDao.findById(subtaskId)?.let {
+            subtaskDao.updateWithParentSync(it.copy(isChecked = !it.isChecked), taskDao)
+        }
+    }
 
     override suspend fun saveTask(task: Task): Long =
         taskDao.upsert(task.asEntity().copy(syncStatus = SyncStatus.CHANGED))

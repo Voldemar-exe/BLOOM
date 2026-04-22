@@ -14,7 +14,7 @@ import timber.log.Timber
 
 @KoinViewModel
 class TaskViewModel(
-    taskRepository: TaskRepository
+    val taskRepository: TaskRepository,
 ) : ViewModel() {
     private val _taskUiState = MutableStateFlow(TaskState())
     val taskUiState: StateFlow<TaskState>
@@ -24,72 +24,34 @@ class TaskViewModel(
         Timber.d("Start with $taskUiState")
         viewModelScope.launch {
             taskRepository.getTasksWithRelations().collect { tasksWithRelations ->
+                Timber.d("Colled new tasks: $tasksWithRelations")
                 _taskUiState.update { it.copy(tasks = tasksWithRelations) }
             }
         }
     }
 
     fun onAction(action: TaskAction) {
+        Timber.d("$action")
         when (action) {
-            TaskAction.OnAddClick -> handleAddClick()
-            TaskAction.OnDateClick -> handleDateClick()
-            TaskAction.OnSearchClick -> handleSearchClick()
-            TaskAction.OnFilterClick -> handleFilterClick()
             is TaskAction.SelectTimeInterval -> handleSelectTimeInterval(action.timeInterval)
             is TaskAction.ToggleTask -> handleToggleTask(action.id)
             is TaskAction.ToggleSubtask -> handleToggleSubtask(action.id)
         }
     }
 
-    private fun handleAddClick() {
-        Timber.d("Add task clicked")
-    }
-
-    private fun handleDateClick() {
-        Timber.d("Date picker clicked")
-    }
-
-    private fun handleSearchClick() {
-        Timber.d("Search clicked")
-    }
-
-    private fun handleFilterClick() {
-        Timber.d("Sort clicked")
-    }
-
     private fun handleSelectTimeInterval(timeInterval: DayTimeInterval) {
         _taskUiState.update { it.copy(selectedTabTime = timeInterval) }
-        // viewModelScope.launch { loadTasksForInterval(timeInterval) }
     }
 
-    private fun handleToggleTask(id: Long) {
-//        _taskUiState.update { currentState ->
-//            val updatedTasks =
-//                currentState.tasks.mapKeys { (task, _) ->
-//                    if (task.id == id) task.copy(isChecked = !task.isChecked) else task
-//                }
-//            currentState.copy(tasks = updatedTasks)
-//        }
+    private fun handleToggleTask(taskId: Long) {
+        viewModelScope.launch {
+            taskRepository.toggleTask(taskId)
+        }
     }
 
-    private fun handleToggleSubtask(id: Int) {
-//        _taskUiState.update { currentState ->
-//            val updatedTasks =
-//                currentState.tasks.mapKeys { (task, _) ->
-//                    if (task.id == id) task.copy(isChecked = !task.isChecked) else task
-//                }
-//            currentState.copy(tasks = updatedTasks)
-//        }
+    private fun handleToggleSubtask(subtaskId: Long) {
+        viewModelScope.launch {
+            taskRepository.toggleSubtask(subtaskId)
+        }
     }
-
-//     private suspend fun loadTasksForInterval(interval: DayTimeInterval) {
-//         _taskUiState.update { it.copy(isLoading = true) }
-//         try {
-//             val tasks = taskRepository.getTasksForInterval(interval)
-//             _taskUiState.update { it.copy(tasks = tasks, isLoading = false) }
-//         } catch (e: Exception) {
-//             _taskUiState.update { it.copy(error = e.message ?: "Unknown error", isLoading = false) }
-//             Timber.e(e, "Failed to load tasks for interval: $interval")
-//         }
-//     }
 }

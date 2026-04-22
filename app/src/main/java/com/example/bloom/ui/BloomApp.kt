@@ -16,19 +16,19 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.auth.navigation.authEntry
 import com.example.bloom.navigation.TOP_LEVEL_NAV_ITEMS
-import com.example.habit.navigation.HabitNavKey
 import com.example.habit.navigation.habitEntry
 import com.example.navigation.Navigator
 import com.example.navigation.rememberNavigationState
 import com.example.navigation.toEntries
 import com.example.profile.navigation.profileEntry
 import com.example.stats.navigation.statsEntry
+import com.example.task.navigation.TaskNavKey
 import com.example.task.navigation.taskEntry
 
 @Composable
 fun BloomApp() {
     val navigationState =
-        rememberNavigationState(HabitNavKey, TOP_LEVEL_NAV_ITEMS.keys)
+        rememberNavigationState(TaskNavKey, TOP_LEVEL_NAV_ITEMS.keys)
 
     val navigator = remember { Navigator(navigationState) }
 

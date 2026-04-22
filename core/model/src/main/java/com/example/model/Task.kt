@@ -8,6 +8,7 @@ data class Task(
     val priority: Priority,
     val deadline: Long?,
     val tags: List<String>,
+    val isChecked: Boolean,
     val isArchived: Boolean,
     val isPaused: Boolean,
     val isMuted: Boolean

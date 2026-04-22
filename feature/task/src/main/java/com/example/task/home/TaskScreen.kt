@@ -20,8 +20,10 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -46,7 +48,6 @@ import com.example.model.Subtask
 import com.example.task.navigation.TaskItemNavKey
 import com.example.ui.components.DayTimeTabs
 import org.koin.compose.viewmodel.koinViewModel
-import timber.log.Timber
 
 @Composable
 fun TaskScreen(
@@ -76,7 +77,7 @@ internal fun TaskScreen(
                     Text(text = stringResource(R.string.task_screen_title))
                 },
                 navigationIcon = {
-                    IconButton(onClick = { onAction(TaskAction.OnFilterClick) }) {
+                    IconButton(onClick = { }) {
                         Icon(
                             painter = painterResource(BloomIcons.Filter),
                             contentDescription = "Date",
@@ -84,7 +85,7 @@ internal fun TaskScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { onAction(TaskAction.OnDateClick) }) {
+                    IconButton(onClick = { }) {
                         Icon(
                             painter = painterResource(BloomIcons.CalendarMonth),
                             contentDescription = "Date",
@@ -96,7 +97,7 @@ internal fun TaskScreen(
                             contentDescription = "Add task",
                         )
                     }
-                    IconButton(onClick = { onAction(TaskAction.OnSearchClick) }) {
+                    IconButton(onClick = { }) {
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search",
@@ -129,13 +130,11 @@ internal fun TaskScreen(
                     TaskItem(
                         title = task.title,
                         description = task.description,
-                        isChecked = false,
+                        isChecked = task.isChecked,
                         subtasks = subtasks,
                         onTaskClick = { onNavigate(TaskItemNavKey(task.id)) },
                         onToggleTask = { onAction(TaskAction.ToggleTask(task.id)) },
-                        onToggleSubtask = { subIndex ->
-                            Timber.d("Toggle Subtask $subIndex for task ${task.id}")
-                        },
+                        onToggleSubtask = { onAction(TaskAction.ToggleSubtask(it)) },
                     )
                 }
             }
@@ -143,6 +142,7 @@ internal fun TaskScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TaskItem(
     title: String,
@@ -151,7 +151,7 @@ private fun TaskItem(
     subtasks: List<Subtask>,
     onTaskClick: () -> Unit,
     onToggleTask: () -> Unit,
-    onToggleSubtask: (Int) -> Unit,
+    onToggleSubtask: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -202,7 +202,13 @@ private fun TaskItem(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                IconButton(onClick = { isExpanded = !isExpanded }) {
+                IconButton(
+                    onClick = { isExpanded = !isExpanded },
+                    colors =
+                        IconButtonDefaults.iconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                        ),
+                ) {
                     Icon(
                         imageVector =
                             if (isExpanded) {
@@ -211,7 +217,7 @@ private fun TaskItem(
                                 Icons.Default.KeyboardArrowUp
                             },
                         contentDescription = if (isExpanded) "collapse" else "expand",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = MaterialTheme.colorScheme.onSecondary,
                     )
                 }
             }
@@ -224,18 +230,18 @@ private fun TaskItem(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
             ) {
-                subtasks.forEachIndexed { index, subtask ->
+                subtasks.forEach { subtask ->
                     Row(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .clickable { onToggleSubtask(index) }
+                                .clickable { onToggleSubtask(subtask.id) }
                                 .padding(vertical = 8.dp, horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Checkbox(
                             checked = subtask.isChecked,
-                            onCheckedChange = { onToggleSubtask(index) },
+                            onCheckedChange = { onToggleSubtask(subtask.id) },
                         )
 
                         Spacer(modifier = Modifier.width(12.dp))
