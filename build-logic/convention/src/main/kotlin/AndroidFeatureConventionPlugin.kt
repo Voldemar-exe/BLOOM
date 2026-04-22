@@ -8,8 +8,6 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             apply(plugin = "bloom.android.library")
-            apply(plugin = "bloom.koin")
-            apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
 
             dependencies {
                 "implementation"(project(":core:model"))
@@ -17,10 +15,6 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 "implementation"(project(":core:designsystem"))
                 "implementation"(project(":core:ui"))
                 "implementation"(libs.findLibrary("androidx-lifecycle-viewModel-compose").get())
-//                "implementation"(libs.findLibrary("androidx.lifecycle.viewModelCompose").get())
-//                "implementation"(libs.findLibrary("androidx.navigation.compose").get())
-                "implementation"(libs.findLibrary("kotlinx.serialization.json").get())
-                "implementation"(libs.findLibrary("timber").get())
                 "testImplementation"(libs.findLibrary("junit").get())
                 "androidTestImplementation"(libs.findLibrary("androidx-junit").get())
                 "androidTestImplementation"(libs.findLibrary("androidx-espresso-core").get())

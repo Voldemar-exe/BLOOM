@@ -1,4 +1,4 @@
-package com.example.task
+package com.example.task.home
 
 import com.example.model.DayTimeInterval
 
@@ -8,6 +8,10 @@ sealed interface TaskAction {
     ) : TaskAction
 
     data class ToggleTask(
+        val id: Int,
+    ) : TaskAction
+
+    data class ToggleSubtask(
         val id: Int,
     ) : TaskAction
 

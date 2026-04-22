@@ -35,12 +35,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bloom.feature.auth.R
 import com.example.designsystem.component.ImagePlaceholder
-import com.example.designsystem.icon.BloomIcons
+import com.example.designsystem.picture.BloomIcons
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun RegisterScreen(
     modifier: Modifier = Modifier,
+    // TODO: Replace with koin injection
     viewModel: AuthViewModel = AuthViewModel(),
 ) {
     val authUiState by viewModel.authUiState.collectAsStateWithLifecycle()
@@ -62,7 +63,7 @@ internal fun RegisterScreen(
         topBar = {},
     ) { paddingValues ->
         Column(
-            modifier = modifier.padding(paddingValues),
+            modifier = Modifier.padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             ImagePlaceholder(

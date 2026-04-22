@@ -1,6 +1,7 @@
-package com.example.task
+package com.example.task.home
 
 import androidx.lifecycle.ViewModel
+import com.example.data.repository.TaskRepository
 import com.example.model.DayTimeInterval
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +12,7 @@ import timber.log.Timber
 
 @KoinViewModel
 class TaskViewModel(
-//    taskRepository: TaskRepository
+    taskRepository: TaskRepository
 ) : ViewModel() {
     private val _taskUiState = MutableStateFlow(TaskState())
     val taskUiState: StateFlow<TaskState>
@@ -29,6 +30,7 @@ class TaskViewModel(
             TaskAction.OnFilterClick -> handleFilterClick()
             is TaskAction.SelectTimeInterval -> handleSelectTimeInterval(action.timeInterval)
             is TaskAction.ToggleTask -> handleToggleTask(action.id)
+            is TaskAction.ToggleSubtask -> handleToggleSubtask(action.id)
         }
     }
 
@@ -54,13 +56,23 @@ class TaskViewModel(
     }
 
     private fun handleToggleTask(id: Int) {
-        _taskUiState.update { currentState ->
-            val updatedTasks =
-                currentState.tasks.mapKeys { (task, _) ->
-                    if (task.id == id) task.copy(isChecked = !task.isChecked) else task
-                }
-            currentState.copy(tasks = updatedTasks)
-        }
+//        _taskUiState.update { currentState ->
+//            val updatedTasks =
+//                currentState.tasks.mapKeys { (task, _) ->
+//                    if (task.id == id) task.copy(isChecked = !task.isChecked) else task
+//                }
+//            currentState.copy(tasks = updatedTasks)
+//        }
+    }
+
+    private fun handleToggleSubtask(id: Int) {
+//        _taskUiState.update { currentState ->
+//            val updatedTasks =
+//                currentState.tasks.mapKeys { (task, _) ->
+//                    if (task.id == id) task.copy(isChecked = !task.isChecked) else task
+//                }
+//            currentState.copy(tasks = updatedTasks)
+//        }
     }
 
 //     private suspend fun loadTasksForInterval(interval: DayTimeInterval) {

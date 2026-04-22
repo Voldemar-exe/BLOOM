@@ -11,10 +11,10 @@ data class Task(
     val userId: Long,
     val title: String,
     val description: String,
-    val daysOfWeek: List<Int>, // TODO: Converter
+    val daysOfWeek: List<Int>,
     val priority: Priority,
     val deadline: Long?,
-    val tags: List<String>, // TODO: Converter
+    val tags: List<String>,
     val isArchived: Boolean,
     val isPaused: Boolean,
     val isMuted: Boolean,

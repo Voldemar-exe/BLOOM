@@ -11,9 +11,9 @@ data class Habit(
     val id: Long,
     val title: String,
     val description: String,
-    val tags: List<String>, // TODO: converter
-    val steps: List<String>, // TODO: converter
-    val daysOfWeek: List<Int>, // TODO: converter
+    val tags: List<String>,
+    val steps: List<String>,
+    val daysOfWeek: List<Int>,
     val isArchived: Boolean = false,
     val isPaused: Boolean = false,
     val isMuted: Boolean = false,

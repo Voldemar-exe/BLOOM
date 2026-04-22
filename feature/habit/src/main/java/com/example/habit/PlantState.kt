@@ -1,4 +1,4 @@
-package com.example.habit.models
+package com.example.habit
 
 import com.example.plant.GenerationConfig
 import com.example.plant.PlantConfig

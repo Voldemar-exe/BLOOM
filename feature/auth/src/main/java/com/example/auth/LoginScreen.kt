@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bloom.feature.auth.R
 import com.example.designsystem.component.ImagePlaceholder
-import com.example.designsystem.icon.BloomIcons
+import com.example.designsystem.picture.BloomIcons
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -82,7 +82,7 @@ internal fun LoginScreen(
                 Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                 Text(text = stringResource(R.string.login_button))
             }
-        }
+        },
     ) { paddingValues ->
         Column(
             modifier =

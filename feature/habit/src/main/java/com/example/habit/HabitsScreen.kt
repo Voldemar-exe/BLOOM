@@ -1,4 +1,4 @@
-package com.example.habit.ui
+package com.example.habit
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -28,12 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.habit.PlantViewModel
-import com.example.habit.models.PlantState
+import com.example.habit.PlantState
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun DefaultLSystemView() {
+fun HabitsScreen() {
     val viewModel = remember { PlantViewModel() }
 
     var shownPlantCard: PlantState? by remember { mutableStateOf(null) }

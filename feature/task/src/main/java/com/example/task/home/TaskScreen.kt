@@ -1,4 +1,4 @@
-package com.example.task
+package com.example.task.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -39,23 +39,27 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import com.example.bloom.feature.task.R
 import com.example.designsystem.picture.BloomIcons
-import com.example.ui.DayTimeTabs
+import com.example.model.Subtask
+import com.example.task.embedded.TaskItemState
+import com.example.task.navigation.TaskItemNavKey
+import com.example.ui.components.DayTimeTabs
 import org.koin.compose.viewmodel.koinViewModel
 import timber.log.Timber
 
 @Composable
 fun TaskScreen(
-    modifier: Modifier = Modifier,
-    // TODO: Replace with koin injection
     viewModel: TaskViewModel = koinViewModel(),
+    onNavigate: (NavKey) -> Unit,
 ) {
     val taskUiState by viewModel.taskUiState.collectAsStateWithLifecycle()
 
     TaskScreen(
         taskUiState = taskUiState,
         onAction = viewModel::onAction,
+        onNavigate = onNavigate,
     )
 }
 
@@ -64,7 +68,7 @@ fun TaskScreen(
 internal fun TaskScreen(
     taskUiState: TaskState,
     onAction: (TaskAction) -> Unit,
-    modifier: Modifier = Modifier,
+    onNavigate: (NavKey) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -87,7 +91,7 @@ internal fun TaskScreen(
                             contentDescription = "Date",
                         )
                     }
-                    IconButton(onClick = { onAction(TaskAction.OnAddClick) }) {
+                    IconButton(onClick = { onNavigate(TaskItemNavKey(id = null)) }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Add task",
@@ -122,14 +126,14 @@ internal fun TaskScreen(
                 items(
                     items = taskUiState.tasks.toList(),
                     key = { (task, _) -> task.id },
-                ) { (task, subTasks) ->
+                ) { (task, subtasks) ->
                     TaskItem(
                         task = task,
-                        subTasks = subTasks,
-                        onTaskClick = { /* Expand/collapse */ },
+                        subtasks = subtasks,
+                        onTaskClick = { onNavigate(TaskItemNavKey(task.id)) },
                         onToggleTask = { onAction(TaskAction.ToggleTask(task.id)) },
-                        onToggleSubTask = { subIndex ->
-                            Timber.d("Toggle subtask $subIndex for task ${task.id}")
+                        onToggleSubtask = { subIndex ->
+                            Timber.d("Toggle Subtask $subIndex for task ${task.id}")
                         },
                     )
                 }
@@ -141,10 +145,10 @@ internal fun TaskScreen(
 @Composable
 private fun TaskItem(
     task: TaskItemState,
-    subTasks: List<SubTask>,
+    subtasks: List<Subtask>,
     onTaskClick: () -> Unit,
     onToggleTask: () -> Unit,
-    onToggleSubTask: (Int) -> Unit,
+    onToggleSubtask: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -155,7 +159,7 @@ private fun TaskItem(
                 Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 4.dp)
-                    .clickable { isExpanded = !isExpanded },
+                    .clickable { onTaskClick() },
             color = MaterialTheme.colorScheme.primaryContainer,
             shape = MaterialTheme.shapes.medium,
         ) {
@@ -181,7 +185,7 @@ private fun TaskItem(
                         overflow = TextOverflow.Ellipsis,
                     )
 
-                    task.description?.takeIf { it.isNotBlank() }?.let { desc ->
+                    task.description.takeIf { it.isNotBlank() }?.let { desc ->
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = desc,
@@ -195,44 +199,46 @@ private fun TaskItem(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                Icon(
-                    imageVector =
-                        if (isExpanded) {
-                            Icons.Default.KeyboardArrowDown
-                        } else {
-                            Icons.Default.KeyboardArrowUp
-                        },
-                    contentDescription = if (isExpanded) "Collapse" else "Expand",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                IconButton(onClick = { isExpanded = !isExpanded }) {
+                    Icon(
+                        imageVector =
+                            if (isExpanded) {
+                                Icons.Default.KeyboardArrowDown
+                            } else {
+                                Icons.Default.KeyboardArrowUp
+                            },
+                        contentDescription = if (isExpanded) "collapse" else "expand",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
 
-        if (isExpanded && subTasks.isNotEmpty()) {
+        if (isExpanded && subtasks.isNotEmpty()) {
             Column(
                 modifier =
                     Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
             ) {
-                subTasks.forEachIndexed { index, subTask ->
+                subtasks.forEachIndexed { index, subtask ->
                     Row(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .clickable { onToggleSubTask(index) }
+                                .clickable { onToggleSubtask(index) }
                                 .padding(vertical = 8.dp, horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Checkbox(
-                            checked = subTask.isChecked,
-                            onCheckedChange = { onToggleSubTask(index) },
+                            checked = subtask.isChecked,
+                            onCheckedChange = { onToggleSubtask(index) },
                         )
 
                         Spacer(modifier = Modifier.width(12.dp))
 
                         Text(
-                            text = subTask.title,
+                            text = subtask.title,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(1f),
                         )

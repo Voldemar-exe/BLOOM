@@ -1,6 +1,4 @@
-package com.example.data.models
-
-import android.provider.CalendarContract
+package com.example.model
 
 data class AppConfig(
     val emailEnabled: Boolean,

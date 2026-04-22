@@ -2,7 +2,7 @@ package com.example.habit
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
-import com.example.habit.models.PlantState
+import com.example.habit.PlantState
 import com.example.plant.LeafType
 import com.example.plant.utils.LSystemGeneratorImpl
 import com.example.plant.utils.PresetLibrary

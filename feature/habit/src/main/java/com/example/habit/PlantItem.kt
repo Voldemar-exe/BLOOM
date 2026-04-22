@@ -1,4 +1,4 @@
-package com.example.habit.ui
+package com.example.habit
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.habit.models.PlantState
 import com.example.plant.utils.Randomizer
 
 @Composable

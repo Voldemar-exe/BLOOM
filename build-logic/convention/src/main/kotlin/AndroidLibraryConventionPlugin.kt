@@ -14,6 +14,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             apply(plugin = "com.android.library")
             apply(plugin = "org.jetbrains.kotlin.android")
             apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+            apply(plugin = "bloom.koin")
 
             requireNotNull(libraryExtension).apply {
                 buildFeatures {
@@ -26,6 +27,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
             dependencies {
                 "implementation"(libs.findLibrary("kotlinx.serialization.json").get())
+                "implementation"(libs.findLibrary("timber").get())
             }
 
             configureJUnit()

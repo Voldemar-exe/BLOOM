@@ -17,4 +17,6 @@ object BloomIcons {
     val RatingStar = R.drawable.award_star_24px
     val CalendarMonth = R.drawable.calendar_month_24px
     val Filter = R.drawable.filter_list_24px
+    val Priority = R.drawable.low_priority_24px
+    val Tag = R.drawable.tag_24px
 }

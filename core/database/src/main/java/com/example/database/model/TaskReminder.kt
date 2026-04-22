@@ -11,5 +11,5 @@ data class TaskReminder(
     val reminderTime: Instant,
     val isEnabled: Boolean,
     val createdAt: Long,
-    val updatedAt: Long
+    val updatedAt: Long,
 )

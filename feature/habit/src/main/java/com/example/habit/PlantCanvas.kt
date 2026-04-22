@@ -1,4 +1,4 @@
-package com.example.habit.ui
+package com.example.habit
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitEachGesture

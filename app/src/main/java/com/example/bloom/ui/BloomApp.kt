@@ -8,6 +8,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
@@ -25,33 +27,48 @@ import com.example.task.navigation.taskEntry
 
 @Composable
 fun BloomApp() {
-
-    val navigationState = rememberNavigationState(HabitNavKey, TOP_LEVEL_NAV_ITEMS.keys)
+    val navigationState =
+        rememberNavigationState(HabitNavKey, TOP_LEVEL_NAV_ITEMS.keys)
 
     val navigator = remember { Navigator(navigationState) }
 
+    val isTopLevelScreen by remember {
+        derivedStateOf { navigationState.currentKey == navigationState.currentTopLevelKey }
+    }
+
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                TOP_LEVEL_NAV_ITEMS.forEach { (navKey, navItem) ->
-                    val selected = navKey == navigationState.currentTopLevelKey
-                    NavigationBarItem(
-                        icon = {
-                            Icon(
-                                if (selected) navItem.selectedIcon else navItem.unselectedIcon,
-                                contentDescription = navItem.iconTextId,
-                            )
-                        },
-                        label = { Text(navItem.titleTextId) },
-                        selected = selected,
-                        onClick = { navigator.navigate(navKey) },
-                    )
+            if (isTopLevelScreen) {
+                NavigationBar {
+                    TOP_LEVEL_NAV_ITEMS.forEach { (navKey, navItem) ->
+                        val selected = navKey == navigationState.currentTopLevelKey
+                        NavigationBarItem(
+                            icon = {
+                                Icon(
+                                    imageVector =
+                                        if (selected) {
+                                            navItem.selectedIcon
+                                        } else {
+                                            navItem.unselectedIcon
+                                        },
+                                    contentDescription = navItem.iconTextId,
+                                )
+                            },
+                            label = { Text(navItem.titleTextId) },
+                            selected = selected,
+                            onClick = { navigator.navigate(navKey) },
+                        )
+                    }
                 }
             }
         },
     ) { paddingValues ->
 
-        Box(modifier = Modifier.padding(paddingValues)) {
+        Box(
+            modifier =
+                Modifier
+                    .padding(paddingValues),
+        ) {
             val entryProvider =
                 entryProvider {
                     habitEntry(navigator)
