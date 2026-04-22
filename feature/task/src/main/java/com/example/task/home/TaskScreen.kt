@@ -43,7 +43,6 @@ import androidx.navigation3.runtime.NavKey
 import com.example.bloom.feature.task.R
 import com.example.designsystem.picture.BloomIcons
 import com.example.model.Subtask
-import com.example.task.embedded.TaskItemState
 import com.example.task.navigation.TaskItemNavKey
 import com.example.ui.components.DayTimeTabs
 import org.koin.compose.viewmodel.koinViewModel
@@ -128,7 +127,9 @@ internal fun TaskScreen(
                     key = { (task, _) -> task.id },
                 ) { (task, subtasks) ->
                     TaskItem(
-                        task = task,
+                        title = task.title,
+                        description = task.description,
+                        isChecked = false,
                         subtasks = subtasks,
                         onTaskClick = { onNavigate(TaskItemNavKey(task.id)) },
                         onToggleTask = { onAction(TaskAction.ToggleTask(task.id)) },
@@ -144,7 +145,9 @@ internal fun TaskScreen(
 
 @Composable
 private fun TaskItem(
-    task: TaskItemState,
+    title: String,
+    description: String,
+    isChecked: Boolean,
     subtasks: List<Subtask>,
     onTaskClick: () -> Unit,
     onToggleTask: () -> Unit,
@@ -171,7 +174,7 @@ private fun TaskItem(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Checkbox(
-                    checked = task.isChecked,
+                    checked = isChecked,
                     onCheckedChange = { onToggleTask() },
                 )
 
@@ -179,13 +182,13 @@ private fun TaskItem(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = task.title,
+                        text = title,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
 
-                    task.description.takeIf { it.isNotBlank() }?.let { desc ->
+                    description.takeIf { it.isNotBlank() }?.let { desc ->
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = desc,

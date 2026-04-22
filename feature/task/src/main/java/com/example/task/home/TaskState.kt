@@ -3,12 +3,11 @@ package com.example.task.home
 import androidx.compose.runtime.Immutable
 import com.example.model.DayTimeInterval
 import com.example.model.SelectedDate
-import com.example.model.Subtask
-import com.example.task.embedded.TaskItemState
+import com.example.model.TaskWithRelations
 
 @Immutable
 data class TaskState(
-    val tasks: Map<TaskItemState, List<Subtask>> = emptyMap(),
+    val tasks: List<TaskWithRelations> = emptyList(),
     val selectedTabTime: DayTimeInterval = DayTimeInterval.TODAY,
     val selectedDate: SelectedDate = SelectedDate(0, 0),
     val searchQuery: String = "",

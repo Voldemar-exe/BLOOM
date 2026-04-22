@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.repository.TaskRepository
 import com.example.model.RecurrenceType
 import com.example.model.Subtask
+import com.example.model.Task
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,7 @@ import timber.log.Timber
 
 @KoinViewModel
 class TaskSetupViewModel(
-    taskRepository: TaskRepository
+    val taskRepository: TaskRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TaskItemState())
     val state: StateFlow<TaskItemState> = _state.asStateFlow()
@@ -39,14 +40,21 @@ class TaskSetupViewModel(
             TaskSetupAction.OnTagsClick -> Timber.d("Open tags")
             is TaskSetupAction.SetRecurrenceType -> setRecurrence(action.type)
             is TaskSetupAction.ToggleDay -> toggleDay(action.dayIndex)
-            is TaskSetupAction.SetReminderTime -> { /* TODO */ }
+            is TaskSetupAction.SetReminderTime -> { /* TODO */
+            }
+
             TaskSetupAction.ToggleEndDate -> _state.update { it.copy(hasEndDate = !it.hasEndDate) }
-            is TaskSetupAction.SetEndDate -> { /* TODO */ }
+            is TaskSetupAction.SetEndDate -> { /* TODO */
+            }
+
             is TaskSetupAction.AddSubtask -> addSubtask(action.text)
             is TaskSetupAction.RemoveSubtask -> removeSubtask(action.index)
             is TaskSetupAction.ToggleSubtask -> toggleSubtask(action.index)
             TaskSetupAction.OnSaveTask -> saveTask()
             TaskSetupAction.OnNavigateBack -> Timber.d("Navigate back")
+            is TaskSetupAction.LoadTask -> {
+                action.taskId?.let { loadTask(it) }
+            }
         }
     }
 
@@ -77,7 +85,14 @@ class TaskSetupViewModel(
     private fun addSubtask(text: String) {
         _state.update { current ->
             if (current.subtasks.size < 3) {
-                current.copy(subtasks = current.subtasks + Subtask(title = text))
+                current.copy(
+                    subtasks =
+                        current.subtasks +
+                                Subtask(
+                                    taskId = _state.value.id,
+                                    title = text,
+                                ),
+                )
             } else {
                 current
             }
@@ -96,6 +111,55 @@ class TaskSetupViewModel(
 
     private fun saveTask() {
         Timber.d("Saving task: ${_state.value}")
-        viewModelScope.launch { _effect.emit(TaskItemEffect.SaveSuccess) }
+        viewModelScope.launch {
+            val taskId = taskRepository.saveTask(stateToTask())
+            _state.value.reminders.forEach {
+                taskRepository.saveReminder(it.copy(parentId = taskId))
+            }
+            _state.value.subtasks.forEach {
+                taskRepository.saveSubtask(it.copy(taskId = taskId))
+            }
+            _effect.emit(TaskItemEffect.SaveSuccess)
+        }
+    }
+
+    private fun loadTask(taskId: Long) {
+        viewModelScope.launch {
+            taskRepository.getTaskWithRelations(taskId)?.let { taskWithRelations ->
+                _state.update {
+                    it.copy(
+                        id = taskWithRelations.task.id,
+                        title = taskWithRelations.task.title,
+                        description = taskWithRelations.task.description,
+                        priority = taskWithRelations.task.priority,
+                        daysOfWeek = taskWithRelations.task.daysOfWeek.toSet(),
+                        deadline = taskWithRelations.task.deadline,
+                        reminders = taskWithRelations.reminders,
+                        tags = taskWithRelations.task.tags,
+                        isArchived = taskWithRelations.task.isArchived,
+                        isPaused = taskWithRelations.task.isPaused,
+                        isMuted = taskWithRelations.task.isMuted,
+                        subtasks = taskWithRelations.subtask,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun stateToTask(): Task {
+        val currState = _state.value
+
+        return Task(
+            id = currState.id,
+            title = currState.title,
+            description = currState.description,
+            priority = currState.priority,
+            daysOfWeek = currState.daysOfWeek.toList(),
+            deadline = currState.deadline,
+            tags = currState.tags,
+            isArchived = currState.isArchived,
+            isPaused = currState.isPaused,
+            isMuted = currState.isMuted,
+        )
     }
 }

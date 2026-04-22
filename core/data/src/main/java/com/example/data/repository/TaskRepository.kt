@@ -1,28 +1,39 @@
 package com.example.data.repository
 
+import com.example.data.model.asEntity
+import com.example.data.model.asModel
+import com.example.data.model.asTaskEntity
 import com.example.database.dao.SubtaskDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
-import com.example.database.model.Subtask
-import com.example.database.model.Task
-import com.example.database.model.TaskReminder
-import com.example.database.model.relationships.TaskAndSubtask
+import com.example.database.model.relationships.TaskAndSubtasks
+import com.example.model.Reminder
+import com.example.model.Subtask
 import com.example.model.SyncStatus
+import com.example.model.Task
+import com.example.model.TaskWithRelations
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Singleton
 
 @Singleton
 interface TaskRepository {
     fun getTasks(): Flow<List<Task>>
 
-    fun getTaskWithSubtasks(taskId: Long): Flow<TaskAndSubtask?>
+    fun getTasksWithRelations(): Flow<List<TaskWithRelations>>
 
-    suspend fun saveTask(task: Task)
+    suspend fun getTaskWithSubtasks(taskId: Long): TaskAndSubtasks?
+
+    suspend fun getTaskWithRelations(taskId: Long): TaskWithRelations?
+
+    suspend fun getTaskById(taskId: Long): Task?
+
+    suspend fun saveTask(task: Task): Long
 
     suspend fun saveSubtask(subtask: Subtask)
 
-    suspend fun saveReminder(reminder: TaskReminder)
+    suspend fun saveReminder(reminder: Reminder)
 }
 
 @Singleton
@@ -32,22 +43,38 @@ internal class TaskRepositoryImpl(
     val taskReminderDao: TaskReminderDao,
     val taskWithRelationDao: TaskWithRelationDao,
 ) : TaskRepository {
-    override fun getTasks(): Flow<List<Task>> = taskDao.getTasks()
+    override fun getTasks(): Flow<List<Task>> =
+        taskDao.getTasks().map { entities -> entities.map { it.asModel() } }
 
-    override fun getTaskWithSubtasks(taskId: Long): Flow<TaskAndSubtask?> =
+    override fun getTasksWithRelations(): Flow<List<TaskWithRelations>> =
+        taskWithRelationDao
+            .getTasksWithSubtasksAndReminders()
+            .map { entities -> entities.map { it.asModel() } }
+
+    override suspend fun getTaskWithSubtasks(taskId: Long): TaskAndSubtasks? =
         taskWithRelationDao.getTaskWithSubtasks(taskId)
 
-    override suspend fun saveTask(task: Task) {
-        taskDao.upsert(task.copy(syncStatus = SyncStatus.CHANGED))
-    }
+    override suspend fun getTaskWithRelations(taskId: Long): TaskWithRelations? =
+        taskWithRelationDao.getTaskWithSubtasksAndReminders(taskId)?.let { taskInfo ->
+            TaskWithRelations(
+                taskInfo.taskEntity.asModel(),
+                taskInfo.subtaskEntities.map { it.asModel() },
+                taskInfo.taskReminderEntities.map { it.asModel() },
+            )
+        }
+
+    override suspend fun getTaskById(taskId: Long): Task? = taskDao.getTaskById(taskId)?.asModel()
+
+    override suspend fun saveTask(task: Task): Long =
+        taskDao.upsert(task.asEntity().copy(syncStatus = SyncStatus.CHANGED))
 
     override suspend fun saveSubtask(subtask: Subtask) {
         taskDao.updateSyncStatus(subtask.taskId, SyncStatus.CHANGED)
-        subtaskDao.upsert(subtask)
+        subtaskDao.upsert(subtask.asEntity())
     }
 
-    override suspend fun saveReminder(reminder: TaskReminder) {
-        taskDao.updateSyncStatus(reminder.taskId, SyncStatus.CHANGED)
-        taskReminderDao.upsert(reminder)
+    override suspend fun saveReminder(reminder: Reminder) {
+        taskDao.updateSyncStatus(reminder.parentId, SyncStatus.CHANGED)
+        taskReminderDao.upsert(reminder.asTaskEntity())
     }
 }

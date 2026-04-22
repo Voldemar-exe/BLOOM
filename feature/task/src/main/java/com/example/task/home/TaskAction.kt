@@ -8,7 +8,7 @@ sealed interface TaskAction {
     ) : TaskAction
 
     data class ToggleTask(
-        val id: Int,
+        val id: Long,
     ) : TaskAction
 
     data class ToggleSubtask(

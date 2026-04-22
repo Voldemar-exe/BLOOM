@@ -3,20 +3,33 @@ package com.example.database.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
-import com.example.database.model.Subtask
-import kotlinx.coroutines.flow.Flow
+import com.example.database.model.SubtaskEntity
 
 @Dao
 interface SubtaskDao {
-    @Query("SELECT * FROM subtasks WHERE taskId = :taskId ORDER BY createdAt ASC")
-    fun getSubtasks(taskId: Long): Flow<List<Subtask>>
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(subtask: Subtask)
+    suspend fun upsert(subtaskEntity: SubtaskEntity)
 
-    // TODO: Update related Task SyncStatus
     @Update
-    suspend fun update(subtask: Subtask)
+    suspend fun update(subtaskEntity: SubtaskEntity)
+
+    @Transaction
+    suspend fun upsertWithParentSync(
+        subtaskEntity: SubtaskEntity,
+        taskDao: TaskDao,
+    ) {
+        upsert(subtaskEntity)
+        taskDao.updateSyncStatus(subtaskEntity.taskId)
+    }
+
+    @Transaction
+    suspend fun updateWithParentSync(
+        subtaskEntity: SubtaskEntity,
+        taskDao: TaskDao,
+    ) {
+        update(subtaskEntity)
+        taskDao.updateSyncStatus(subtaskEntity.taskId)
+    }
 }

@@ -10,9 +10,9 @@ import com.example.database.dao.TaskWithRelationDao
 import com.example.database.model.Habit
 import com.example.database.model.HabitPlant
 import com.example.database.model.HabitReminder
-import com.example.database.model.Subtask
-import com.example.database.model.Task
-import com.example.database.model.TaskReminder
+import com.example.database.model.SubtaskEntity
+import com.example.database.model.TaskEntity
+import com.example.database.model.TaskReminderEntity
 import com.example.database.util.InstantConverter
 import com.example.database.util.IntListConverter
 import com.example.database.util.StringListConverter
@@ -22,9 +22,9 @@ import com.example.database.util.StringListConverter
         Habit::class,
         HabitPlant::class,
         HabitReminder::class,
-        Subtask::class,
-        Task::class,
-        TaskReminder::class,
+        SubtaskEntity::class,
+        TaskEntity::class,
+        TaskReminderEntity::class,
     ],
     version = 1,
     exportSchema = true,

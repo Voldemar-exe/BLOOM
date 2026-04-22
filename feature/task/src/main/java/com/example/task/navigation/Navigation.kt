@@ -12,7 +12,7 @@ object TaskNavKey : NavKey
 
 @Serializable
 data class TaskItemNavKey(
-    val id: Int?,
+    val id: Long?,
 ) : NavKey
 
 fun EntryProviderScope<NavKey>.taskEntry(navigator: Navigator) {
@@ -23,8 +23,9 @@ fun EntryProviderScope<NavKey>.taskEntry(navigator: Navigator) {
             },
         )
     }
-    entry<TaskItemNavKey> {
+    entry<TaskItemNavKey> { navKey ->
         TaskItemScreen(
+            taskId = navKey.id,
             onBack = { navigator.goBack() },
         )
     }

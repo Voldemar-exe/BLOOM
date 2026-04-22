@@ -1,12 +1,14 @@
 package com.example.task.home
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.data.repository.TaskRepository
 import com.example.model.DayTimeInterval
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import timber.log.Timber
 
@@ -20,6 +22,11 @@ class TaskViewModel(
 
     init {
         Timber.d("Start with $taskUiState")
+        viewModelScope.launch {
+            taskRepository.getTasksWithRelations().collect { tasksWithRelations ->
+                _taskUiState.update { it.copy(tasks = tasksWithRelations) }
+            }
+        }
     }
 
     fun onAction(action: TaskAction) {
@@ -55,7 +62,7 @@ class TaskViewModel(
         // viewModelScope.launch { loadTasksForInterval(timeInterval) }
     }
 
-    private fun handleToggleTask(id: Int) {
+    private fun handleToggleTask(id: Long) {
 //        _taskUiState.update { currentState ->
 //            val updatedTasks =
 //                currentState.tasks.mapKeys { (task, _) ->

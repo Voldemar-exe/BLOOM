@@ -48,4 +48,8 @@ sealed interface TaskSetupAction {
     object OnSaveTask : TaskSetupAction
 
     object OnNavigateBack : TaskSetupAction
+
+    data class LoadTask(
+        val taskId: Long?,
+    ) : TaskSetupAction
 }

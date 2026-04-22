@@ -8,12 +8,12 @@ import com.example.model.Subtask
 
 @Immutable
 data class TaskItemState(
-    val id: Int = 0,
+    val id: Long = 0,
     val title: String = "",
     val description: String = "",
     val priority: Priority = Priority.MEDIUM,
     val daysOfWeek: Set<Int> = emptySet(),
-    val deadline: Long = 0,
+    val deadline: Long? = 0,
     val reminders: List<Reminder> = emptyList(),
     val tags: List<String> = emptyList(),
     val isArchived: Boolean = false,

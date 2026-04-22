@@ -6,7 +6,8 @@ import kotlin.time.Instant
 
 @Entity(tableName = "habit_reminders")
 data class HabitReminder(
-    @PrimaryKey val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long,
     val habitId: Long,
     val reminderTime: Instant,
     val isEnabled: Boolean,

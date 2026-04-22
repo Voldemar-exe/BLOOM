@@ -40,6 +40,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,9 +59,16 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun TaskItemScreen(
+    taskId: Long?,
     viewModel: TaskSetupViewModel = koinViewModel(),
     onBack: () -> Unit,
 ) {
+    LaunchedEffect(taskId) {
+        taskId?.let {
+            viewModel.onAction(TaskSetupAction.LoadTask(it))
+        }
+    }
+
     val taskItemState by viewModel.state.collectAsStateWithLifecycle()
 
     viewModel.effect.CollectOneShotEffect { effect ->
@@ -171,9 +179,12 @@ internal fun TaskItemScreen(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 )
 
-                LazyColumn(modifier = Modifier
-                    .wrapContentSize()
-                    .heightIn(max = 150.dp)) {
+                LazyColumn(
+                    modifier =
+                        Modifier
+                            .wrapContentSize()
+                            .heightIn(max = 150.dp),
+                ) {
                     if (taskItemState.reminders.isEmpty()) {
                         item { Text(text = "Здесь будут напоминания") }
                     } else {
@@ -186,8 +197,7 @@ internal fun TaskItemScreen(
                                         .background(
                                             MaterialTheme.colorScheme.secondaryContainer,
                                             RoundedCornerShape(12.dp),
-                                        )
-                                        .padding(16.dp),
+                                        ).padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
@@ -197,7 +207,7 @@ internal fun TaskItemScreen(
                                     fontWeight = FontWeight.Medium,
                                 )
                                 Checkbox(
-                                    checked = reminder.isOn,
+                                    checked = reminder.isEnabled,
                                     onCheckedChange = { /* TODO */ },
                                 )
                             }
@@ -285,8 +295,7 @@ private fun InputFieldWithClear(
                     .background(
                         MaterialTheme.colorScheme.secondaryContainer,
                         RoundedCornerShape(12.dp),
-                    )
-                    .padding(end = 8.dp),
+                    ).padding(end = 8.dp),
         )
     }
 }
