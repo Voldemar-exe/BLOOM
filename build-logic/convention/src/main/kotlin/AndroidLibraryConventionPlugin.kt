@@ -9,7 +9,6 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
-
     override fun apply(target: Project) {
         with(target) {
             apply(plugin = "com.android.library")
@@ -33,5 +32,4 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             configureJUnit()
         }
     }
-
 }

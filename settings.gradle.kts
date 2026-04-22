@@ -33,6 +33,7 @@ rootProject.name = "BLOOM"
 
 include(":app")
 include(":core:database")
+include(":core:datastore")
 include(":core:network")
 include(":core:data")
 include(":core:model")
