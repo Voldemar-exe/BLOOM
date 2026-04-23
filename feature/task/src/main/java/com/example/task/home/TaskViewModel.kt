@@ -3,6 +3,7 @@ package com.example.task.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.TaskRepository
+import com.example.model.DateRange
 import com.example.model.DayTimeInterval
 import com.example.model.Tag
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -57,6 +58,7 @@ class TaskViewModel(
             is TaskAction.DeleteTask -> handleTaskDeletion(action.id)
             is TaskAction.Search -> handleSearch(action.query)
             is TaskAction.OnTagSelect -> handleTagSelect(action.tag)
+            is TaskAction.SelectDateRange -> handleDateSelection(action.dateRange)
         }
     }
 
@@ -88,5 +90,9 @@ class TaskViewModel(
 
     private fun handleTagSelect(tag: Tag) {
         filterTagsFlow.update { if (tag in it) it - tag else it + tag }
+    }
+
+    private fun handleDateSelection(dateRange: DateRange) {
+        _taskUiState.update { it.copy(selectedDate = dateRange) }
     }
 }

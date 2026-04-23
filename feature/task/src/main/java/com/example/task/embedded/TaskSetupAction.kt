@@ -29,8 +29,21 @@ sealed interface TaskSetupAction {
         val dayIndex: Int,
     ) : TaskSetupAction
 
-    data class SetReminderTime(
-        val time: String,
+    data class AddReminder(
+        val time: Pair<Int, Int>,
+    ) : TaskSetupAction
+
+    data class UpdateReminder(
+        val index: Int,
+        val time: Pair<Int, Int>,
+    ) : TaskSetupAction
+
+    data class ToggleReminder(
+        val index: Int,
+    ) : TaskSetupAction
+
+    data class RemoveReminder(
+        val index: Int,
     ) : TaskSetupAction
 
     object ToggleEndDate : TaskSetupAction
@@ -52,8 +65,6 @@ sealed interface TaskSetupAction {
     ) : TaskSetupAction
 
     object OnSaveTask : TaskSetupAction
-
-    object OnNavigateBack : TaskSetupAction
 
     data class LoadTask(
         val taskId: Long?,

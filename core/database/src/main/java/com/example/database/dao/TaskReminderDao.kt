@@ -20,6 +20,9 @@ interface TaskReminderDao {
     @Update
     suspend fun update(reminder: TaskReminderEntity)
 
+    @Query("DELETE FROM task_reminders WHERE id = :taskReminderId")
+    suspend fun deleteById(taskReminderId: Long)
+
     @Transaction
     suspend fun upsertWithParentSync(
         reminder: TaskReminderEntity,

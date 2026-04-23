@@ -16,6 +16,7 @@ data class TaskItemState(
     val daysOfWeek: Set<Int> = emptySet(),
     val deadline: Long? = 0,
     val reminders: List<Reminder> = emptyList(),
+    val remindersToDelete: Set<Long> = emptySet(),
     val tags: Set<Tag> = emptySet(),
     val isArchived: Boolean = false,
     val isPaused: Boolean = false,

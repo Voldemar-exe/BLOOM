@@ -39,6 +39,8 @@ interface TaskRepository {
 
     suspend fun deleteTask(taskId: Long)
 
+    suspend fun deleteRemindersByIds(remindersToDelete: List<Long>)
+
     suspend fun deleteSubtasksByIds(subtasksToDelete: List<Long>)
 
     suspend fun saveTask(task: Task): Long
@@ -100,6 +102,10 @@ internal class TaskRepositoryImpl(
 
     override suspend fun deleteTask(taskId: Long) {
         taskWithRelationDao.softDeleteTaskCascade(taskId)
+    }
+
+    override suspend fun deleteRemindersByIds(remindersToDelete: List<Long>) {
+        remindersToDelete.forEach { taskReminderDao.deleteById(it) }
     }
 
     override suspend fun deleteSubtasksByIds(subtasksToDelete: List<Long>) {

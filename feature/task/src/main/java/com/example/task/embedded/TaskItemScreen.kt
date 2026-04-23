@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +25,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
@@ -34,10 +34,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,6 +61,7 @@ import com.example.model.RecurrenceType
 import com.example.model.Tag
 import com.example.ui.components.LocalizedDropdownMenu
 import com.example.ui.components.TextInputDialog
+import com.example.ui.components.TimePick
 import com.example.ui.logic.CollectOneShotEffect
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -200,11 +203,34 @@ internal fun TaskItemScreen(
 
             item {
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    "Напоминание",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    var isVisibleReminderInput by remember { mutableStateOf(false) }
+
+                    Text(
+                        "Напоминание",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+                    IconButton(
+                        onClick = { isVisibleReminderInput = true },
+                    ) {
+                        Icon(Icons.Default.Add, "add")
+                    }
+                    if (isVisibleReminderInput) {
+                        TimePick(
+                            onConfirm = { hour, min ->
+                                onAction(TaskSetupAction.AddReminder(Pair(hour, min)))
+                                isVisibleReminderInput = false
+                            },
+                            onDismiss = { isVisibleReminderInput = false },
+                        )
+                    }
+                }
 
                 LazyColumn(
                     modifier =
@@ -215,28 +241,74 @@ internal fun TaskItemScreen(
                     if (taskItemState.reminders.isEmpty()) {
                         item { Text(text = "Здесь будут напоминания") }
                     } else {
-                        items(taskItemState.reminders) { reminder ->
-                            Row(
+                        itemsIndexed(taskItemState.reminders) { index, reminder ->
+                            val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
+                            var isVisibleReminderInput by remember { mutableStateOf(false) }
+                            if (isVisibleReminderInput) {
+                                TimePick(
+                                    onConfirm = { hour, min ->
+                                        onAction(
+                                            TaskSetupAction.UpdateReminder(
+                                                index,
+                                                Pair(hour, min),
+                                            ),
+                                        )
+                                        isVisibleReminderInput = false
+                                    },
+                                    onDismiss = { isVisibleReminderInput = false },
+                                )
+                            }
+                            SwipeToDismissBox(
                                 modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp)
-                                        .background(
-                                            MaterialTheme.colorScheme.secondaryContainer,
-                                            RoundedCornerShape(12.dp),
-                                        ).padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween,
+                                    Modifier.clickable {
+                                        isVisibleReminderInput = true
+                                    },
+                                state = swipeToDismissBoxState,
+                                backgroundContent = {
+                                    Row(
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.End,
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            tint = MaterialTheme.colorScheme.error,
+                                            contentDescription = "delete",
+                                        )
+                                    }
+                                },
+                                enableDismissFromStartToEnd = false,
+                                onDismiss = {
+                                    onAction(TaskSetupAction.RemoveReminder(index))
+                                },
                             ) {
-                                Text(
-                                    reminder.time.toString(),
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Medium,
-                                )
-                                Checkbox(
-                                    checked = reminder.isEnabled,
-                                    onCheckedChange = { /* TODO */ },
-                                )
+                                Row(
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp)
+                                            .background(
+                                                MaterialTheme.colorScheme.secondaryContainer,
+                                                RoundedCornerShape(12.dp),
+                                            ).padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                ) {
+                                    Text(
+                                        reminder.time.toString(),
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Medium,
+                                    )
+                                    Checkbox(
+                                        checked = reminder.isEnabled,
+                                        onCheckedChange = {
+                                            onAction(TaskSetupAction.ToggleReminder(index))
+                                        },
+                                    )
+                                }
                             }
                         }
                     }

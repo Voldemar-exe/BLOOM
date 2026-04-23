@@ -51,9 +51,11 @@ import com.example.bloom.feature.task.R
 import com.example.designsystem.picture.BloomIcons
 import com.example.model.Subtask
 import com.example.task.navigation.TaskItemNavKey
+import com.example.ui.components.DateRangePickerDialog
 import com.example.ui.components.DayTimeTabs
 import com.example.ui.components.TextInputDialog
 import org.koin.compose.viewmodel.koinViewModel
+import java.time.YearMonth
 
 @Composable
 fun TaskScreen(
@@ -91,12 +93,23 @@ internal fun TaskScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { }) {
+                    var isDatePickVisible by remember { mutableStateOf(false) }
+                    IconButton(onClick = { isDatePickVisible = true }) {
                         Icon(
                             painter = painterResource(BloomIcons.CalendarMonth),
                             contentDescription = "date",
                         )
                     }
+                    DateRangePickerDialog(
+                        show = isDatePickVisible,
+                        month = YearMonth.now(),
+                        selected = taskUiState.selectedDate,
+                        onChange = { date ->
+                            onAction(TaskAction.SelectDateRange(date))
+                        },
+                        onDismiss = { isDatePickVisible = false },
+                    )
+
                     IconButton(onClick = { onNavigate(TaskItemNavKey(id = null)) }) {
                         Icon(
                             imageVector = Icons.Default.Add,

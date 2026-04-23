@@ -1,11 +1,11 @@
 package com.example.model
 
-import kotlin.time.Instant
+import java.time.LocalTime
 
 
 data class Reminder(
     val id: Long,
     val parentId: Long,
-    val time: Instant,
+    val time: LocalTime,
     val isEnabled: Boolean = false
 )

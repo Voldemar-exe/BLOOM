@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.repository.TaskRepository
 import com.example.model.Priority
 import com.example.model.RecurrenceType
+import com.example.model.Reminder
 import com.example.model.Subtask
 import com.example.model.Tag
 import com.example.model.Task
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import timber.log.Timber
+import java.time.LocalTime
 
 @KoinViewModel
 class TaskSetupViewModel(
@@ -35,6 +37,7 @@ class TaskSetupViewModel(
     val effect: SharedFlow<TaskItemEffect> = _effect
 
     fun onAction(action: TaskSetupAction) {
+        Timber.d("$action")
         when (action) {
             is TaskSetupAction.OnTitleChange -> updateTitle(action.text)
             is TaskSetupAction.OnDescriptionChange -> updateDescription(action.text)
@@ -42,8 +45,10 @@ class TaskSetupViewModel(
             is TaskSetupAction.OnTagClick -> handleTagSelect(action.tag)
             is TaskSetupAction.SetRecurrenceType -> setRecurrence(action.type)
             is TaskSetupAction.ToggleDay -> toggleDay(action.dayIndex)
-            is TaskSetupAction.SetReminderTime -> { // TODO
-            }
+            is TaskSetupAction.AddReminder -> addReminder(action.time)
+            is TaskSetupAction.UpdateReminder -> updateReminder(action.index, action.time)
+            is TaskSetupAction.ToggleReminder -> toggleReminder(action.index)
+            is TaskSetupAction.RemoveReminder -> removeReminder(action.index)
 
             TaskSetupAction.ToggleEndDate -> _state.update { it.copy(hasEndDate = !it.hasEndDate) }
             is TaskSetupAction.SetEndDate -> { // TODO
@@ -53,7 +58,6 @@ class TaskSetupViewModel(
             is TaskSetupAction.RemoveSubtask -> removeSubtask(action.index)
             is TaskSetupAction.ToggleSubtask -> toggleSubtask(action.index)
             TaskSetupAction.OnSaveTask -> saveTask()
-            TaskSetupAction.OnNavigateBack -> Timber.d("Navigate back")
             is TaskSetupAction.LoadTask -> {
                 action.taskId?.let { loadTask(it) }
             }
@@ -90,6 +94,76 @@ class TaskSetupViewModel(
                     current.daysOfWeek + dayIndex
                 }
             current.copy(daysOfWeek = newDays)
+        }
+    }
+
+    private fun addReminder(time: Pair<Int, Int>) {
+        _state.update { current ->
+            if (current.reminders.any { it.time == time }) return@update current
+
+            current.copy(
+                reminders =
+                    current.reminders +
+                        Reminder(
+                            id = 0L,
+                            parentId = current.id,
+                            time = LocalTime.of(time.first, time.second),
+                            isEnabled = true,
+                        ),
+            )
+        }
+    }
+
+    private fun updateReminder(
+        index: Int,
+        time: Pair<Int, Int>,
+    ) {
+        _state.update { current ->
+            current.copy(
+                reminders =
+                    current.reminders.mapIndexed { i, reminder ->
+                        if (i == index) {
+                            reminder.copy(
+                                time =
+                                    LocalTime.of(
+                                        time.first,
+                                        time.second,
+                                    ),
+                            )
+                        } else {
+                            reminder
+                        }
+                    },
+            )
+        }
+    }
+
+    private fun toggleReminder(index: Int) {
+        _state.update { current ->
+            current.copy(
+                reminders =
+                    current.reminders.mapIndexed { i, reminder ->
+                        if (i == index) reminder.copy(isEnabled = !reminder.isEnabled) else reminder
+                    },
+            )
+        }
+    }
+
+    private fun removeReminder(index: Int) {
+        _state.update { current ->
+            val target = current.reminders.getOrNull(index) ?: return@update current
+
+            val newPending =
+                if (target.id > 0L) {
+                    current.remindersToDelete + target.id
+                } else {
+                    current.remindersToDelete
+                }
+
+            current.copy(
+                reminders = current.reminders.filterIndexed { i, _ -> i != index },
+                remindersToDelete = newPending,
+            )
         }
     }
 
@@ -140,16 +214,23 @@ class TaskSetupViewModel(
     }
 
     private fun saveTask() {
-        Timber.d("Saving task: ${_state.value}")
         viewModelScope.launch {
             val taskId = taskRepository.saveTask(stateToTask())
             _state.value.reminders.forEach {
                 taskRepository.saveReminder(it.copy(parentId = taskId))
             }
+
+            taskRepository.deleteRemindersByIds(
+                _state.value.remindersToDelete.toList(),
+            )
+
             _state.value.subtasks.forEach {
                 taskRepository.saveSubtask(it.copy(taskId = taskId))
             }
-            taskRepository.deleteSubtasksByIds(state.value.subtasksToDelete.toList())
+
+            taskRepository.deleteSubtasksByIds(
+                state.value.subtasksToDelete.toList(),
+            )
             _effect.emit(TaskItemEffect.SaveSuccess)
         }
     }
