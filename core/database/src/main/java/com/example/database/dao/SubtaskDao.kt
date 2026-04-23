@@ -19,6 +19,9 @@ interface SubtaskDao {
     @Update
     suspend fun update(subtaskEntity: SubtaskEntity)
 
+    @Query("DELETE FROM subtasks WHERE id = :subtaskId")
+    suspend fun deleteById(subtaskId: Long)
+
     @Query("SELECT COUNT(*) FROM subtasks WHERE taskId = :taskId")
     suspend fun countByTaskId(taskId: Long): Int
 

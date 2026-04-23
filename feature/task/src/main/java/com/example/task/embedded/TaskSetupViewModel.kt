@@ -47,7 +47,7 @@ class TaskSetupViewModel(
             is TaskSetupAction.SetEndDate -> { // TODO
             }
 
-            is TaskSetupAction.AddSubtask -> addSubtask(action.text)
+            is TaskSetupAction.AddSubtask -> addSubtask(action.title)
             is TaskSetupAction.RemoveSubtask -> removeSubtask(action.index)
             is TaskSetupAction.ToggleSubtask -> toggleSubtask(action.index)
             TaskSetupAction.OnSaveTask -> saveTask()
@@ -101,7 +101,19 @@ class TaskSetupViewModel(
 
     private fun removeSubtask(index: Int) {
         _state.update { current ->
-            current.copy(subtasks = current.subtasks.filterIndexed { i, _ -> i != index })
+            val target = current.subtasks.getOrNull(index) ?: return@update current
+
+            val newPending =
+                if (target.id > 0L) {
+                    current.subtasksToDelete + target.id
+                } else {
+                    current.subtasksToDelete
+                }
+
+            current.copy(
+                subtasks = current.subtasks.filterIndexed { i, _ -> i != index },
+                subtasksToDelete = newPending,
+            )
         }
     }
 
@@ -126,6 +138,7 @@ class TaskSetupViewModel(
             _state.value.subtasks.forEach {
                 taskRepository.saveSubtask(it.copy(taskId = taskId))
             }
+            taskRepository.deleteSubtasksByIds(state.value.subtasksToDelete.toList())
             _effect.emit(TaskItemEffect.SaveSuccess)
         }
     }

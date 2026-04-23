@@ -42,6 +42,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.designsystem.picture.BloomIcons
 import com.example.model.RecurrenceType
+import com.example.ui.components.TextInputDialog
 import com.example.ui.logic.CollectOneShotEffect
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -197,7 +201,8 @@ internal fun TaskItemScreen(
                                         .background(
                                             MaterialTheme.colorScheme.secondaryContainer,
                                             RoundedCornerShape(12.dp),
-                                        ).padding(16.dp),
+                                        )
+                                        .padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
@@ -250,8 +255,9 @@ internal fun TaskItemScreen(
 
             item {
                 if (taskItemState.subtasks.size < 3) {
+                    var isInputDialog by remember { mutableStateOf(false) }
                     Button(
-                        onClick = { onAction(TaskSetupAction.AddSubtask("Новая подзадача")) },
+                        onClick = { isInputDialog = true },
                         modifier =
                             Modifier
                                 .fillMaxWidth()
@@ -261,6 +267,17 @@ internal fun TaskItemScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Добавить подзадачу")
                     }
+                    TextInputDialog(
+                        isVisible = isInputDialog,
+                        title = "Новая подзадача",
+                        placeholder = "Введите название",
+                        initialText = "",
+                        onDismiss = { isInputDialog = false },
+                        onConfirm = { title ->
+                            onAction(TaskSetupAction.AddSubtask(title))
+                            isInputDialog = false
+                        },
+                    )
                 }
             }
         }
@@ -295,7 +312,8 @@ private fun InputFieldWithClear(
                     .background(
                         MaterialTheme.colorScheme.secondaryContainer,
                         RoundedCornerShape(12.dp),
-                    ).padding(end = 8.dp),
+                    )
+                    .padding(end = 8.dp),
         )
     }
 }

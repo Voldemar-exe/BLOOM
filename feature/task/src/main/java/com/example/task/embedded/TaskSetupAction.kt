@@ -34,7 +34,7 @@ sealed interface TaskSetupAction {
     ) : TaskSetupAction
 
     data class AddSubtask(
-        val text: String,
+        val title: String,
     ) : TaskSetupAction
 
     data class RemoveSubtask(

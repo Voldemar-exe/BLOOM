@@ -21,6 +21,7 @@ data class TaskItemState(
     val isMuted: Boolean = false,
     val isChecked: Boolean = false,
     val subtasks: List<Subtask> = emptyList(),
+    val subtasksToDelete: Set<Long> = emptySet(),
     val recurrenceType: RecurrenceType = RecurrenceType.WEEK,
     val hasEndDate: Boolean = false,
     val isLoading: Boolean = false,

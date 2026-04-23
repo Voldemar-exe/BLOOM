@@ -33,6 +33,8 @@ interface TaskRepository {
 
     suspend fun deleteTask(taskId: Long)
 
+    suspend fun deleteSubtasksByIds(subtasksToDelete: List<Long>)
+
     suspend fun saveTask(task: Task): Long
 
     suspend fun toggleSubtask(subtaskId: Long)
@@ -75,6 +77,10 @@ internal class TaskRepositoryImpl(
 
     override suspend fun deleteTask(taskId: Long) {
         taskWithRelationDao.softDeleteTaskCascade(taskId)
+    }
+
+    override suspend fun deleteSubtasksByIds(subtasksToDelete: List<Long>) {
+        subtasksToDelete.forEach { subtaskDao.deleteById(it) }
     }
 
     override suspend fun getTaskById(taskId: Long): Task? = taskDao.getTaskById(taskId)?.asModel()

@@ -138,7 +138,7 @@ internal fun TaskScreen(
                             Row(
                                 modifier =
                                     Modifier
-                                        .fillParentMaxSize()
+                                        .fillMaxWidth()
                                         .padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.End,
