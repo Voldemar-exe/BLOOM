@@ -13,10 +13,10 @@ import kotlin.time.Clock
 
 @Dao
 interface TaskDao {
-    @Query("SELECT * FROM tasks ORDER BY updatedAt DESC")
+    @Query("SELECT * FROM tasks WHERE syncStatus != 'DELETED' ORDER BY updatedAt DESC")
     fun getTasks(): Flow<List<TaskEntity>>
 
-    @Query("SELECT * FROM tasks WHERE id = :taskId")
+    @Query("SELECT * FROM tasks WHERE id = :taskId AND syncStatus != 'DELETED'")
     suspend fun getTaskById(taskId: Long): TaskEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

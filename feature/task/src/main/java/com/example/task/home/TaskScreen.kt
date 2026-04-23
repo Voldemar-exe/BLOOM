@@ -1,6 +1,7 @@
 package com.example.task.home
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
@@ -27,8 +29,10 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -127,15 +131,40 @@ internal fun TaskScreen(
                     items = taskUiState.tasks.toList(),
                     key = { (task, _) -> task.id },
                 ) { (task, subtasks) ->
-                    TaskItem(
-                        title = task.title,
-                        description = task.description,
-                        isChecked = task.isChecked,
-                        subtasks = subtasks,
-                        onTaskClick = { onNavigate(TaskItemNavKey(task.id)) },
-                        onToggleTask = { onAction(TaskAction.ToggleTask(task.id)) },
-                        onToggleSubtask = { onAction(TaskAction.ToggleSubtask(it)) },
-                    )
+                    val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
+                    SwipeToDismissBox(
+                        state = swipeToDismissBoxState,
+                        backgroundContent = {
+                            Row(
+                                modifier =
+                                    Modifier
+                                        .fillParentMaxSize()
+                                        .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.End,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    tint = MaterialTheme.colorScheme.error,
+                                    contentDescription = "delete",
+                                )
+                            }
+                        },
+                        enableDismissFromStartToEnd = false,
+                        onDismiss = {
+                            onAction(TaskAction.DeleteTask(task.id))
+                        },
+                    ) {
+                        TaskItem(
+                            title = task.title,
+                            description = task.description,
+                            isChecked = task.isChecked,
+                            subtasks = subtasks,
+                            onTaskClick = { onNavigate(TaskItemNavKey(task.id)) },
+                            onToggleTask = { onAction(TaskAction.ToggleTask(task.id)) },
+                            onToggleSubtask = { onAction(TaskAction.ToggleSubtask(it)) },
+                        )
+                    }
                 }
             }
         }
@@ -202,23 +231,25 @@ private fun TaskItem(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                IconButton(
-                    onClick = { isExpanded = !isExpanded },
-                    colors =
-                        IconButtonDefaults.iconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                        ),
-                ) {
-                    Icon(
-                        imageVector =
-                            if (isExpanded) {
-                                Icons.Default.KeyboardArrowDown
-                            } else {
-                                Icons.Default.KeyboardArrowUp
-                            },
-                        contentDescription = if (isExpanded) "collapse" else "expand",
-                        tint = MaterialTheme.colorScheme.onSecondary,
-                    )
+                if (subtasks.isNotEmpty()) {
+                    IconButton(
+                        onClick = { isExpanded = !isExpanded },
+                        colors =
+                            IconButtonDefaults.iconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                            ),
+                    ) {
+                        Icon(
+                            imageVector =
+                                if (isExpanded) {
+                                    Icons.Default.KeyboardArrowDown
+                                } else {
+                                    Icons.Default.KeyboardArrowUp
+                                },
+                            contentDescription = if (isExpanded) "collapse" else "expand",
+                            tint = MaterialTheme.colorScheme.onSecondary,
+                        )
+                    }
                 }
             }
         }

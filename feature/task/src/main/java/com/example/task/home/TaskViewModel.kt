@@ -36,6 +36,7 @@ class TaskViewModel(
             is TaskAction.SelectTimeInterval -> handleSelectTimeInterval(action.timeInterval)
             is TaskAction.ToggleTask -> handleToggleTask(action.id)
             is TaskAction.ToggleSubtask -> handleToggleSubtask(action.id)
+            is TaskAction.DeleteTask -> handleTaskDeletion(action.id)
         }
     }
 
@@ -52,6 +53,12 @@ class TaskViewModel(
     private fun handleToggleSubtask(subtaskId: Long) {
         viewModelScope.launch {
             taskRepository.toggleSubtask(subtaskId)
+        }
+    }
+
+    private fun handleTaskDeletion(taskId: Long) {
+        viewModelScope.launch {
+            taskRepository.deleteTask(taskId)
         }
     }
 }

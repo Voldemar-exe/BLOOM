@@ -20,9 +20,9 @@ data class HabitPlant(
     val widthFalloffEndAt: Float,
     val petalLength: Float,
     val petalType: String,
-    val petalColor: Long, // Store as RGBa
-    val baseColor: Long, // Store as RGBa
+    val petalColor: Long,
+    val baseColor: Long,
     val petalAlpha: Float,
     val createdAt: Instant,
-    val updatedAt: Instant
+    val updatedAt: Instant,
 )

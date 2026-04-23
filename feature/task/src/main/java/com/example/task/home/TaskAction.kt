@@ -14,4 +14,8 @@ sealed interface TaskAction {
     data class ToggleSubtask(
         val id: Long,
     ) : TaskAction
+
+    data class DeleteTask(
+        val id: Long,
+    ) : TaskAction
 }
