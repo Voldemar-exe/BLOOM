@@ -3,8 +3,10 @@ package com.example.task.embedded
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.TaskRepository
+import com.example.model.Priority
 import com.example.model.RecurrenceType
 import com.example.model.Subtask
+import com.example.model.Tag
 import com.example.model.Task
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,8 +38,8 @@ class TaskSetupViewModel(
         when (action) {
             is TaskSetupAction.OnTitleChange -> updateTitle(action.text)
             is TaskSetupAction.OnDescriptionChange -> updateDescription(action.text)
-            TaskSetupAction.OnPriorityClick -> Timber.d("Open priority")
-            TaskSetupAction.OnTagsClick -> Timber.d("Open tags")
+            is TaskSetupAction.OnPriorityClick -> setPriority(action.priority)
+            is TaskSetupAction.OnTagClick -> handleTagSelect(action.tag)
             is TaskSetupAction.SetRecurrenceType -> setRecurrence(action.type)
             is TaskSetupAction.ToggleDay -> toggleDay(action.dayIndex)
             is TaskSetupAction.SetReminderTime -> { // TODO
@@ -64,6 +66,15 @@ class TaskSetupViewModel(
 
     private fun updateDescription(text: String) {
         _state.update { it.copy(description = text) }
+    }
+
+    private fun setPriority(priority: Priority) {
+        _state.update { it.copy(priority = priority) }
+    }
+
+    private fun handleTagSelect(tag: Tag) {
+        val current = _state.value.tags
+        _state.update { it.copy(tags = if (tag in current) current - tag else current + tag) }
     }
 
     private fun setRecurrence(type: RecurrenceType) {

@@ -5,6 +5,7 @@ import com.example.model.Priority
 import com.example.model.RecurrenceType
 import com.example.model.Reminder
 import com.example.model.Subtask
+import com.example.model.Tag
 
 @Immutable
 data class TaskItemState(
@@ -15,7 +16,7 @@ data class TaskItemState(
     val daysOfWeek: Set<Int> = emptySet(),
     val deadline: Long? = 0,
     val reminders: List<Reminder> = emptyList(),
-    val tags: List<String> = emptyList(),
+    val tags: Set<Tag> = emptySet(),
     val isArchived: Boolean = false,
     val isPaused: Boolean = false,
     val isMuted: Boolean = false,

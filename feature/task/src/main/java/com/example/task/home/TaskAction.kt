@@ -1,6 +1,7 @@
 package com.example.task.home
 
 import com.example.model.DayTimeInterval
+import com.example.model.Tag
 
 sealed interface TaskAction {
     data class SelectTimeInterval(
@@ -9,6 +10,10 @@ sealed interface TaskAction {
 
     data class Search(
         val query: String,
+    ) : TaskAction
+
+    data class OnTagSelect(
+        val tag: Tag,
     ) : TaskAction
 
     data class ToggleTask(

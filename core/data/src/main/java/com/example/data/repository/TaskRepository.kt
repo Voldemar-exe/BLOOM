@@ -11,6 +11,7 @@ import com.example.database.model.relationships.TaskAndSubtasks
 import com.example.model.Reminder
 import com.example.model.Subtask
 import com.example.model.SyncStatus
+import com.example.model.Tag
 import com.example.model.Task
 import com.example.model.TaskWithRelations
 import kotlinx.coroutines.flow.Flow
@@ -23,7 +24,10 @@ interface TaskRepository {
 
     fun getTasksWithRelations(): Flow<List<TaskWithRelations>>
 
-    fun searchTasksWithRelations(query: String): Flow<List<TaskWithRelations>>
+    fun searchTasksWithRelations(
+        query: String,
+        filterTags: Set<Tag>,
+    ): Flow<List<TaskWithRelations>>
 
     suspend fun getTaskWithSubtasks(taskId: Long): TaskAndSubtasks?
 
@@ -61,10 +65,22 @@ internal class TaskRepositoryImpl(
             .getTasksWithSubtasksAndReminders()
             .map { entities -> entities.map { it.asModel() } }
 
-    override fun searchTasksWithRelations(query: String): Flow<List<TaskWithRelations>> =
+    override fun searchTasksWithRelations(
+        query: String,
+        filterTags: Set<Tag>,
+    ): Flow<List<TaskWithRelations>> =
         taskWithRelationDao
             .searchTasksWithRelations(query)
             .map { entities -> entities.map { it.asModel() } }
+            .map { tasks ->
+                if (filterTags.isEmpty()) {
+                    tasks
+                } else {
+                    tasks.filter {
+                        it.task.tags.containsAll(filterTags)
+                    }
+                }
+            }
 
     override suspend fun getTaskWithSubtasks(taskId: Long): TaskAndSubtasks? =
         taskWithRelationDao.getTaskWithSubtasks(taskId)

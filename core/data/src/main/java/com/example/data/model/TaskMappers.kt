@@ -6,6 +6,7 @@ import com.example.database.model.TaskReminderEntity
 import com.example.database.model.relationships.TaskWithSubtasksAndReminders
 import com.example.model.Reminder
 import com.example.model.Subtask
+import com.example.model.Tag
 import com.example.model.Task
 import com.example.model.TaskWithRelations
 
@@ -17,7 +18,7 @@ fun TaskEntity.asModel() =
         daysOfWeek = daysOfWeek,
         priority = priority,
         deadline = deadline,
-        tags = tags,
+        tags = tags.map { Tag.valueOf(it) }.toSet(),
         isChecked = isChecked,
         isArchived = isArchived,
         isPaused = isPaused,
@@ -32,7 +33,7 @@ fun Task.asEntity() =
         daysOfWeek = daysOfWeek,
         priority = priority,
         deadline = deadline,
-        tags = tags,
+        tags = tags.map { it.name },
         isChecked = isChecked,
         isArchived = isArchived,
         isPaused = isPaused,

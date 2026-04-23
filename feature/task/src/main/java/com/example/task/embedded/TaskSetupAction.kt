@@ -1,6 +1,8 @@
 package com.example.task.embedded
 
+import com.example.model.Priority
 import com.example.model.RecurrenceType
+import com.example.model.Tag
 
 sealed interface TaskSetupAction {
     data class OnTitleChange(
@@ -11,9 +13,13 @@ sealed interface TaskSetupAction {
         val text: String,
     ) : TaskSetupAction
 
-    object OnPriorityClick : TaskSetupAction
+    data class OnPriorityClick(
+        val priority: Priority,
+    ) : TaskSetupAction
 
-    object OnTagsClick : TaskSetupAction
+    data class OnTagClick(
+        val tag: Tag,
+    ) : TaskSetupAction
 
     data class SetRecurrenceType(
         val type: RecurrenceType,

@@ -7,7 +7,7 @@ data class Task(
     val daysOfWeek: List<Int>,
     val priority: Priority,
     val deadline: Long?,
-    val tags: List<String>,
+    val tags: Set<Tag>,
     val isChecked: Boolean,
     val isArchived: Boolean,
     val isPaused: Boolean,

@@ -23,7 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -49,14 +48,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.designsystem.picture.BloomIcons
+import com.example.model.Priority
 import com.example.model.RecurrenceType
+import com.example.model.Tag
+import com.example.ui.components.LocalizedDropdownMenu
 import com.example.ui.components.TextInputDialog
 import com.example.ui.logic.CollectOneShotEffect
 import org.koin.compose.viewmodel.koinViewModel
@@ -137,19 +138,41 @@ internal fun TaskItemScreen(
                     value = taskItemState.description,
                     onValueChange = { onAction(TaskSetupAction.OnDescriptionChange(it)) },
                 )
+            }
 
-                MenuRow(
+            item {
+                LocalizedDropdownMenu(
                     icon = BloomIcons.Priority,
-                    text = taskItemState.priority.ru,
-                    onClick = { onAction(TaskSetupAction.OnPriorityClick) },
+                    label = taskItemState.priority.ru,
+                    onSelect = {
+                        onAction(TaskSetupAction.OnPriorityClick(it as Priority))
+                    },
+                    items = Priority.entries,
                 )
+            }
 
-                MenuRow(
+            item {
+                LocalizedDropdownMenu(
                     icon = BloomIcons.Tag,
-                    text = "Выбрано тегов: ${taskItemState.tags.size}",
-                    onClick = { onAction(TaskSetupAction.OnTagsClick) },
+                    label =
+                        if (taskItemState.tags.isEmpty()) {
+                            "Выбери несколько тегов"
+                        } else {
+                            val count = taskItemState.tags.size
+                            if (count > 1) {
+                                taskItemState.tags.first().ru + " + ${taskItemState.tags.size - 1}"
+                            } else {
+                                taskItemState.tags.first().ru
+                            }
+                        },
+                    onSelect = {
+                        onAction(TaskSetupAction.OnTagClick(it as Tag))
+                    },
+                    items = Tag.entries,
                 )
+            }
 
+            item {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     "Интервал и повторение",
@@ -201,8 +224,7 @@ internal fun TaskItemScreen(
                                         .background(
                                             MaterialTheme.colorScheme.secondaryContainer,
                                             RoundedCornerShape(12.dp),
-                                        )
-                                        .padding(16.dp),
+                                        ).padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
@@ -312,33 +334,7 @@ private fun InputFieldWithClear(
                     .background(
                         MaterialTheme.colorScheme.secondaryContainer,
                         RoundedCornerShape(12.dp),
-                    )
-                    .padding(end = 8.dp),
-        )
-    }
-}
-
-@Composable
-private fun MenuRow(
-    icon: Int,
-    text: String,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .clickable { onClick() }
-                .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(painter = painterResource(icon), contentDescription = null, tint = Color(0xFF6750A4))
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(text, modifier = Modifier.weight(1f), fontSize = 16.sp)
-        Icon(
-            Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            contentDescription = null,
-            tint = Color.Gray,
+                    ).padding(end = 8.dp),
         )
     }
 }

@@ -15,12 +15,12 @@ interface TaskWithRelationDao {
         """
     SELECT * FROM tasks
     WHERE (:includeDeleted OR syncStatus != 'DELETED')
-      AND (title LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%')
+      AND (:query == '' OR title LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%')
     ORDER BY updatedAt DESC
 """,
     )
     fun searchTasksWithRelations(
-        query: String,
+        query: String = "",
         includeDeleted: Boolean = false,
     ): Flow<List<TaskWithSubtasksAndReminders>>
 
