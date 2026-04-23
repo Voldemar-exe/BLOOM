@@ -23,6 +23,8 @@ interface TaskRepository {
 
     fun getTasksWithRelations(): Flow<List<TaskWithRelations>>
 
+    fun searchTasksWithRelations(query: String): Flow<List<TaskWithRelations>>
+
     suspend fun getTaskWithSubtasks(taskId: Long): TaskAndSubtasks?
 
     suspend fun getTaskWithRelations(taskId: Long): TaskWithRelations?
@@ -57,6 +59,11 @@ internal class TaskRepositoryImpl(
     override fun getTasksWithRelations(): Flow<List<TaskWithRelations>> =
         taskWithRelationDao
             .getTasksWithSubtasksAndReminders()
+            .map { entities -> entities.map { it.asModel() } }
+
+    override fun searchTasksWithRelations(query: String): Flow<List<TaskWithRelations>> =
+        taskWithRelationDao
+            .searchTasksWithRelations(query)
             .map { entities -> entities.map { it.asModel() } }
 
     override suspend fun getTaskWithSubtasks(taskId: Long): TaskAndSubtasks? =

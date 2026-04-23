@@ -7,6 +7,10 @@ sealed interface TaskAction {
         val timeInterval: DayTimeInterval,
     ) : TaskAction
 
+    data class Search(
+        val query: String,
+    ) : TaskAction
+
     data class ToggleTask(
         val id: Long,
     ) : TaskAction

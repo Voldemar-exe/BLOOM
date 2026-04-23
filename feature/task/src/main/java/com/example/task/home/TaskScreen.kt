@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -51,6 +52,7 @@ import com.example.designsystem.picture.BloomIcons
 import com.example.model.Subtask
 import com.example.task.navigation.TaskItemNavKey
 import com.example.ui.components.DayTimeTabs
+import com.example.ui.components.TextInputDialog
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -84,7 +86,7 @@ internal fun TaskScreen(
                     IconButton(onClick = { }) {
                         Icon(
                             painter = painterResource(BloomIcons.Filter),
-                            contentDescription = "Date",
+                            contentDescription = "filter",
                         )
                     }
                 },
@@ -92,21 +94,47 @@ internal fun TaskScreen(
                     IconButton(onClick = { }) {
                         Icon(
                             painter = painterResource(BloomIcons.CalendarMonth),
-                            contentDescription = "Date",
+                            contentDescription = "date",
                         )
                     }
                     IconButton(onClick = { onNavigate(TaskItemNavKey(id = null)) }) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Add task",
+                            contentDescription = "add",
                         )
                     }
-                    IconButton(onClick = { }) {
+                    var isSearchVisible by remember { mutableStateOf(false) }
+                    val canClearSearch = isSearchVisible && taskUiState.searchQuery.isNotEmpty()
+
+                    IconButton(
+                        onClick = {
+                            if (canClearSearch) {
+                                onAction(TaskAction.Search(""))
+                            } else {
+                                isSearchVisible = true
+                            }
+                        },
+                    ) {
                         Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
+                            imageVector =
+                                if (canClearSearch) {
+                                    Icons.Default.Clear
+                                } else {
+                                    Icons.Default.Search
+                                },
+                            contentDescription = "search",
                         )
                     }
+                    TextInputDialog(
+                        isVisible = isSearchVisible,
+                        title = "Поиск",
+                        placeholder = "Текст названия или описания",
+                        onDismiss = { isSearchVisible = false },
+                        onConfirm = {
+                            onAction(TaskAction.Search(it))
+                            isSearchVisible = false
+                        },
+                    )
                 },
                 expandedHeight = TopAppBarDefaults.MediumAppBarCollapsedHeight,
             )
