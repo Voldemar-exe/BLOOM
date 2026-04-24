@@ -25,8 +25,8 @@ sealed interface TaskSetupAction {
         val type: RecurrenceType,
     ) : TaskSetupAction
 
-    data class ToggleDay(
-        val dayIndex: Int,
+    data class UpdateSelectedDays(
+        val days: Set<Int>,
     ) : TaskSetupAction
 
     data class AddReminder(
@@ -49,7 +49,7 @@ sealed interface TaskSetupAction {
     object ToggleEndDate : TaskSetupAction
 
     data class SetEndDate(
-        val date: String,
+        val date: Long,
     ) : TaskSetupAction
 
     data class AddSubtask(

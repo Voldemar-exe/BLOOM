@@ -2,44 +2,32 @@ package com.example.task.embedded
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,22 +36,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.designsystem.picture.BloomIcons
 import com.example.model.Priority
-import com.example.model.RecurrenceType
 import com.example.model.Tag
+import com.example.ui.components.DatePickDialog
+import com.example.ui.components.InputFieldWithClear
 import com.example.ui.components.LocalizedDropdownMenu
+import com.example.ui.components.RecurrenceSection
+import com.example.ui.components.ReminderSection
 import com.example.ui.components.TextInputDialog
-import com.example.ui.components.TimePick
+import com.example.ui.components.convertMillisToDate
 import com.example.ui.logic.CollectOneShotEffect
 import org.koin.compose.viewmodel.koinViewModel
+import java.time.YearMonth
 
 @Composable
 fun TaskItemScreen(
@@ -186,145 +176,42 @@ internal fun TaskItemScreen(
             }
 
             item {
-                RecurrenceTabs(
-                    selectedType = taskItemState.recurrenceType,
+                RecurrenceSection(
+                    type = taskItemState.recurrenceType,
+                    monthDays = taskItemState.daysOfWeek,
+                    currentMonth = YearMonth.now(),
                     onTypeChange = { onAction(TaskSetupAction.SetRecurrenceType(it)) },
+                    onDaysChange = { onAction(TaskSetupAction.UpdateSelectedDays(it)) },
                 )
             }
 
-            if (taskItemState.recurrenceType == RecurrenceType.WEEK) {
-                item {
-                    WeekDaysSelector(
-                        selectedDays = taskItemState.daysOfWeek,
-                        onDayToggle = { onAction(TaskSetupAction.ToggleDay(it)) },
-                    )
-                }
+            item {
+                EndDateToggle(
+                    checked = taskItemState.hasEndDate,
+                    onToggle = { onAction(TaskSetupAction.ToggleEndDate) },
+                )
             }
 
             item {
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    var isVisibleReminderInput by remember { mutableStateOf(false) }
-
-                    Text(
-                        "Напоминание",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                if (taskItemState.hasEndDate) {
+                    EndDateField(
+                        dateMillis = taskItemState.deadline,
+                        onDateSelected = {
+                            it?.let {
+                                onAction(TaskSetupAction.SetEndDate(it))
+                            }
+                        },
                     )
-                    IconButton(
-                        onClick = { isVisibleReminderInput = true },
-                    ) {
-                        Icon(Icons.Default.Add, "add")
-                    }
-                    if (isVisibleReminderInput) {
-                        TimePick(
-                            onConfirm = { hour, min ->
-                                onAction(TaskSetupAction.AddReminder(Pair(hour, min)))
-                                isVisibleReminderInput = false
-                            },
-                            onDismiss = { isVisibleReminderInput = false },
-                        )
-                    }
-                }
-
-                LazyColumn(
-                    modifier =
-                        Modifier
-                            .wrapContentSize()
-                            .heightIn(max = 150.dp),
-                ) {
-                    if (taskItemState.reminders.isEmpty()) {
-                        item { Text(text = "Здесь будут напоминания") }
-                    } else {
-                        itemsIndexed(taskItemState.reminders) { index, reminder ->
-                            val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
-                            var isVisibleReminderInput by remember { mutableStateOf(false) }
-                            if (isVisibleReminderInput) {
-                                TimePick(
-                                    onConfirm = { hour, min ->
-                                        onAction(
-                                            TaskSetupAction.UpdateReminder(
-                                                index,
-                                                Pair(hour, min),
-                                            ),
-                                        )
-                                        isVisibleReminderInput = false
-                                    },
-                                    onDismiss = { isVisibleReminderInput = false },
-                                )
-                            }
-                            SwipeToDismissBox(
-                                modifier =
-                                    Modifier.clickable {
-                                        isVisibleReminderInput = true
-                                    },
-                                state = swipeToDismissBoxState,
-                                backgroundContent = {
-                                    Row(
-                                        modifier =
-                                            Modifier
-                                                .fillMaxWidth()
-                                                .padding(16.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.End,
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Delete,
-                                            tint = MaterialTheme.colorScheme.error,
-                                            contentDescription = "delete",
-                                        )
-                                    }
-                                },
-                                enableDismissFromStartToEnd = false,
-                                onDismiss = {
-                                    onAction(TaskSetupAction.RemoveReminder(index))
-                                },
-                            ) {
-                                Row(
-                                    modifier =
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp)
-                                            .background(
-                                                MaterialTheme.colorScheme.secondaryContainer,
-                                                RoundedCornerShape(12.dp),
-                                            ).padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                ) {
-                                    Text(
-                                        reminder.time.toString(),
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Medium,
-                                    )
-                                    Checkbox(
-                                        checked = reminder.isEnabled,
-                                        onCheckedChange = {
-                                            onAction(TaskSetupAction.ToggleReminder(index))
-                                        },
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                    Row(
-                        modifier = Modifier.clickable { onAction(TaskSetupAction.ToggleEndDate) },
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Checkbox(
-                            checked = taskItemState.hasEndDate,
-                            onCheckedChange = { onAction(TaskSetupAction.ToggleEndDate) },
-                        )
-                        Text("Или выбрать конечную дату", modifier = Modifier.padding(start = 8.dp))
-                    }
+                } else {
+                    ReminderSection(
+                        reminders = taskItemState.reminders,
+                        onAdd = { onAction(TaskSetupAction.AddReminder(it)) },
+                        onUpdate = { index, time ->
+                            onAction(TaskSetupAction.UpdateReminder(index, time))
+                        },
+                        onToggle = { onAction(TaskSetupAction.ToggleReminder(it)) },
+                        onRemove = { onAction(TaskSetupAction.RemoveReminder(it)) },
+                    )
                 }
             }
 
@@ -379,110 +266,6 @@ internal fun TaskItemScreen(
 }
 
 @Composable
-private fun InputFieldWithClear(
-    label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    singleLine: Boolean = true,
-) {
-    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(label, fontSize = 12.sp, color = Color.Gray)
-        TextField(
-            value = value,
-            onValueChange = onValueChange,
-            singleLine = singleLine,
-            colors =
-                TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                ),
-            keyboardOptions =
-                KeyboardOptions(imeAction = if (singleLine) ImeAction.Next else ImeAction.Default),
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colorScheme.secondaryContainer,
-                        RoundedCornerShape(12.dp),
-                    ).padding(end = 8.dp),
-        )
-    }
-}
-
-@Composable
-private fun RecurrenceTabs(
-    selectedType: RecurrenceType,
-    onTypeChange: (RecurrenceType) -> Unit,
-) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        RecurrenceType.entries.forEach { type ->
-            FilterChip(
-                selected = selectedType == type,
-                onClick = { onTypeChange(type) },
-                label = {
-                    Text(
-                        when (type) {
-                            RecurrenceType.DAY -> "День"
-                            RecurrenceType.WEEK -> "Неделя"
-                            RecurrenceType.MONTH -> "Месяц"
-                        },
-                    )
-                },
-                modifier = Modifier.weight(1f),
-                colors =
-                    FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = Color(0xFFD1C4E9),
-                        selectedLabelColor = Color(0xFF673AB7),
-                    ),
-            )
-        }
-    }
-}
-
-@Composable
-private fun WeekDaysSelector(
-    selectedDays: Set<Int>,
-    onDayToggle: (Int) -> Unit,
-) {
-    val days = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
-
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        days.forEachIndexed { index, label ->
-            val isSelected = selectedDays.contains(index)
-            Box(
-                modifier =
-                    Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(if (isSelected) Color(0xFF6750A4) else Color(0xFFE0E0E0))
-                        .clickable { onDayToggle(index) },
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    label,
-                    color = if (isSelected) Color.White else Color.Black,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun SubtaskRow(
     text: String,
     isChecked: Boolean,
@@ -494,8 +277,10 @@ private fun SubtaskRow(
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 4.dp)
-                .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(12.dp))
-                .padding(12.dp),
+                .background(
+                    MaterialTheme.colorScheme.secondaryContainer,
+                    RoundedCornerShape(12.dp),
+                ).padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Checkbox(
@@ -506,5 +291,74 @@ private fun SubtaskRow(
         IconButton(onClick = onRemove) {
             Icon(Icons.Default.Close, "remove", tint = Color.Gray)
         }
+    }
+}
+
+@Composable
+fun EndDateField(
+    dateMillis: Long?,
+    onDateSelected: (Long?) -> Unit,
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    val formattedDate =
+        remember(dateMillis) {
+            dateMillis?.let {
+                convertMillisToDate(it)
+            } ?: "Выберите дату"
+        }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        OutlinedTextField(
+            value = formattedDate,
+            onValueChange = {},
+            label = { Text("Крайний срок") },
+            readOnly = true,
+            trailingIcon = {
+                IconButton(onClick = { showDialog = true }) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Select date",
+                    )
+                }
+            },
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(64.dp),
+        )
+    }
+
+    if (showDialog) {
+        DatePickDialog(
+            onDateSelect = {
+                onDateSelected(it)
+                showDialog = false
+            },
+            onDismiss = { showDialog = false },
+        )
+    }
+}
+
+@Composable
+fun EndDateToggle(
+    checked: Boolean,
+    onToggle: () -> Unit,
+) {
+    Row(
+        modifier =
+            Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .clickable { onToggle() },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = { onToggle() },
+        )
+        Text(
+            "Или выбрать конечную дату",
+            modifier = Modifier.padding(start = 8.dp),
+        )
     }
 }

@@ -14,7 +14,7 @@ data class TaskItemState(
     val description: String = "",
     val priority: Priority = Priority.MEDIUM,
     val daysOfWeek: Set<Int> = emptySet(),
-    val deadline: Long? = 0,
+    val deadline: Long? = null,
     val reminders: List<Reminder> = emptyList(),
     val remindersToDelete: Set<Long> = emptySet(),
     val tags: Set<Tag> = emptySet(),

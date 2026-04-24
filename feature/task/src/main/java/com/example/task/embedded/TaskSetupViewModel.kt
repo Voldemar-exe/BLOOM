@@ -9,6 +9,7 @@ import com.example.model.Reminder
 import com.example.model.Subtask
 import com.example.model.Tag
 import com.example.model.Task
+import com.example.model.util.weekToMonthDays
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import timber.log.Timber
 import java.time.LocalTime
+import java.time.YearMonth
 
 @KoinViewModel
 class TaskSetupViewModel(
@@ -44,15 +46,14 @@ class TaskSetupViewModel(
             is TaskSetupAction.OnPriorityClick -> setPriority(action.priority)
             is TaskSetupAction.OnTagClick -> handleTagSelect(action.tag)
             is TaskSetupAction.SetRecurrenceType -> setRecurrence(action.type)
-            is TaskSetupAction.ToggleDay -> toggleDay(action.dayIndex)
+            is TaskSetupAction.UpdateSelectedDays -> updateSelectedDays(action.days)
             is TaskSetupAction.AddReminder -> addReminder(action.time)
             is TaskSetupAction.UpdateReminder -> updateReminder(action.index, action.time)
             is TaskSetupAction.ToggleReminder -> toggleReminder(action.index)
             is TaskSetupAction.RemoveReminder -> removeReminder(action.index)
 
             TaskSetupAction.ToggleEndDate -> _state.update { it.copy(hasEndDate = !it.hasEndDate) }
-            is TaskSetupAction.SetEndDate -> { // TODO
-            }
+            is TaskSetupAction.SetEndDate -> setEndDate(action.date)
 
             is TaskSetupAction.AddSubtask -> addSubtask(action.title)
             is TaskSetupAction.RemoveSubtask -> removeSubtask(action.index)
@@ -85,21 +86,35 @@ class TaskSetupViewModel(
         _state.update { it.copy(recurrenceType = type) }
     }
 
-    private fun toggleDay(dayIndex: Int) {
+    private fun updateSelectedDays(days: Set<Int>) {
+        val month = YearMonth.now()
         _state.update { current ->
-            val newDays =
-                if (current.daysOfWeek.contains(dayIndex)) {
-                    current.daysOfWeek - dayIndex
-                } else {
-                    current.daysOfWeek + dayIndex
+            val normalizedDays =
+                when (current.recurrenceType) {
+                    RecurrenceType.DAY -> {
+                        (1..31).toSet()
+                    }
+
+                    RecurrenceType.WEEK -> {
+                        weekToMonthDays(days, month)
+                    }
+
+                    RecurrenceType.MONTH -> {
+                        days
+                    }
                 }
-            current.copy(daysOfWeek = newDays)
+            current.copy(daysOfWeek = normalizedDays)
         }
     }
 
     private fun addReminder(time: Pair<Int, Int>) {
         _state.update { current ->
-            if (current.reminders.any { it.time == time }) return@update current
+            if (current.reminders.any {
+                    it.time.hour == time.first && it.time.minute == time.second
+                }
+            ) {
+                return@update current
+            }
 
             current.copy(
                 reminders =
@@ -165,6 +180,10 @@ class TaskSetupViewModel(
                 remindersToDelete = newPending,
             )
         }
+    }
+
+    private fun setEndDate(date: Long) {
+        _state.update { it.copy(deadline = date) }
     }
 
     private fun addSubtask(text: String) {
