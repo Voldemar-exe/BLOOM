@@ -83,9 +83,7 @@ fun LocalizedDropdownMenu(
         }
 
         ExposedDropdownMenu(
-            modifier =
-                Modifier
-                    .exposedDropdownSize(true),
+            modifier = Modifier.exposedDropdownSize(true),
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {

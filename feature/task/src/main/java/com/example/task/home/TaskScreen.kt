@@ -53,6 +53,7 @@ import com.example.model.Subtask
 import com.example.task.navigation.TaskItemNavKey
 import com.example.ui.components.DateRangePickerDialog
 import com.example.ui.components.DayTimeTabs
+import com.example.ui.components.TagDropdownMenu
 import com.example.ui.components.TextInputDialog
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.YearMonth
@@ -85,12 +86,11 @@ internal fun TaskScreen(
                     Text(text = stringResource(R.string.task_screen_title))
                 },
                 navigationIcon = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            painter = painterResource(BloomIcons.Filter),
-                            contentDescription = "filter",
-                        )
-                    }
+                    TagDropdownMenu(
+                        icon = BloomIcons.Filter,
+                        selectedTags = taskUiState.selectedFilterTags,
+                        onSelect = { onAction(TaskAction.OnTagSelect(it)) }
+                    )
                 },
                 actions = {
                     var isDatePickVisible by remember { mutableStateOf(false) }
