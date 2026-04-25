@@ -27,23 +27,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.fromColorLong
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
 import com.example.bloom.feature.habit.R
 import com.example.habit.PlantCanvas
-import com.example.habit.navigation.HabitItemNavKey
+import com.example.habit.util.toPlantConfig
 import com.example.model.Habit
 import com.example.model.HabitPlant
-import com.example.plant.BranchConfig
-import com.example.plant.LeafConfig
-import com.example.plant.LeafType
-import com.example.plant.PlantConfig
-import com.example.plant.RenderConfig
-import com.example.plant.utils.LSystemGeneratorImpl
 import com.example.plant.utils.Randomizer
 import com.example.ui.components.DayTimeTabs
 import com.example.ui.components.ListTopBar
@@ -52,14 +43,14 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun HabitScreen(
     viewModel: HabitViewModel = koinViewModel(),
-    onNavigate: (NavKey) -> Unit,
+    onOpenHabitSetup: (Long?) -> Unit,
 ) {
     val state by viewModel.habitState.collectAsStateWithLifecycle()
 
     HabitScreen(
         state = state,
         onAction = viewModel::onAction,
-        onNavigate = onNavigate,
+        onOpenHabitSetup = onOpenHabitSetup,
     )
 }
 
@@ -67,7 +58,7 @@ fun HabitScreen(
 fun HabitScreen(
     state: HabitState,
     onAction: (HabitAction) -> Unit,
-    onNavigate: (NavKey) -> Unit,
+    onOpenHabitSetup: (Long?) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -79,7 +70,7 @@ fun HabitScreen(
                 onDateRangeSelect = { date ->
                     onAction(HabitAction.SelectDateRange(date))
                 },
-                onAddClick = { onNavigate(HabitItemNavKey(habitId = null)) },
+                onAddClick = { onOpenHabitSetup(null) },
                 searchQuery = state.searchQuery,
                 onSearch = { onAction(HabitAction.Search(it)) },
             )
@@ -112,7 +103,7 @@ fun HabitScreen(
                         plant = habitWithRelations.plant,
                         onToggle = { onAction(HabitAction.ToggleHabit(it)) },
                         onDelete = { onAction(HabitAction.DeleteHabit(it)) },
-                        onClick = { onNavigate(HabitItemNavKey(it)) },
+                        onClick = { onOpenHabitSetup(it) },
                     )
                 }
             }
@@ -149,7 +140,8 @@ fun HabitItem(
                 variability = plant.variability,
                 config = plant.toPlantConfig(),
                 onAnimate = {},
-                onNextStage = {},
+                onStopAnimate = {},
+                onDownload = {},
             )
 
             Spacer(Modifier.height(8.dp))
@@ -184,46 +176,3 @@ fun HabitItem(
         }
     }
 }
-
-// TODO: Maybe replace config with new model
-fun HabitPlant.toPlantConfig(): PlantConfig =
-    PlantConfig(
-        lSystemSentence =
-            generateSentence(
-                seed = seed,
-                presetId = presetId,
-                iterations = iterations,
-                variability = variability,
-            ),
-        branchConfig =
-            BranchConfig(
-                baseLength = baseLength,
-                baseAngle = baseAngle,
-                baseWidth = baseWidth,
-                widthFalloff = widthFalloff,
-                minWidth = widthFalloffEndAt,
-            ),
-        leafConfig =
-            LeafConfig(
-                length = petalLength,
-                type = LeafType.valueOf(petalType),
-            ),
-        renderConfig =
-            RenderConfig(
-                branchColor = Color.fromColorLong(baseColor),
-                leafColor = Color.fromColorLong(petalColor),
-                leafAlpha = petalAlpha,
-            ),
-    )
-
-fun generateSentence(
-    seed: Long,
-    presetId: Int,
-    iterations: Int,
-    variability: Float,
-): String =
-    LSystemGeneratorImpl(Randomizer(seed)).generateSentence(
-        presetId,
-        iterations,
-        variability,
-    )

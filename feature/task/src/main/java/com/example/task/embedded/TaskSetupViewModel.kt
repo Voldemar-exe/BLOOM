@@ -24,19 +24,17 @@ import java.time.LocalTime
 import java.time.YearMonth
 
 @KoinViewModel
-class TaskSetupViewModel(
-    val taskRepository: TaskRepository,
-) : ViewModel() {
-    private val _state = MutableStateFlow(TaskItemState())
-    val state: StateFlow<TaskItemState> = _state.asStateFlow()
+class TaskSetupViewModel(private val taskRepository: TaskRepository) : ViewModel() {
+    private val _state = MutableStateFlow(TaskSetupState())
+    val state: StateFlow<TaskSetupState> = _state.asStateFlow()
 
     private val _effect =
-        MutableSharedFlow<TaskItemEffect>(
+        MutableSharedFlow<TaskSetupEffect>(
             replay = 0,
             extraBufferCapacity = 1,
             onBufferOverflow = BufferOverflow.SUSPEND,
         )
-    val effect: SharedFlow<TaskItemEffect> = _effect
+    val effect: SharedFlow<TaskSetupEffect> = _effect
 
     fun onAction(action: TaskSetupAction) {
         Timber.d("$action")
@@ -51,10 +49,8 @@ class TaskSetupViewModel(
             is TaskSetupAction.UpdateReminder -> updateReminder(action.index, action.time)
             is TaskSetupAction.ToggleReminder -> toggleReminder(action.index)
             is TaskSetupAction.RemoveReminder -> removeReminder(action.index)
-
             TaskSetupAction.ToggleEndDate -> _state.update { it.copy(hasEndDate = !it.hasEndDate) }
             is TaskSetupAction.SetEndDate -> setEndDate(action.date)
-
             is TaskSetupAction.AddSubtask -> addSubtask(action.title)
             is TaskSetupAction.RemoveSubtask -> removeSubtask(action.index)
             is TaskSetupAction.ToggleSubtask -> toggleSubtask(action.index)
@@ -250,7 +246,7 @@ class TaskSetupViewModel(
             taskRepository.deleteSubtasksByIds(
                 state.value.subtasksToDelete.toList(),
             )
-            _effect.emit(TaskItemEffect.SaveSuccess)
+            _effect.emit(TaskSetupEffect.SaveSuccess)
         }
     }
 

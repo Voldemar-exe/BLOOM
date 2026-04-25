@@ -1,45 +1,73 @@
 package com.example.habit
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.designsystem.picture.BloomIcons
+import com.example.plant.PlantConfig
 import com.example.plant.utils.Randomizer
 
 @Composable
-fun PlantItem(
-    modifier: Modifier = Modifier,
-    plantState: PlantState,
-    onAnimate: () -> Unit = {},
-    onNextStage: () -> Unit = {},
-    onItemClick: () -> Unit = {},
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(text = plantState.label, fontSize = 28.sp)
+fun PlantItem() {
+}
 
-        PlantCanvas(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .border(1.dp, Color.Gray)
-                    .clickable { onItemClick() },
-            randomizer = Randomizer(plantState.generationConfig.seed),
-            variability = plantState.generationConfig.variability,
-            config = plantState.plantConfig,
-            onAnimate = onAnimate,
-            onNextStage = onNextStage,
-        )
+@Composable
+fun PlantCloseUp(
+    modifier: Modifier = Modifier,
+    seed: Long,
+    variability: Float,
+    plantConfig: PlantConfig,
+) {
+    Row(
+        modifier =
+            Modifier
+                .height(250.dp)
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(modifier = Modifier.weight(1f).border(1.dp, Color.Gray)) {
+            PlantCanvas(
+                randomizer = Randomizer(seed),
+                variability = variability,
+                config = plantConfig,
+                onAnimate = {},
+                onStopAnimate = {},
+                onDownload = {},
+            )
+        }
+
+        Column {
+            FilledIconButton(onClick = {}) {
+                Icon(
+                    painter = painterResource(BloomIcons.Play),
+                    contentDescription = "play",
+                )
+            }
+            FilledIconButton(onClick = {}) {
+                Icon(
+                    painter = painterResource(BloomIcons.Stop),
+                    contentDescription = "stop",
+                )
+            }
+            FilledIconButton(onClick = {}) {
+                Icon(
+                    painter = painterResource(BloomIcons.Download),
+                    contentDescription = "download",
+                )
+            }
+        }
     }
 }

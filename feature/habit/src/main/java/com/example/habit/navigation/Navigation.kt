@@ -12,26 +12,24 @@ import kotlinx.serialization.Serializable
 object HabitNavKey : NavKey
 
 @Serializable
-data class HabitItemNavKey(
-    val habitId: Long?,
-) : NavKey
+data class HabitItemNavKey(val habitId: Long?) : NavKey
 
 @Serializable
-data class HabitPlantNavKey(
-    val habitId: Long?,
-) : NavKey
+data class HabitPlantNavKey(val habitId: Long?) : NavKey
 
 fun EntryProviderScope<NavKey>.habitEntry(navigator: Navigator) {
     entry<HabitNavKey> {
         HabitScreen(
-            onNavigate = {
-                navigator.navigate(it)
+            onOpenHabitSetup = {
+                navigator.navigate(HabitItemNavKey(it))
             },
         )
     }
     entry<HabitItemNavKey> { navKey ->
         HabitItemScreen(
             habitId = navKey.habitId,
+            onBack = { navigator.goBack() },
+            onNavigate = { navigator.navigate(HabitPlantNavKey(it)) },
         )
     }
     entry<HabitPlantNavKey> { navKey ->

@@ -71,12 +71,12 @@ fun TaskItemScreen(
 
     viewModel.effect.CollectOneShotEffect { effect ->
         when (effect) {
-            TaskItemEffect.SaveSuccess -> onBack()
+            TaskSetupEffect.SaveSuccess -> onBack()
         }
     }
 
     TaskItemScreen(
-        taskItemState = taskItemState,
+        state = taskItemState,
         onAction = viewModel::onAction,
         onBack = onBack,
     )
@@ -84,7 +84,7 @@ fun TaskItemScreen(
 
 @Composable
 internal fun TaskItemScreen(
-    taskItemState: TaskItemState,
+    state: TaskSetupState,
     onAction: (TaskSetupAction) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -122,13 +122,13 @@ internal fun TaskItemScreen(
 
                 InputFieldWithClear(
                     label = "Измените название",
-                    value = taskItemState.title,
+                    value = state.title,
                     onValueChange = { onAction(TaskSetupAction.OnTitleChange(it)) },
                 )
 
                 InputFieldWithClear(
                     label = "Измените описание",
-                    value = taskItemState.description,
+                    value = state.description,
                     onValueChange = { onAction(TaskSetupAction.OnDescriptionChange(it)) },
                 )
             }
@@ -136,7 +136,7 @@ internal fun TaskItemScreen(
             item {
                 LocalizedDropdownMenu(
                     icon = BloomIcons.Priority,
-                    label = taskItemState.priority.ru,
+                    label = state.priority.ru,
                     onSelect = {
                         onAction(TaskSetupAction.OnPriorityClick(it as Priority))
                     },
@@ -148,14 +148,14 @@ internal fun TaskItemScreen(
                 LocalizedDropdownMenu(
                     icon = BloomIcons.Tag,
                     label =
-                        if (taskItemState.tags.isEmpty()) {
+                        if (state.tags.isEmpty()) {
                             "Выбери несколько тегов"
                         } else {
-                            val count = taskItemState.tags.size
+                            val count = state.tags.size
                             if (count > 1) {
-                                taskItemState.tags.first().ru + " + ${taskItemState.tags.size - 1}"
+                                state.tags.first().ru + " + ${state.tags.size - 1}"
                             } else {
-                                taskItemState.tags.first().ru
+                                state.tags.first().ru
                             }
                         },
                     onSelect = {
@@ -177,8 +177,8 @@ internal fun TaskItemScreen(
 
             item {
                 RecurrenceSection(
-                    type = taskItemState.recurrenceType,
-                    monthDays = taskItemState.daysOfWeek,
+                    type = state.recurrenceType,
+                    monthDays = state.daysOfWeek,
                     currentMonth = YearMonth.now(),
                     onTypeChange = { onAction(TaskSetupAction.SetRecurrenceType(it)) },
                     onDaysChange = { onAction(TaskSetupAction.UpdateSelectedDays(it)) },
@@ -187,15 +187,15 @@ internal fun TaskItemScreen(
 
             item {
                 EndDateToggle(
-                    checked = taskItemState.hasEndDate,
+                    checked = state.hasEndDate,
                     onToggle = { onAction(TaskSetupAction.ToggleEndDate) },
                 )
             }
 
             item {
-                if (taskItemState.hasEndDate) {
+                if (state.hasEndDate) {
                     EndDateField(
-                        dateMillis = taskItemState.deadline,
+                        dateMillis = state.deadline,
                         onDateSelected = {
                             it?.let {
                                 onAction(TaskSetupAction.SetEndDate(it))
@@ -204,7 +204,7 @@ internal fun TaskItemScreen(
                     )
                 } else {
                     ReminderSection(
-                        reminders = taskItemState.reminders,
+                        reminders = state.reminders,
                         onAdd = { onAction(TaskSetupAction.AddReminder(it)) },
                         onUpdate = { index, time ->
                             onAction(TaskSetupAction.UpdateReminder(index, time))
@@ -225,7 +225,7 @@ internal fun TaskItemScreen(
                 )
             }
 
-            itemsIndexed(taskItemState.subtasks) { index, subtask ->
+            itemsIndexed(state.subtasks) { index, subtask ->
                 SubtaskRow(
                     text = subtask.title,
                     isChecked = subtask.isChecked,
@@ -235,7 +235,7 @@ internal fun TaskItemScreen(
             }
 
             item {
-                if (taskItemState.subtasks.size < 3) {
+                if (state.subtasks.size < 3) {
                     var isInputDialog by remember { mutableStateOf(false) }
                     Button(
                         onClick = { isInputDialog = true },

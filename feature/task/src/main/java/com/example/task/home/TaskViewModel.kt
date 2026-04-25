@@ -19,9 +19,7 @@ import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @KoinViewModel
-class TaskViewModel(
-    val taskRepository: TaskRepository,
-) : ViewModel() {
+class TaskViewModel(private val taskRepository: TaskRepository) : ViewModel() {
     private val _taskUiState = MutableStateFlow(TaskState())
     val taskUiState: StateFlow<TaskState>
         get() = _taskUiState.asStateFlow()

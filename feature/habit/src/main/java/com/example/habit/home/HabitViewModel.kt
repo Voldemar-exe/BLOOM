@@ -19,9 +19,7 @@ import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @KoinViewModel
-class HabitViewModel(
-    private val habitRepository: HabitRepository,
-) : ViewModel() {
+class HabitViewModel(private val habitRepository: HabitRepository) : ViewModel() {
     private val _habitState = MutableStateFlow(HabitState())
     val habitState: StateFlow<HabitState>
         get() = _habitState.asStateFlow()
@@ -30,7 +28,7 @@ class HabitViewModel(
     private val filterTagsFlow = MutableStateFlow(emptySet<Tag>())
 
     init {
-        Timber.d("Start HabitViewModel with $_habitState")
+        Timber.d("Start with ${_habitState.value}")
 
         viewModelScope.launch {
             searchQueryFlow

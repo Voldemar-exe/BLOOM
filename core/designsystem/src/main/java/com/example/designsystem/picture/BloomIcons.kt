@@ -19,4 +19,8 @@ object BloomIcons {
     val Filter = R.drawable.filter_list_24px
     val Priority = R.drawable.low_priority_24px
     val Tag = R.drawable.tag_24px
+    val Play = R.drawable.play_arrow_24px
+    val Stop = R.drawable.stop_24px
+    val Download = R.drawable.download_24px
+    val Random = R.drawable.casino_24px
 }

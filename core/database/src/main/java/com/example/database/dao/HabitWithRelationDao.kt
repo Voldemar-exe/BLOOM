@@ -11,6 +11,7 @@ import kotlin.time.Clock
 
 @Dao
 interface HabitWithRelationDao {
+    @Transaction
     @Query(
         """
     SELECT * FROM habits
@@ -80,11 +81,15 @@ interface HabitWithRelationDao {
     @Query("DELETE FROM habit_plants WHERE habitId = :habitId")
     suspend fun deletePlantByHabitId(habitId: Long)
 
+    @Query("DELETE FROM habit_reminders WHERE habitId = :habitId")
+    suspend fun deleteRemindersByHabitId(habitId: Long)
+
     @Transaction
     suspend fun softDeleteHabitCascade(habitId: Long) {
         val now = Clock.System.now().toEpochMilliseconds()
 
         softDeleteHabit(habitId, now, SyncStatus.DELETED)
         deletePlantByHabitId(habitId)
+        deleteRemindersByHabitId(habitId)
     }
 }

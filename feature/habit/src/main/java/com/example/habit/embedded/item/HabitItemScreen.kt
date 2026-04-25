@@ -1,10 +1,300 @@
 package com.example.habit.embedded.item
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.designsystem.picture.BloomIcons
+import com.example.habit.PlantCloseUp
+import com.example.habit.util.toPlantConfig
+import com.example.model.Tag
+import com.example.ui.components.InputFieldWithClear
+import com.example.ui.components.LocalizedDropdownMenu
+import com.example.ui.components.RecurrenceSection
+import com.example.ui.components.ReminderSection
+import com.example.ui.components.TextInputDialog
+import com.example.ui.logic.CollectOneShotEffect
+import org.koin.compose.viewmodel.koinViewModel
+import java.time.YearMonth
 
 @Composable
 fun HabitItemScreen(
-    habitId: Long?
+    habitId: Long?,
+    onBack: () -> Unit,
+    onNavigate: (habitId: Long?) -> Unit,
+    viewModel: HabitSetupViewModel = koinViewModel(),
 ) {
+    LaunchedEffect(habitId) {
+        habitId?.let { viewModel.onAction(HabitSetupAction.LoadHabit(it)) }
+    }
 
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    viewModel.effect.CollectOneShotEffect { effect ->
+        when (effect) {
+            HabitSetupEffect.SaveSuccess -> onBack()
+        }
+    }
+
+    HabitItemScreen(
+        state = state,
+        onAction = viewModel::onAction,
+        onBack = onBack,
+        onNavigate = onNavigate,
+    )
+}
+
+@Composable
+internal fun HabitItemScreen(
+    state: HabitSetupState,
+    onAction: (HabitSetupAction) -> Unit,
+    onBack: () -> Unit,
+    onNavigate: (habitId: Long?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Настрой привычку") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = "back",
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { onAction(HabitSetupAction.OnSaveHabit) }) {
+                        Icon(Icons.Default.Check, contentDescription = "save")
+                    }
+                },
+            )
+        },
+    ) { padding ->
+
+        LazyColumn(modifier = modifier.padding(padding)) {
+            item {
+                PlantCloseUp(
+                    seed = state.plant.seed,
+                    variability = state.plant.variability,
+                    plantConfig = state.plant.toPlantConfig(),
+                )
+            }
+            item {
+                Button(
+                    onClick = { onNavigate(state.id.takeIf { it > 0L }) },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                ) {
+                    Text("Изменить растение")
+                }
+
+                Text(
+                    text =
+                        "preset=${state.plant.presetId}, " +
+                            "iter=${state.plant.iterations}, var=${state.plant.variability}",
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                InputFieldWithClear(
+                    label = "Измените название",
+                    value = state.title,
+                    onValueChange = { onAction(HabitSetupAction.OnTitleChange(it)) },
+                )
+
+                InputFieldWithClear(
+                    label = "Измените описание",
+                    value = state.description,
+                    onValueChange = { onAction(HabitSetupAction.OnDescriptionChange(it)) },
+                )
+            }
+
+            item {
+                LocalizedDropdownMenu(
+                    icon = BloomIcons.Tag,
+                    label =
+                        if (state.tags.isEmpty()) {
+                            "Выбери несколько тегов"
+                        } else {
+                            val count = state.tags.size
+                            if (count > 1) {
+                                state.tags.first().ru + " + ${count - 1}"
+                            } else {
+                                state.tags.first().ru
+                            }
+                        },
+                    onSelect = { onAction(HabitSetupAction.OnTagClick(it as Tag)) },
+                    items = Tag.entries,
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    "Интервал и повторение",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+
+            item {
+                RecurrenceSection(
+                    type = state.recurrenceType,
+                    monthDays = state.daysOfWeek,
+                    currentMonth = YearMonth.now(),
+                    onTypeChange = {
+                        onAction(
+                            HabitSetupAction.SetRecurrenceType(it),
+                        )
+                    },
+                    onDaysChange = { onAction(HabitSetupAction.UpdateSelectedDays(it)) },
+                )
+            }
+
+            item {
+                ReminderSection(
+                    reminders = state.reminders,
+                    onAdd = { onAction(HabitSetupAction.AddReminder(it)) },
+                    onUpdate = { index, time ->
+                        onAction(
+                            HabitSetupAction.UpdateReminder(
+                                index,
+                                time,
+                            ),
+                        )
+                    },
+                    onToggle = { onAction(HabitSetupAction.ToggleReminder(it)) },
+                    onRemove = { onAction(HabitSetupAction.RemoveReminder(it)) },
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    "Этапы (макс. 3)",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+
+            itemsIndexed(state.steps) { index, title ->
+                HabitSteps(
+                    title = title,
+                    checked = index in state.checkedSteps,
+                    onToggle = { onAction(HabitSetupAction.ToggleStep(index)) },
+                    onRemove = { onAction(HabitSetupAction.RemoveStep(index)) },
+                )
+            }
+
+            item {
+                if (state.steps.size < 3) {
+                    var isDialog by remember { mutableStateOf(false) }
+
+                    Button(
+                        onClick = { isDialog = true },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                    ) {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "add")
+                        Spacer(modifier = Modifier.height(0.dp))
+                        Text("Добавить этап")
+                    }
+
+                    TextInputDialog(
+                        isVisible = isDialog,
+                        title = "Новый этап",
+                        placeholder = "Введите текст этапа",
+                        initialText = "",
+                        onDismiss = { isDialog = false },
+                        onConfirm = { text ->
+                            onAction(HabitSetupAction.AddStep(text))
+                            isDialog = false
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HabitSteps(
+    title: String,
+    checked: Boolean,
+    onToggle: () -> Unit,
+    onRemove: () -> Unit,
+) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+                .background(
+                    MaterialTheme.colorScheme.secondaryContainer,
+                    RoundedCornerShape(12.dp),
+                ).clickable { onToggle() }
+                .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = { onToggle() },
+        )
+        Text(
+            text = title,
+            modifier = Modifier.weight(1f),
+            fontSize = 14.sp,
+        )
+        IconButton(onClick = onRemove) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "remove",
+                tint = Color.Gray,
+            )
+        }
+    }
 }
