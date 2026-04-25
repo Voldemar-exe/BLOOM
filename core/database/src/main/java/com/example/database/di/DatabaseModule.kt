@@ -2,6 +2,10 @@ package com.example.database.di
 
 import androidx.room.Room
 import com.example.database.BloomDatabase
+import com.example.database.dao.HabitDao
+import com.example.database.dao.HabitPlantDao
+import com.example.database.dao.HabitReminderDao
+import com.example.database.dao.HabitWithRelationDao
 import com.example.database.dao.SubtaskDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
@@ -29,5 +33,17 @@ val databaseModule =
         }
         single<TaskWithRelationDao> {
             get<BloomDatabase>().taskWithRelationDao()
+        }
+        single<HabitDao> {
+            get<BloomDatabase>().habitDao()
+        }
+        single<HabitPlantDao> {
+            get<BloomDatabase>().habitPlantDao()
+        }
+        single<HabitReminderDao> {
+            get<BloomDatabase>().habitReminderDao()
+        }
+        single<HabitWithRelationDao> {
+            get<BloomDatabase>().habitWithRelationDao()
         }
     }

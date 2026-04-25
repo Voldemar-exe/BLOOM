@@ -3,13 +3,17 @@ package com.example.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.database.dao.HabitDao
+import com.example.database.dao.HabitPlantDao
+import com.example.database.dao.HabitReminderDao
+import com.example.database.dao.HabitWithRelationDao
 import com.example.database.dao.SubtaskDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
-import com.example.database.model.Habit
-import com.example.database.model.HabitPlant
-import com.example.database.model.HabitReminder
+import com.example.database.model.HabitEntity
+import com.example.database.model.HabitPlantEntity
+import com.example.database.model.HabitReminderEntity
 import com.example.database.model.SubtaskEntity
 import com.example.database.model.TaskEntity
 import com.example.database.model.TaskReminderEntity
@@ -19,9 +23,9 @@ import com.example.database.util.StringListConverter
 
 @Database(
     entities = [
-        Habit::class,
-        HabitPlant::class,
-        HabitReminder::class,
+        HabitEntity::class,
+        HabitPlantEntity::class,
+        HabitReminderEntity::class,
         SubtaskEntity::class,
         TaskEntity::class,
         TaskReminderEntity::class,
@@ -44,4 +48,12 @@ internal abstract class BloomDatabase : RoomDatabase() {
     abstract fun taskReminderDao(): TaskReminderDao
 
     abstract fun taskWithRelationDao(): TaskWithRelationDao
+
+    abstract fun habitDao(): HabitDao
+
+    abstract fun habitPlantDao(): HabitPlantDao
+
+    abstract fun habitReminderDao(): HabitReminderDao
+
+    abstract fun habitWithRelationDao(): HabitWithRelationDao
 }

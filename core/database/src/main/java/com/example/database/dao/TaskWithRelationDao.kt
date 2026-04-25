@@ -3,7 +3,7 @@ package com.example.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
-import com.example.database.model.relationships.TaskAndSubtasks
+import com.example.database.model.relationships.TaskWithSubtasks
 import com.example.database.model.relationships.TaskWithSubtasksAndReminders
 import com.example.model.SyncStatus
 import kotlinx.coroutines.flow.Flow
@@ -32,7 +32,7 @@ interface TaskWithRelationDao {
 
     @Transaction
     @Query("SELECT * FROM tasks WHERE id = :taskId AND syncStatus != 'DELETED'")
-    suspend fun getTaskWithSubtasks(taskId: Long): TaskAndSubtasks?
+    suspend fun getTaskWithSubtasks(taskId: Long): TaskWithSubtasks?
 
     @Transaction
     @Query("SELECT * FROM tasks WHERE id = :taskId AND syncStatus != 'DELETED'")

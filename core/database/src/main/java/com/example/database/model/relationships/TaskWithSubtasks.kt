@@ -5,7 +5,7 @@ import androidx.room.Relation
 import com.example.database.model.SubtaskEntity
 import com.example.database.model.TaskEntity
 
-data class TaskAndSubtasks(
+data class TaskWithSubtasks(
     @Embedded val taskEntity: TaskEntity,
     @Relation(
         parentColumn = "id",
