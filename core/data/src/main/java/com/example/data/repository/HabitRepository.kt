@@ -36,9 +36,10 @@ interface HabitRepository {
 
     suspend fun deleteRemindersByIds(ids: List<Long>)
 
-    suspend fun saveHabit(habit: Habit): Long
-
-    suspend fun savePlant(plant: HabitPlant)
+    suspend fun saveHabit(
+        habit: Habit,
+        plant: HabitPlant,
+    ): Long
 
     suspend fun saveReminder(reminder: Reminder)
 }
@@ -96,13 +97,10 @@ internal class HabitRepositoryImpl(
         ids.forEach { reminderDao.deleteById(it) }
     }
 
-    override suspend fun saveHabit(habit: Habit): Long =
-        habitDao.upsert(habit.asEntity().copy(syncStatus = SyncStatus.CHANGED))
-
-    override suspend fun savePlant(plant: HabitPlant) {
-        habitDao.updateSyncStatus(plant.habitId, SyncStatus.CHANGED)
-        plantDao.upsert(plant.asEntity())
-    }
+    override suspend fun saveHabit(
+        habit: Habit,
+        plant: HabitPlant,
+    ): Long = plantDao.upsertHabitWithPlant(habit.asEntity(), plant.asEntity())
 
     override suspend fun saveReminder(reminder: Reminder) {
         habitDao.updateSyncStatus(reminder.parentId, SyncStatus.CHANGED)

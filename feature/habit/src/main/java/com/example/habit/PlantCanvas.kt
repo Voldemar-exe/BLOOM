@@ -30,7 +30,6 @@ fun PlantCanvas(
     config: PlantConfig,
     onAnimate: () -> Unit,
     onStopAnimate: () -> Unit,
-    onDownload: () -> Unit,
 ) {
     val lSystemInterpreter = remember { LSystemInterpreterImpl() }
     val pathBuilder = remember { PathBuilderImpl() }

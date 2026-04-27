@@ -1,5 +1,6 @@
 package com.example.habit.embedded.item
 
+import com.example.model.HabitPlant
 import com.example.model.RecurrenceType
 import com.example.model.Tag
 
@@ -28,7 +29,7 @@ sealed interface HabitSetupAction {
 
     data class ToggleStep(val index: Int) : HabitSetupAction
 
-//    data class SetPlant(val plant: HabitPlant) : HabitSetupAction
+    data class SetPlant(val plant: HabitPlant) : HabitSetupAction
 
     object OnSaveHabit : HabitSetupAction
 

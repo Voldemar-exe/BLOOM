@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.designsystem.picture.BloomIcons
 import com.example.habit.PlantCloseUp
 import com.example.habit.util.toPlantConfig
+import com.example.model.HabitPlant
 import com.example.model.Tag
 import com.example.ui.components.InputFieldWithClear
 import com.example.ui.components.LocalizedDropdownMenu
@@ -52,12 +55,16 @@ import java.time.YearMonth
 @Composable
 fun HabitItemScreen(
     habitId: Long?,
+    plant: HabitPlant?,
     onBack: () -> Unit,
-    onNavigate: (habitId: Long?) -> Unit,
+    onOpenPlantSetup: (HabitPlant) -> Unit,
     viewModel: HabitSetupViewModel = koinViewModel(),
 ) {
     LaunchedEffect(habitId) {
         habitId?.let { viewModel.onAction(HabitSetupAction.LoadHabit(it)) }
+    }
+    LaunchedEffect(plant) {
+        plant?.let { viewModel.onAction(HabitSetupAction.SetPlant(it)) }
     }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -72,7 +79,7 @@ fun HabitItemScreen(
         state = state,
         onAction = viewModel::onAction,
         onBack = onBack,
-        onNavigate = onNavigate,
+        onOpenPlantSetup = onOpenPlantSetup,
     )
 }
 
@@ -81,7 +88,7 @@ internal fun HabitItemScreen(
     state: HabitSetupState,
     onAction: (HabitSetupAction) -> Unit,
     onBack: () -> Unit,
-    onNavigate: (habitId: Long?) -> Unit,
+    onOpenPlantSetup: (HabitPlant) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -107,15 +114,24 @@ internal fun HabitItemScreen(
 
         LazyColumn(modifier = modifier.padding(padding)) {
             item {
+                // TODO: It draw differently. I don't know why
                 PlantCloseUp(
                     seed = state.plant.seed,
                     variability = state.plant.variability,
                     plantConfig = state.plant.toPlantConfig(),
+                    extraButton = {
+                        FilledIconButton(onClick = {}) {
+                            Icon(
+                                painter = painterResource(BloomIcons.Download),
+                                contentDescription = "download",
+                            )
+                        }
+                    },
                 )
             }
             item {
                 Button(
-                    onClick = { onNavigate(state.id.takeIf { it > 0L }) },
+                    onClick = { onOpenPlantSetup(state.plant) },
                     modifier =
                         Modifier
                             .fillMaxWidth()

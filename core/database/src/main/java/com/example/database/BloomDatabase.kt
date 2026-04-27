@@ -17,7 +17,6 @@ import com.example.database.model.HabitReminderEntity
 import com.example.database.model.SubtaskEntity
 import com.example.database.model.TaskEntity
 import com.example.database.model.TaskReminderEntity
-import com.example.database.util.InstantConverter
 import com.example.database.util.IntListConverter
 import com.example.database.util.StringListConverter
 
@@ -35,7 +34,6 @@ import com.example.database.util.StringListConverter
 )
 @TypeConverters(
     value = [
-        InstantConverter::class,
         IntListConverter::class,
         StringListConverter::class,
     ],

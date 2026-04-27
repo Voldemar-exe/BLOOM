@@ -2,9 +2,7 @@ package com.example.navigation
 
 import androidx.navigation3.runtime.NavKey
 
-class Navigator(
-    val state: NavigationState,
-) {
+class Navigator(val state: NavigationState) {
     fun navigate(key: NavKey) {
         when (key) {
             state.currentTopLevelKey -> clearSubStack()
@@ -28,6 +26,15 @@ class Navigator(
             }
         }
     }
+
+    fun <T> setResult(
+        key: String,
+        value: T?,
+    ) {
+        state.setResult(key, value)
+    }
+
+    fun <T> consumeResult(key: String): T? = state.consumeResult(key)
 
     private fun goToKey(key: NavKey) {
         state.currentSubStack.apply {

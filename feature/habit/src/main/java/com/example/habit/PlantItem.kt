@@ -29,6 +29,7 @@ fun PlantCloseUp(
     seed: Long,
     variability: Float,
     plantConfig: PlantConfig,
+    extraButton: @Composable (() -> Unit),
 ) {
     Row(
         modifier =
@@ -38,14 +39,18 @@ fun PlantCloseUp(
                 .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(modifier = Modifier.weight(1f).border(1.dp, Color.Gray)) {
+        Box(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .border(1.dp, Color.Gray),
+        ) {
             PlantCanvas(
                 randomizer = Randomizer(seed),
                 variability = variability,
                 config = plantConfig,
                 onAnimate = {},
                 onStopAnimate = {},
-                onDownload = {},
             )
         }
 
@@ -62,12 +67,7 @@ fun PlantCloseUp(
                     contentDescription = "stop",
                 )
             }
-            FilledIconButton(onClick = {}) {
-                Icon(
-                    painter = painterResource(BloomIcons.Download),
-                    contentDescription = "download",
-                )
-            }
+            extraButton()
         }
     }
 }

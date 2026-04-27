@@ -40,28 +40,43 @@ class NavigationState(
 
     val topKeys get() = subStacks.keys
 
-    val currentSubStack: NavBackStack<NavKey> get() =
-        subStacks[currentTopLevelKey]
-            ?: error("Sub stack for $currentTopLevelKey does not exist")
+    val currentSubStack: NavBackStack<NavKey>
+        get() =
+            subStacks[currentTopLevelKey]
+                ?: error("Sub stack for $currentTopLevelKey does not exist")
 
     val currentKey: NavKey by derivedStateOf { currentSubStack.last() }
+
+    private val results = mutableMapOf<String, Any?>()
+
+    fun <T> setResult(
+        key: String,
+        value: T?,
+    ) {
+        results[key] = value
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T> consumeResult(key: String): T? = results.remove(key) as? T
 }
 
 @Composable
 fun NavigationState.toEntries(
     entryProvider: (NavKey) -> NavEntry<NavKey>,
 ): SnapshotStateList<NavEntry<NavKey>> {
-    val decoratedEntries = subStacks.mapValues { (_, stack) ->
-        val decorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator<NavKey>(),
-            rememberViewModelStoreNavEntryDecorator<NavKey>(),
-        )
-        rememberDecoratedNavEntries(
-            backStack = stack,
-            entryDecorators = decorators,
-            entryProvider = entryProvider,
-        )
-    }
+    val decoratedEntries =
+        subStacks.mapValues { (_, stack) ->
+            val decorators =
+                listOf(
+                    rememberSaveableStateHolderNavEntryDecorator<NavKey>(),
+                    rememberViewModelStoreNavEntryDecorator<NavKey>(),
+                )
+            rememberDecoratedNavEntries(
+                backStack = stack,
+                entryDecorators = decorators,
+                entryProvider = entryProvider,
+            )
+        }
 
     return topStack
         .flatMap { decoratedEntries[it] ?: emptyList() }

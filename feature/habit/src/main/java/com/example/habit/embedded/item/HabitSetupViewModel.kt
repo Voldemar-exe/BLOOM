@@ -69,7 +69,7 @@ class HabitSetupViewModel(private val habitRepository: HabitRepository) : ViewMo
             is HabitSetupAction.RemoveStep -> removeStep(action.index)
             is HabitSetupAction.ToggleStep -> toggleStep(action.index)
 
-//            is HabitSetupAction.SetPlant -> _state.update { it.copy(plant = action.plant) }
+            is HabitSetupAction.SetPlant -> _state.update { it.copy(plant = action.plant) }
 
             HabitSetupAction.OnSaveHabit -> saveHabit()
 
@@ -198,9 +198,7 @@ class HabitSetupViewModel(private val habitRepository: HabitRepository) : ViewMo
 
     private fun saveHabit() {
         viewModelScope.launch {
-            val habitId = habitRepository.saveHabit(stateToHabit())
-
-            habitRepository.savePlant(_state.value.plant.copy(habitId = habitId))
+            val habitId = habitRepository.saveHabit(stateToHabit(), _state.value.plant)
 
             _state.value.reminders.forEach {
                 habitRepository.saveReminder(

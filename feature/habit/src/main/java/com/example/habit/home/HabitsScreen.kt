@@ -140,9 +140,7 @@ fun HabitItem(
                 variability = plant.variability,
                 config = plant.toPlantConfig(),
                 onAnimate = {},
-                onStopAnimate = {},
-                onDownload = {},
-            )
+            ) {}
 
             Spacer(Modifier.height(8.dp))
 

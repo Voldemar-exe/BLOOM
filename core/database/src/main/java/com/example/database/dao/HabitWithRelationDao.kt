@@ -26,27 +26,8 @@ interface HabitWithRelationDao {
     ): Flow<List<HabitWithPlantAndReminders>>
 
     @Transaction
-    @Query(
-        """
-        SELECT * FROM habits
-        WHERE (:includeDeleted OR syncStatus != 'DELETED')
-        ORDER BY updatedAt DESC
-    """,
-    )
-    fun getHabitsWithPlant(includeDeleted: Boolean = false): Flow<List<HabitWithPlant>>
-
-    @Transaction
     @Query("SELECT * FROM habits WHERE id = :habitId AND syncStatus != 'DELETED'")
     suspend fun getHabitWithPlantAndReminders(habitId: Long): HabitWithPlantAndReminders?
-
-    @Transaction
-    @Query(
-        """
-        SELECT * FROM habits
-        WHERE id = :habitId AND syncStatus != 'DELETED'
-    """,
-    )
-    suspend fun getHabitWithPlant(habitId: Long): HabitWithPlant?
 
     @Transaction
     @Query(

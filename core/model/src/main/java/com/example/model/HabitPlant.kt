@@ -1,5 +1,10 @@
 package com.example.model
 
+import androidx.compose.runtime.Immutable
+import kotlinx.serialization.Serializable
+
+@Immutable
+@Serializable
 data class HabitPlant(
     val id: Long,
     val habitId: Long,

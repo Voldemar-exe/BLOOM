@@ -2,6 +2,7 @@ package com.example.habit.di
 
 import com.example.data.repository.HabitRepository
 import com.example.habit.embedded.item.HabitSetupViewModel
+import com.example.habit.embedded.plant.PlantSetupViewModel
 import com.example.habit.home.HabitViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -13,5 +14,8 @@ val habitModule =
         }
         viewModel<HabitSetupViewModel> {
             HabitSetupViewModel(get<HabitRepository>())
+        }
+        viewModel<PlantSetupViewModel> {
+            PlantSetupViewModel()
         }
     }
