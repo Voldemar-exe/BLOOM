@@ -1,4 +1,4 @@
-package com.example.profile
+package com.example.profile.home
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,15 +15,6 @@ class ProfileViewModel(
         get() = _profileUiState.asStateFlow()
 
     fun onAction(action: ProfileAction) {
-        when (action) {
-            is ProfileAction.LoadProfile -> TODO()
-            ProfileAction.OnAchievementsClick -> TODO()
-            ProfileAction.OnAvatarClick -> TODO()
-            ProfileAction.OnCustomizationClick -> TODO()
-            ProfileAction.OnLeaderboardClick -> TODO()
-            ProfileAction.OnSettingsClick -> TODO()
-            ProfileAction.OnShopClick -> TODO()
-            ProfileAction.OnThemeClick -> TODO()
-        }
+
     }
 }

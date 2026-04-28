@@ -2,8 +2,8 @@ package com.example.database.model.relationships
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.example.database.model.SubtaskEntity
-import com.example.database.model.TaskEntity
+import com.example.database.model.entities.SubtaskEntity
+import com.example.database.model.entities.TaskEntity
 
 data class TaskWithSubtasks(
     @Embedded val taskEntity: TaskEntity,

@@ -1,18 +1,14 @@
 package com.example.model
 
-import java.util.UUID
+import androidx.compose.ui.graphics.Color
 
 data class User(
-    val userId: UUID,
+    val userId: Long,
     val email: String,
-    val nickname: String,
-    val avatarUrl: String,
-    val createdAt: Long,
-    // TODO Add Data class for User's habit config
-    val weeklyGoal: Int,
-    val dailyStreakTarget: Int,
-    val totalHabitsCompleted: Double,
-    val currentStreak: Int,
-    val longestStreak: Int,
-    val achievements: List<String> // TODO Add Data class for Achievement
+    val username: String,
+    val avatar: Int,
+    val background: Int,
+    val color: Color,
+    val achievements: Set<Int>,
+    val purchases: List<Pair<String, String>>
 )

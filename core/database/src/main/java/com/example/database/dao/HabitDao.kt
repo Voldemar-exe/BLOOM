@@ -5,8 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.database.model.HabitEntity
-import com.example.model.SyncStatus
+import com.example.database.model.entities.HabitEntity
+import com.example.database.model.SyncStatus
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 

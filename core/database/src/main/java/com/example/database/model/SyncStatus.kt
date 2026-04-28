@@ -1,4 +1,4 @@
-package com.example.model
+package com.example.database.model
 
 enum class SyncStatus {
     SYNCED,

@@ -11,12 +11,12 @@ import com.example.database.dao.SubtaskDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
-import com.example.database.model.HabitEntity
-import com.example.database.model.HabitPlantEntity
-import com.example.database.model.HabitReminderEntity
-import com.example.database.model.SubtaskEntity
-import com.example.database.model.TaskEntity
-import com.example.database.model.TaskReminderEntity
+import com.example.database.model.entities.HabitEntity
+import com.example.database.model.entities.HabitPlantEntity
+import com.example.database.model.entities.HabitReminderEntity
+import com.example.database.model.entities.SubtaskEntity
+import com.example.database.model.entities.TaskEntity
+import com.example.database.model.entities.TaskReminderEntity
 import com.example.database.util.IntListConverter
 import com.example.database.util.StringListConverter
 

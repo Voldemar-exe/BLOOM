@@ -2,9 +2,9 @@ package com.example.database.model.relationships
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.example.database.model.HabitEntity
-import com.example.database.model.HabitPlantEntity
-import com.example.database.model.HabitReminderEntity
+import com.example.database.model.entities.HabitEntity
+import com.example.database.model.entities.HabitPlantEntity
+import com.example.database.model.entities.HabitReminderEntity
 
 data class HabitWithPlantAndReminders(
     @Embedded val habit: HabitEntity,

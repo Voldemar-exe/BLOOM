@@ -10,7 +10,7 @@ import com.example.database.dao.TaskWithRelationDao
 import com.example.database.model.relationships.TaskWithSubtasks
 import com.example.model.Reminder
 import com.example.model.Subtask
-import com.example.model.SyncStatus
+import com.example.database.model.SyncStatus
 import com.example.model.Tag
 import com.example.model.Task
 import com.example.model.TaskWithRelations

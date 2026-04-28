@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.example.database.model.SubtaskEntity
+import com.example.database.model.entities.SubtaskEntity
 
 @Dao
 interface SubtaskDao {

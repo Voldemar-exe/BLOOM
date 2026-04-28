@@ -1,8 +1,8 @@
 package com.example.data.util
 
-import com.example.database.model.SubtaskEntity
-import com.example.database.model.TaskEntity
-import com.example.database.model.TaskReminderEntity
+import com.example.database.model.entities.SubtaskEntity
+import com.example.database.model.entities.TaskEntity
+import com.example.database.model.entities.TaskReminderEntity
 import com.example.database.model.relationships.TaskWithSubtasksAndReminders
 import com.example.model.Reminder
 import com.example.model.Subtask

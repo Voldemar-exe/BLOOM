@@ -1,8 +1,8 @@
-package com.example.database.model
+package com.example.database.model.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.model.SyncStatus
+import com.example.database.model.SyncStatus
 import kotlin.time.Clock
 
 @Entity(tableName = "habits")

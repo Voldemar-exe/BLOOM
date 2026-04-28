@@ -1,4 +1,4 @@
-package com.example.profile
+package com.example.profile.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
@@ -75,11 +74,6 @@ internal fun ProfileScreen(
                 title = {
                     Text(text = stringResource(R.string.screen_title))
                 },
-                navigationIcon = {
-                    IconButton(onClick = { /* Menu */ }) {
-                        Icon(imageVector = Icons.Default.Menu, contentDescription = "menu")
-                    }
-                },
                 actions = {
                     IconButton(onClick = { /* Notifications */ }) {
                         Icon(Icons.Default.Notifications, contentDescription = "notifications")
@@ -92,15 +86,15 @@ internal fun ProfileScreen(
         },
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
+            val user = profileUiState.user!!
+            val stats = profileUiState.stats!!
             UserProfile(
-                username = profileUiState.username,
-                rankTitle = profileUiState.rankTitle,
-                progress = profileUiState.progress,
-                level = profileUiState.level,
-                coins = profileUiState.coins,
-                background = profileUiState.background,
-                avatar = profileUiState.avatar,
-                color = profileUiState.color,
+                username = user.username,
+                level = stats.level,
+                coins = stats.currentCoinsAmount,
+                background = user.background,
+                avatar = user.avatar,
+                color = user.color,
             )
             LazyColumn {
                 item {
@@ -114,7 +108,7 @@ internal fun ProfileScreen(
                                     stringResource(R.string.edit_parameters_label),
                                 ) {
                                     onAction(
-                                        ProfileAction.OnCustomizationClick,
+                                        ProfileAction.OnParametersClick,
                                     )
                                 },
                                 MenuItem(
@@ -146,7 +140,7 @@ internal fun ProfileScreen(
                                 MenuItem(
                                     BloomIcons.Store,
                                     stringResource(R.string.store_label),
-                                ) { onAction(ProfileAction.OnShopClick) },
+                                ) { onAction(ProfileAction.OnStoreClick) },
                                 MenuItem(
                                     BloomIcons.RatingStar,
                                     stringResource(R.string.rating_label),
@@ -162,9 +156,9 @@ internal fun ProfileScreen(
 @Composable
 fun UserProfile(
     username: String,
-    rankTitle: String,
+//    rankTitle: String,
 //    experience: Long,
-    progress: Float,
+//    progress: Float,
     level: Int,
     coins: Int,
     background: Int,
@@ -180,7 +174,8 @@ fun UserProfile(
                     .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
         ) {
-            Text(modifier = Modifier.padding(16.dp), text = rankTitle)
+            // TODO: Add Rank Title ENUM based on level
+            Text(modifier = Modifier.padding(16.dp), text = "Звание")
         }
         Box(
             modifier =
@@ -222,7 +217,7 @@ fun UserProfile(
                     Modifier
                         .weight(1f)
                         .padding(horizontal = 32.dp),
-                progress = { progress },
+                progress = { 0f }, // TODO: Add calculation based on level and experience
             )
             Surface(
                 shape = CircleShape,

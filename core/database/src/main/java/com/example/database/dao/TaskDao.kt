@@ -6,8 +6,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.example.database.model.TaskEntity
-import com.example.model.SyncStatus
+import com.example.database.model.entities.TaskEntity
+import com.example.database.model.SyncStatus
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 

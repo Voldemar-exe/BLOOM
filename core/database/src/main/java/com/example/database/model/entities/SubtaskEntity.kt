@@ -1,16 +1,16 @@
-package com.example.database.model
+package com.example.database.model.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlin.time.Clock
 
-@Entity(tableName = "task_reminders")
-data class TaskReminderEntity(
+@Entity(tableName = "subtasks")
+data class SubtaskEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
     val taskId: Long,
-    val reminderTime: String,
-    val isEnabled: Boolean,
+    val title: String,
+    val isChecked: Boolean,
     val createdAt: Long = Clock.System.now().toEpochMilliseconds(),
     val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
 )

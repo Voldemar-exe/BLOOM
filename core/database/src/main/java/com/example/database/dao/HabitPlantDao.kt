@@ -6,8 +6,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.example.database.model.HabitEntity
-import com.example.database.model.HabitPlantEntity
+import com.example.database.model.entities.HabitEntity
+import com.example.database.model.entities.HabitPlantEntity
 
 @Dao
 interface HabitPlantDao {

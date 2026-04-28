@@ -1,8 +1,8 @@
 package com.example.data.util
 
-import com.example.database.model.HabitEntity
-import com.example.database.model.HabitPlantEntity
-import com.example.database.model.HabitReminderEntity
+import com.example.database.model.entities.HabitEntity
+import com.example.database.model.entities.HabitPlantEntity
+import com.example.database.model.entities.HabitReminderEntity
 import com.example.database.model.relationships.HabitWithPlantAndReminders
 import com.example.model.Habit
 import com.example.model.HabitPlant

@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.example.database.model.HabitReminderEntity
+import com.example.database.model.entities.HabitReminderEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
