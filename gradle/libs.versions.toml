@@ -8,14 +8,17 @@ espressoCore = "3.7.0"
 kotlinxCoroutinesAndroid = "1.10.2"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.13.0"
-composeBom = "2026.03.01"
-jetbrainsKotlinJvm = "2.3.20"
+composeBom = "2026.04.01"
+jetbrainsKotlinJvm = "2.3.21"
 kotlinxSerializationJson = "1.11.0"
 androidxLifecycle = "2.10.0"
 timberVer = "5.0.1"
-nav3Core = "1.1.0"
+nav3Core = "1.1.1"
 lifecycleViewmodelNav3 = "2.10.0"
 ksp = "2.3.4"
+androidxDataStore = "1.2.1"
+protobuf = "4.34.1"
+protobufPlugin = "0.10.0"
 
 # used directly in gradle plugins
 androidx-compose-compiler = "1.5.10"
@@ -71,6 +74,11 @@ koin-compose-viewmodel = { group = "io.insert-koin", name = "koin-compose-viewmo
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+# Proto DataStore
+protobuf-kotlin-lite = { group = "com.google.protobuf", name = "protobuf-kotlin-lite", version.ref = "protobuf" }
+protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf" }
+androidx-dataStore = { group = "androidx.datastore", name = "datastore", version.ref = "androidxDataStore" }
+androidx-dataStore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "androidxDataStore" }
 
 # project internal convention plugin
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -89,6 +97,7 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
 
 # project internal convention plugins
 bloom-android-application = { id = "bloom.android.application", version = "unspecified" }
@@ -98,6 +107,7 @@ bloom-android-library = { id = "bloom.android.library", version = "unspecified" 
 bloom-android-library-compose = { id = "bloom.android.library.compose", version = "unspecified" }
 bloom-koin = { id = "bloom.koin", version = "unspecified" }
 bloom-room = { id = "bloom.room", version = "unspecified" }
+bloom-jvm-library = { id = "bloom.jvm.library", version = "unspecified" }
 bloom-feature-ui = { id = "bloom.feature.ui", version = "unspecified" }
 bloom-feature-domain = { id = "bloom.feature.domain", version = "unspecified" }
 bloom-feature-data = { id = "bloom.feature.data", version = "unspecified" }

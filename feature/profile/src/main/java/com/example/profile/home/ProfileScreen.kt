@@ -47,19 +47,23 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bloom.feature.profile.R
 import com.example.designsystem.picture.BloomIcons
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
-    // TODO: Replace with koin injection
-    viewModel: ProfileViewModel = ProfileViewModel(),
+    viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val profileUiState by viewModel.profileUiState.collectAsStateWithLifecycle()
 
-    ProfileScreen(
-        profileUiState = profileUiState,
-        onAction = viewModel::onAction,
-    )
+    if (profileUiState.user == null || profileUiState.stats == null) {
+        Text("placeholder")
+    } else {
+        ProfileScreen(
+            profileUiState = profileUiState,
+            onAction = viewModel::onAction,
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,7 +98,7 @@ internal fun ProfileScreen(
                 coins = stats.currentCoinsAmount,
                 background = user.background,
                 avatar = user.avatar,
-                color = user.color,
+                color = Color(user.color),
             )
             LazyColumn {
                 item {

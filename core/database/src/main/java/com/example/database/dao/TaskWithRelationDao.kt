@@ -3,14 +3,15 @@ package com.example.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import com.example.database.model.SyncStatus
 import com.example.database.model.relationships.TaskWithSubtasks
 import com.example.database.model.relationships.TaskWithSubtasksAndReminders
-import com.example.database.model.SyncStatus
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 
 @Dao
 interface TaskWithRelationDao {
+    @Transaction
     @Query(
         """
     SELECT * FROM tasks

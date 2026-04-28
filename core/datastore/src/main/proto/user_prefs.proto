@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+option java_package = "proto";
+option java_multiple_files = true;
+
+message UserProto {
+  int64 userId = 1;
+  string email = 2;
+  string username = 3;
+  int32 avatar = 4;
+  int32 background = 5;
+  int32 color = 6;
+  repeated int32 achievements = 7;
+
+  message Purchase {
+    string first = 1;
+    string second = 2;
+  }
+
+  repeated Purchase purchases = 8;
+}
+
+message UserStatsProto {
+  int32 level = 1;
+  int64 currentExperience = 2;
+  int32 currentCoinsAmount = 3;
+  int32 maxCoinsAmount = 4;
+  int32 totalHabitsCreated = 5;
+  int32 totalHabitsCompleted = 6;
+  int32 totalTasksCreated = 7;
+  int32 totalTasksCompleted = 8;
+  int32 currentStreak = 9;
+  int32 longestSteak = 10;
+}
+
+message AppSettingsProto {
+  string theme = 1;
+  int32 weeklyGoal = 2;
+  int32 streakTarget = 3;
+  bool emailEnabled = 4;
+  bool pushEnabled = 5;
+  bool habitRemindersEnabled = 6;
+  bool taskRemindersEnabled = 7;
+}
+
+message UserPreferences {
+  UserProto user = 1;
+  UserStatsProto stats = 2;
+  AppSettingsProto settings = 3;
+}

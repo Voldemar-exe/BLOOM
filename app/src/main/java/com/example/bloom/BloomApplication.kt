@@ -3,7 +3,9 @@ package com.example.bloom
 import android.app.Application
 import com.example.data.di.dataModule
 import com.example.database.di.databaseModule
+import com.example.datastore.di.dataStoreModule
 import com.example.habit.di.habitModule
+import com.example.profile.di.profileModule
 import com.example.task.di.taskModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -24,6 +26,8 @@ class BloomApplication : Application() {
                 databaseModule,
                 taskModule,
                 habitModule,
+                profileModule,
+                dataStoreModule,
             )
         }
 

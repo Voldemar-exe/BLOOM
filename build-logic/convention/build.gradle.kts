@@ -55,5 +55,9 @@ gradlePlugin {
             id = "bloom.koin"
             implementationClass = "KoinConventionPlugin"
         }
+        register("jvmLibrary") {
+            id = "bloom.jwm.library"
+            implementationClass = "JvmLibraryConventionPlugin"
+        }
     }
 }
