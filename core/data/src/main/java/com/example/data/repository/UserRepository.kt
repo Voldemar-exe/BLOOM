@@ -11,7 +11,7 @@ import org.koin.core.annotation.Singleton
 @Singleton
 interface UserRepository {
     val user: Flow<User?>
-    val stats: Flow<UserStats?>
+    val stats: Flow<UserStats>
     val settings: Flow<AppSettings>
 
     suspend fun updateUser(user: User)

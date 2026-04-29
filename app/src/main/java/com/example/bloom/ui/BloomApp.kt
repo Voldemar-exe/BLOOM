@@ -1,6 +1,8 @@
 package com.example.bloom.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -62,13 +64,9 @@ fun BloomApp() {
                 }
             }
         },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { paddingValues ->
-
-        Box(
-            modifier =
-                Modifier
-                    .padding(paddingValues),
-        ) {
+        Box(modifier = Modifier.padding(paddingValues).consumeWindowInsets(paddingValues)) {
             val entryProvider =
                 entryProvider {
                     habitEntry(navigator)

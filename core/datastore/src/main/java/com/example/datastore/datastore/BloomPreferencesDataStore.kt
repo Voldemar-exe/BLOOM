@@ -20,14 +20,24 @@ class BloomPreferencesDataStore(private val preferences: DataStore<UserPreferenc
             if (prefs.hasUser()) prefs.user.toDomain() else null
         }
 
-    val stats: Flow<UserStats?> =
+    val stats: Flow<UserStats> =
         preferences.data.map { prefs ->
-            if (prefs.hasStats()) prefs.stats.toDomain() else null
+            if (prefs.hasStats()) prefs.stats.toDomain() else UserStats.default()
         }
 
     val settings: Flow<AppSettings> =
         preferences.data.map { prefs ->
             if (prefs.hasSettings()) prefs.settings.toDomain() else AppSettings.default()
+        }
+
+    val achievements: Flow<Set<Int>> =
+        preferences.data.map { prefs ->
+            if (prefs.hasUser()) prefs.user.toDomain().achievements else emptySet()
+        }
+
+    val purchases: Flow<List<Pair<String, String>>> =
+        preferences.data.map { prefs ->
+            if (prefs.hasUser()) prefs.user.toDomain().purchases else emptyList()
         }
 
     suspend fun setUser(user: User) {

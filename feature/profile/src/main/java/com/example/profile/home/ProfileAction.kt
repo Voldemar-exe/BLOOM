@@ -14,4 +14,7 @@ sealed interface ProfileAction {
     object OnStoreClick : ProfileAction
 
     object OnLeaderboardClick : ProfileAction
+
+    // TODO: Remove later
+    object TestActionSetUser : ProfileAction
 }

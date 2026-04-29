@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,10 +20,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -47,20 +51,30 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bloom.feature.profile.R
 import com.example.designsystem.picture.BloomIcons
+import com.example.ui.logic.CollectOneShotEffect
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
+    onNavigate: (ProfileEvent) -> Unit,
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
-    val profileUiState by viewModel.profileUiState.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    if (profileUiState.user == null || profileUiState.stats == null) {
-        Text("placeholder")
+    viewModel.events.CollectOneShotEffect { event ->
+        onNavigate(event)
+    }
+
+    if (state.user == null) {
+        if (state.isLoading) {
+            CircularProgressIndicator()
+        } else {
+            EnterAccountPlaceholder(viewModel::onAction)
+        }
     } else {
         ProfileScreen(
-            profileUiState = profileUiState,
+            state = state,
             onAction = viewModel::onAction,
         )
     }
@@ -69,7 +83,7 @@ fun ProfileScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ProfileScreen(
-    profileUiState: ProfileState,
+    state: ProfileState,
     onAction: (ProfileAction) -> Unit,
 ) {
     Scaffold(
@@ -77,6 +91,11 @@ internal fun ProfileScreen(
             TopAppBar(
                 title = {
                     Text(text = stringResource(R.string.screen_title))
+                },
+                navigationIcon = {
+                    IconButton(onClick = { /* Edit data */ }) {
+                        Icon(Icons.Default.Edit, contentDescription = "notifications")
+                    }
                 },
                 actions = {
                     IconButton(onClick = { /* Notifications */ }) {
@@ -90,17 +109,16 @@ internal fun ProfileScreen(
         },
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            val user = profileUiState.user!!
-            val stats = profileUiState.stats!!
+            val user = state.user!!
             UserProfile(
                 username = user.username,
-                level = stats.level,
-                coins = stats.currentCoinsAmount,
+                level = state.stats.level,
+                coins = state.stats.currentCoinsAmount,
                 background = user.background,
                 avatar = user.avatar,
                 color = Color(user.color),
             )
-            LazyColumn {
+            LazyColumn(Modifier.fillMaxSize()) {
                 item {
                     ProfileMenuSection(
                         icon = BloomIcons.Customization,
@@ -329,3 +347,15 @@ private data class MenuItem(
     val title: String,
     val onClick: () -> Unit,
 )
+
+@Composable
+fun EnterAccountPlaceholder(onAction: (ProfileAction) -> Unit) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            // TODO: Navigate to :feature:auth
+            Button(onClick = { onAction(ProfileAction.TestActionSetUser) }) {
+                Text("Создать аккаунт")
+            }
+        }
+    }
+}
