@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.bloom.ui.BloomApp
+import com.example.bloom.ui.NotificationPermissionRequester
 import com.example.bloom.ui.theme.BLOOMTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,6 +14,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BLOOMTheme {
+                NotificationPermissionRequester()
                 BloomApp()
             }
         }

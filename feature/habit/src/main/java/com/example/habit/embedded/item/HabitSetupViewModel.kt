@@ -51,12 +51,17 @@ class HabitSetupViewModel(private val habitRepository: HabitRepository) : ViewMo
 
             is HabitSetupAction.OnTagClick -> toggleTag(action.tag)
 
-            is HabitSetupAction.SetRecurrenceType ->
+            is HabitSetupAction.SetRecurrenceType -> {
                 _state.update {
                     it.copy(
                         recurrenceType = action.type,
                     )
                 }
+                when (action.type) {
+                    RecurrenceType.DAY -> updateSelectedDays(emptySet())
+                    else -> {}
+                }
+            }
 
             is HabitSetupAction.UpdateSelectedDays -> updateSelectedDays(action.days)
 
@@ -236,6 +241,7 @@ class HabitSetupViewModel(private val habitRepository: HabitRepository) : ViewMo
 
     private fun stateToHabit(): Habit {
         val current = _state.value
+        Timber.i(current.toString())
         return Habit(
             id = current.id,
             title = current.title,

@@ -2,6 +2,8 @@ package com.example.data.di
 
 import com.example.data.repository.HabitRepository
 import com.example.data.repository.HabitRepositoryImpl
+import com.example.data.repository.NotificationRepository
+import com.example.data.repository.NotificationRepositoryImpl
 import com.example.data.repository.TaskRepository
 import com.example.data.repository.TaskRepositoryImpl
 import com.example.data.repository.UserRepository
@@ -38,5 +40,12 @@ val dataModule =
 
         single<UserRepository> {
             UserRepositoryImpl(get<BloomPreferencesDataStore>())
+        }
+
+        single<NotificationRepository> {
+            NotificationRepositoryImpl(
+                get<HabitReminderDao>(),
+                get<TaskReminderDao>(),
+            )
         }
     }

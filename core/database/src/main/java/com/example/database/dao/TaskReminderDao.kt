@@ -7,12 +7,18 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.example.database.model.entities.TaskReminderEntity
+import com.example.database.model.relationships.TaskWithReminders
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TaskReminderDao {
+    @Transaction
     @Query("SELECT * FROM task_reminders WHERE taskId = :taskId")
     fun getTaskReminders(taskId: Long): Flow<List<TaskReminderEntity>>
+
+    @Transaction
+    @Query("SELECT * FROM tasks")
+    fun getAllTasksWithReminders(): Flow<List<TaskWithReminders>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(reminder: TaskReminderEntity)

@@ -2,8 +2,8 @@ package com.example.database.model.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.model.Priority
 import com.example.database.model.SyncStatus
+import com.example.model.Priority
 import kotlin.time.Clock
 
 @Entity(tableName = "tasks")
@@ -12,7 +12,7 @@ data class TaskEntity(
     val id: Long,
     val title: String,
     val description: String,
-    val daysOfWeek: List<Int>,
+    val daysOfMonth: List<Int>,
     val priority: Priority,
     val deadline: Long?,
     val tags: List<String>,

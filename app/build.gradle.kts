@@ -27,6 +27,7 @@ android {
 
 dependencies {
     implementation(project(":core:navigation"))
+    implementation(project(":core:notification"))
 
     implementation(project(":feature:habit"))
     implementation(project(":feature:task"))

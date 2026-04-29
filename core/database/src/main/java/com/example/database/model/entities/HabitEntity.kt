@@ -11,7 +11,7 @@ data class HabitEntity(
     val id: Long,
     val title: String,
     val description: String,
-    val daysOfWeek: List<Int>,
+    val daysOfMonth: List<Int>,
     val tags: List<String>,
     val steps: List<String>,
     val isChecked: Boolean = false,

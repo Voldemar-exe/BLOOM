@@ -5,11 +5,11 @@ import androidx.room.Relation
 import com.example.database.model.entities.HabitEntity
 import com.example.database.model.entities.HabitReminderEntity
 
-data class HabitWithReminder(
+data class HabitWithReminders(
     @Embedded val habit: HabitEntity,
     @Relation(
         parentColumn = "id",
         entityColumn = "habitId",
     )
-    val habitReminder: List<HabitReminderEntity>,
+    val reminders: List<HabitReminderEntity>,
 )
