@@ -18,11 +18,16 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,13 +38,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,6 +58,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bloom.feature.profile.R
@@ -86,6 +99,7 @@ internal fun ProfileScreen(
     state: ProfileState,
     onAction: (ProfileAction) -> Unit,
 ) {
+    val user = state.user!!
     Scaffold(
         topBar = {
             TopAppBar(
@@ -93,8 +107,35 @@ internal fun ProfileScreen(
                     Text(text = stringResource(R.string.screen_title))
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* Edit data */ }) {
-                        Icon(Icons.Default.Edit, contentDescription = "notifications")
+                    var showDialog by remember { mutableStateOf(false) }
+                    IconButton(onClick = { showDialog = true }) {
+                        Icon(Icons.Default.Edit, contentDescription = "edit")
+                    }
+
+                    if (showDialog) {
+                        var username by rememberSaveable { mutableStateOf(user.username) }
+                        var email by rememberSaveable { mutableStateOf(user.email) }
+                        var password by rememberSaveable { mutableStateOf("") }
+
+                        EditProfileDialog(
+                            username = username,
+                            email = email,
+                            password = password,
+                            onUsernameChange = { username = it },
+                            onEmailChange = { email = it },
+                            onPasswordChange = { password = it },
+                            onDismiss = { showDialog = false },
+                            onSaveClick = {
+                                onAction(
+                                    ProfileAction.OnUserUpdate(
+                                        username,
+                                        email,
+                                        password,
+                                    ),
+                                )
+                                showDialog = false
+                            },
+                        )
                     }
                 },
                 actions = {
@@ -109,9 +150,9 @@ internal fun ProfileScreen(
         },
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            val user = state.user!!
             UserProfile(
                 username = user.username,
+                email = user.email,
                 level = state.stats.level,
                 coins = state.stats.currentCoinsAmount,
                 background = user.background,
@@ -178,6 +219,7 @@ internal fun ProfileScreen(
 @Composable
 fun UserProfile(
     username: String,
+    email: String,
 //    rankTitle: String,
 //    experience: Long,
 //    progress: Float,
@@ -221,12 +263,20 @@ fun UserProfile(
                     painter = painterResource(avatar),
                     contentDescription = "avatar",
                 )
-                Row(
-                    modifier =
-                        Modifier.background(color = color, shape = ShapeDefaults.ExtraLarge),
-                    horizontalArrangement = Arrangement.Center,
+                Box(
+                    modifier = Modifier.background(color = color, shape = ShapeDefaults.ExtraLarge),
                 ) {
-                    Text(modifier = Modifier.padding(16.dp), text = username)
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(text = username)
+                        Text(
+                            text = email,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }
@@ -358,4 +408,90 @@ fun EnterAccountPlaceholder(onAction: (ProfileAction) -> Unit) {
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditProfileDialog(
+    username: String,
+    email: String,
+    password: String,
+    onUsernameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onSaveClick: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(text = "Edit profile")
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                OutlinedTextField(
+                    value = username,
+                    onValueChange = onUsernameChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    label = { Text("Имя пользователя") },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = null,
+                        )
+                    },
+                )
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = onEmailChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    label = { Text("Почта") },
+                    keyboardOptions =
+                        KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                        ),
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Email,
+                            contentDescription = null,
+                        )
+                    },
+                )
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = onPasswordChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    label = { Text("Если замена нужна") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions =
+                        KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                        ),
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Lock,
+                            contentDescription = null,
+                        )
+                    },
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onSaveClick) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+    )
 }

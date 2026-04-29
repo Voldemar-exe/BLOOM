@@ -8,6 +8,7 @@ import com.example.data.repository.UserRepository
 import com.example.designsystem.picture.BloomAvatars
 import com.example.designsystem.picture.BloomBackgrounds
 import com.example.model.User
+import com.example.profile.home.ProfileEvent.NavigateTo
 import com.example.profile.navigation.AchievementsNavKey
 import com.example.profile.navigation.AvatarChoiceNavKey
 import com.example.profile.navigation.LeaderboardNavKey
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
+import timber.log.Timber
 
 @KoinViewModel
 class ProfileViewModel(private val userRepository: UserRepository) : ViewModel() {
@@ -48,28 +50,29 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
     val events = _events.asSharedFlow()
 
     fun onAction(action: ProfileAction) {
+        Timber.i("$action")
         viewModelScope.launch {
             when (action) {
                 ProfileAction.OnSettingsClick ->
-                    _events.emit(ProfileEvent.NavigateTo(SettingsNavKey))
+                    _events.emit(NavigateTo(SettingsNavKey))
 
                 ProfileAction.OnParametersClick ->
-                    _events.emit(ProfileEvent.NavigateTo(ParametersNavKey))
+                    _events.emit(NavigateTo(ParametersNavKey))
 
                 ProfileAction.OnAvatarClick ->
-                    _events.emit(ProfileEvent.NavigateTo(AvatarChoiceNavKey))
+                    _events.emit(NavigateTo(AvatarChoiceNavKey))
 
                 ProfileAction.OnThemeClick ->
-                    _events.emit(ProfileEvent.NavigateTo(ThemeChoiceNavKey))
+                    _events.emit(NavigateTo(ThemeChoiceNavKey))
 
                 ProfileAction.OnAchievementsClick ->
-                    _events.emit(ProfileEvent.NavigateTo(AchievementsNavKey))
+                    _events.emit(NavigateTo(AchievementsNavKey))
 
                 ProfileAction.OnStoreClick ->
-                    _events.emit(ProfileEvent.NavigateTo(StoreNavKey))
+                    _events.emit(NavigateTo(StoreNavKey))
 
                 ProfileAction.OnLeaderboardClick ->
-                    _events.emit(ProfileEvent.NavigateTo(LeaderboardNavKey))
+                    _events.emit(NavigateTo(LeaderboardNavKey))
 
                 ProfileAction.TestActionSetUser -> {
                     userRepository.updateUser(
@@ -84,6 +87,18 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                             purchases = emptyList(),
                         ),
                     )
+                }
+
+                is ProfileAction.OnUserUpdate -> {
+                    if (action.username != state.value.user!!.username) {
+                        userRepository.updateUsername(action.username)
+                    }
+                    if (action.email != state.value.user!!.email) {
+                        userRepository.updateEmail(action.email)
+                    }
+                    if (action.password.isNotEmpty()) {
+                        userRepository.updatePassword(action.password)
+                    }
                 }
             }
         }

@@ -22,6 +22,10 @@ interface UserRepository {
 
     suspend fun updateUsername(username: String)
 
+    suspend fun updateEmail(email: String)
+
+    suspend fun updatePassword(password: String)
+
     suspend fun addAchievement(id: Int)
 
     suspend fun removeAchievement(id: Int)
@@ -63,6 +67,15 @@ internal class UserRepositoryImpl(private val dataSource: BloomPreferencesDataSt
     override suspend fun updateUsername(username: String) {
         val current = user.first() ?: return
         dataSource.setUser(current.copy(username = username))
+    }
+
+    override suspend fun updateEmail(email: String) {
+        val current = user.first() ?: return
+        dataSource.setUser(current.copy(email = email))
+    }
+
+    override suspend fun updatePassword(password: String) {
+        // TODO
     }
 
     override suspend fun addAchievement(id: Int) {

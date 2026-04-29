@@ -15,6 +15,12 @@ sealed interface ProfileAction {
 
     object OnLeaderboardClick : ProfileAction
 
+    data class OnUserUpdate(
+        val username: String,
+        val email: String,
+        val password: String,
+    ) : ProfileAction
+
     // TODO: Remove later
     object TestActionSetUser : ProfileAction
 }
