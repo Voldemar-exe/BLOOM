@@ -1,5 +1,7 @@
 package com.example.data.di
 
+import com.example.data.repository.GamificationRepository
+import com.example.data.repository.GamificationRepositoryImpl
 import com.example.data.repository.HabitRepository
 import com.example.data.repository.HabitRepositoryImpl
 import com.example.data.repository.NotificationRepository
@@ -8,6 +10,7 @@ import com.example.data.repository.TaskRepository
 import com.example.data.repository.TaskRepositoryImpl
 import com.example.data.repository.UserRepository
 import com.example.data.repository.UserRepositoryImpl
+import com.example.database.dao.GamificationDao
 import com.example.database.dao.HabitDao
 import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
@@ -47,5 +50,9 @@ val dataModule =
                 get<HabitReminderDao>(),
                 get<TaskReminderDao>(),
             )
+        }
+
+        single<GamificationRepository> {
+            GamificationRepositoryImpl(get<GamificationDao>())
         }
     }

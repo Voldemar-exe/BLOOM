@@ -7,6 +7,7 @@ import com.example.bloom.ui.createNotificationChannel
 import com.example.data.di.dataModule
 import com.example.database.di.databaseModule
 import com.example.datastore.di.dataStoreModule
+import com.example.gamification.di.gamificationModule
 import com.example.habit.di.habitModule
 import com.example.notification.ReminderWorkStarter
 import com.example.notification.di.notificationModule
@@ -37,6 +38,7 @@ class BloomApplication : Application() {
                 profileModule,
                 dataStoreModule,
                 notificationModule,
+                gamificationModule,
             )
         }
 

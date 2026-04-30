@@ -10,7 +10,7 @@ data class UserStats(
     val totalTasksCreated: Int,
     val totalTasksCompleted: Int,
     val currentStreak: Int,
-    val longestSteak: Int,
+    val longestStreak: Int,
 ) {
     companion object {
         fun default() =
@@ -24,7 +24,7 @@ data class UserStats(
                 totalTasksCreated = 0,
                 totalTasksCompleted = 0,
                 currentStreak = 0,
-                longestSteak = 0,
+                longestStreak = 0,
             )
     }
 }

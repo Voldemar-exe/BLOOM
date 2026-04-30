@@ -50,7 +50,7 @@ fun UserStatsProto.toDomain() =
         totalTasksCreated = totalTasksCreated,
         totalTasksCompleted = totalTasksCompleted,
         currentStreak = currentStreak,
-        longestSteak = longestSteak,
+        longestStreak = longestSteak,
     )
 
 fun UserStats.toProto(): UserStatsProto =
@@ -65,7 +65,7 @@ fun UserStats.toProto(): UserStatsProto =
         .setTotalTasksCreated(totalTasksCreated)
         .setTotalTasksCompleted(totalTasksCompleted)
         .setCurrentStreak(currentStreak)
-        .setLongestSteak(longestSteak)
+        .setLongestSteak(longestStreak)
         .build()
 
 fun AppSettingsProto.toDomain() =

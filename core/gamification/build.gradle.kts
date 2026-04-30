@@ -6,3 +6,8 @@ plugins {
 android {
     namespace = "com.example.bloom.core.gamification"
 }
+
+dependencies {
+    implementation(project(":core:model"))
+    implementation(project(":core:data"))
+}

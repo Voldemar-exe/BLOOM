@@ -28,6 +28,8 @@ android {
 dependencies {
     implementation(project(":core:navigation"))
     implementation(project(":core:notification"))
+    // TODO: Maybe replace with transitive
+    implementation(project(":core:gamification"))
 
     implementation(project(":feature:habit"))
     implementation(project(":feature:task"))
