@@ -19,6 +19,10 @@ interface GamificationRepository {
         experienceEarned: Int,
         coinsEarned: Int,
     )
+
+    suspend fun isHabitCompletedToday(habitId: Long): Boolean
+
+    suspend fun isTaskCompletedToday(taskId: Long): Boolean
 }
 
 class GamificationRepositoryImpl(private val dao: GamificationDao) : GamificationRepository {
@@ -87,5 +91,21 @@ class GamificationRepositoryImpl(private val dao: GamificationDao) : Gamificatio
                 createdAt = System.currentTimeMillis(),
             )
         dao.insertStatsLog(log)
+    }
+
+    override suspend fun isHabitCompletedToday(habitId: Long): Boolean {
+        val (start, end) = todayRange()
+        return dao.hasHabitCompletionToday(habitId, start, end)
+    }
+
+    override suspend fun isTaskCompletedToday(taskId: Long): Boolean {
+        val (start, end) = todayRange()
+        return dao.hasTaskCompletionToday(taskId, start, end)
+    }
+
+    private fun todayRange(): Pair<Long, Long> {
+        val msInDay = 86_400_000L
+        val start = (System.currentTimeMillis() / msInDay) * msInDay
+        return start to start + msInDay
     }
 }

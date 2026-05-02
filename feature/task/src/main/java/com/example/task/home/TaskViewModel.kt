@@ -6,6 +6,7 @@ import com.example.data.repository.TaskRepository
 import com.example.model.DateRange
 import com.example.model.DayTimeInterval
 import com.example.model.Tag
+import com.example.task.usecases.CompleteTaskUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +20,10 @@ import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @KoinViewModel
-class TaskViewModel(private val taskRepository: TaskRepository) : ViewModel() {
+class TaskViewModel(
+    private val taskRepository: TaskRepository,
+    private val completeTaskUseCase: CompleteTaskUseCase,
+) : ViewModel() {
     private val _taskUiState = MutableStateFlow(TaskState())
     val taskUiState: StateFlow<TaskState>
         get() = _taskUiState.asStateFlow()
@@ -66,13 +70,14 @@ class TaskViewModel(private val taskRepository: TaskRepository) : ViewModel() {
 
     private fun handleToggleTask(taskId: Long) {
         viewModelScope.launch {
-            taskRepository.toggleTask(taskId)
+            completeTaskUseCase(taskId)
         }
     }
 
     private fun handleToggleSubtask(subtaskId: Long) {
         viewModelScope.launch {
-            taskRepository.toggleSubtask(subtaskId)
+            val taskId = taskRepository.toggleSubtask(subtaskId)
+            if (taskId != null) completeTaskUseCase(taskId = taskId, calledBySubtask = true)
         }
     }
 

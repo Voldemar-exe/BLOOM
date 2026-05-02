@@ -2,6 +2,7 @@ package com.example.database.di
 
 import androidx.room.Room
 import com.example.database.BloomDatabase
+import com.example.database.dao.GamificationDao
 import com.example.database.dao.HabitDao
 import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
@@ -45,5 +46,8 @@ val databaseModule =
         }
         single<HabitWithRelationDao> {
             get<BloomDatabase>().habitWithRelationDao()
+        }
+        single<GamificationDao> {
+            get<BloomDatabase>().gamificationDao()
         }
     }

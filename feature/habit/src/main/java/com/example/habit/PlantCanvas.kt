@@ -63,12 +63,16 @@ fun PlantCanvas(
         }
 
     Canvas(
-        modifier.fillMaxSize().clipToBounds().onSizeChanged { intSize ->
-            canvasSize = Size(intSize.width.toFloat(), intSize.height.toFloat())
-        },
+        modifier
+            .fillMaxSize()
+            .clipToBounds()
+            .onSizeChanged { intSize ->
+                val newSize = Size(intSize.width.toFloat(), intSize.height.toFloat())
+                if (canvasSize != newSize) {
+                    canvasSize = newSize
+                }
+            },
     ) {
-        canvasSize = size
-
         plantPaths?.let { paths ->
             transformParams?.let { params ->
                 withTransform({

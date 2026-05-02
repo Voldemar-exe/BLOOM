@@ -7,10 +7,10 @@ import com.example.database.dao.SubtaskDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
+import com.example.database.model.SyncStatus
 import com.example.database.model.relationships.TaskWithSubtasks
 import com.example.model.Reminder
 import com.example.model.Subtask
-import com.example.database.model.SyncStatus
 import com.example.model.Tag
 import com.example.model.Task
 import com.example.model.TaskWithRelations
@@ -43,7 +43,7 @@ interface TaskRepository {
 
     suspend fun saveTask(task: Task): Long
 
-    suspend fun toggleSubtask(subtaskId: Long)
+    suspend fun toggleSubtask(subtaskId: Long): Long?
 
     suspend fun saveSubtask(subtask: Subtask)
 
@@ -107,11 +107,14 @@ internal class TaskRepositoryImpl(
 
     override suspend fun getTaskById(taskId: Long): Task? = taskDao.getTaskById(taskId)?.asModel()
 
-    override suspend fun toggleSubtask(subtaskId: Long) {
+    override suspend fun toggleSubtask(subtaskId: Long): Long? =
         subtaskDao.findById(subtaskId)?.let {
             subtaskDao.updateWithParentSync(it.copy(isChecked = !it.isChecked), taskDao)
+            taskDao.getTaskById(it.taskId)?.let { task ->
+                if (task.isChecked) return@let task.id
+                null
+            }
         }
-    }
 
     override suspend fun saveTask(task: Task): Long =
         taskDao.upsert(task.asEntity().copy(syncStatus = SyncStatus.CHANGED))

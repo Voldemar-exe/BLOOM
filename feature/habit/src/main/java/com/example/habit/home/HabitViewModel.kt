@@ -3,6 +3,7 @@ package com.example.habit.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.HabitRepository
+import com.example.habit.usecases.CompleteHabitUseCase
 import com.example.model.DateRange
 import com.example.model.DayTimeInterval
 import com.example.model.Tag
@@ -19,7 +20,10 @@ import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @KoinViewModel
-class HabitViewModel(private val habitRepository: HabitRepository) : ViewModel() {
+class HabitViewModel(
+    private val habitRepository: HabitRepository,
+    private val completeHabitUseCase: CompleteHabitUseCase,
+) : ViewModel() {
     private val _habitState = MutableStateFlow(HabitState())
     val habitState: StateFlow<HabitState>
         get() = _habitState.asStateFlow()
@@ -68,7 +72,7 @@ class HabitViewModel(private val habitRepository: HabitRepository) : ViewModel()
 
     private fun handleToggleHabit(habitId: Long) {
         viewModelScope.launch {
-            habitRepository.toggleHabit(habitId)
+            completeHabitUseCase(habitId)
         }
     }
 

@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bloom.feature.profile.R
 import com.example.designsystem.picture.BloomIcons
+import com.example.model.util.XpRules
 import com.example.ui.logic.CollectOneShotEffect
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -154,6 +155,7 @@ internal fun ProfileScreen(
                 username = user.username,
                 email = user.email,
                 level = state.stats.level,
+                experience = state.stats.currentExperience,
                 coins = state.stats.currentCoinsAmount,
                 background = user.background,
                 avatar = user.avatar,
@@ -221,9 +223,8 @@ fun UserProfile(
     username: String,
     email: String,
 //    rankTitle: String,
-//    experience: Long,
-//    progress: Float,
     level: Int,
+    experience: Long,
     coins: Int,
     background: Int,
     avatar: Int,
@@ -236,7 +237,7 @@ fun UserProfile(
                 Modifier
                     .background(color = Color.Red, shape = ShapeDefaults.Medium)
                     .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.Center
         ) {
             // TODO: Add Rank Title ENUM based on level
             Text(modifier = Modifier.padding(16.dp), text = "Звание")
@@ -274,23 +275,32 @@ fun UserProfile(
                         Text(
                             text = email,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
             }
         }
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp),
+            modifier = Modifier.padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            LinearProgressIndicator(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .padding(horizontal = 32.dp),
-                progress = { 0f }, // TODO: Add calculation based on level and experience
-            )
+            Column(
+                Modifier
+                    .weight(1f)
+                    .padding(horizontal = 32.dp),
+                verticalArrangement = Arrangement.Center,
+            ) {
+                val totalXpForLevel = XpRules.xpToNextLevel(level)
+                LinearProgressIndicator(
+                    progress = { (experience.toFloat() / totalXpForLevel).coerceIn(0f, 1f) },
+                )
+                Text(
+                    text = "$experience/$totalXpForLevel",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             Surface(
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primaryContainer,

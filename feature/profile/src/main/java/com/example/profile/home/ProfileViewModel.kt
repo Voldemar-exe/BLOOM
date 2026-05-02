@@ -34,6 +34,7 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
             userRepository.stats,
             userRepository.settings,
         ) { user, stats, settings ->
+            Timber.i("Collected profile with $user, $stats and $settings")
             ProfileState(
                 user = user,
                 stats = stats,
