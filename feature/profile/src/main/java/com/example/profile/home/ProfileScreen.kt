@@ -160,9 +160,9 @@ internal fun ProfileScreen(
                 level = state.stats.level,
                 experience = state.stats.currentExperience,
                 coins = state.stats.currentCoinsAmount,
-                background = user.background,
-                avatar = user.avatar,
-                color = user.color,
+                background = user.backgroundKey,
+                avatar = user.avatarKey,
+                color = user.colorKey,
             )
             LazyColumn(Modifier.fillMaxSize()) {
                 item {
@@ -245,49 +245,15 @@ fun UserProfile(
             // TODO: Add Rank Title ENUM based on level
             Text(modifier = Modifier.padding(16.dp), text = "Звание")
         }
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(216.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Image(
-                modifier = Modifier.fillMaxWidth(),
-                painter = painterResource(BloomBackgrounds.resolve(background)),
-                contentScale = ContentScale.Crop,
-                contentDescription = "background",
-            )
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Image(
-                    modifier = Modifier.size(120.dp),
-                    painter = painterResource(BloomAvatars.resolve(avatar)),
-                    contentDescription = "avatar",
-                )
-                Box(
-                    modifier =
-                        Modifier.background(
-                            color = BloomColors.resolve(color),
-                            shape = ShapeDefaults.ExtraLarge,
-                        ),
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(text = username)
-                        Text(
-                            text = email,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-            }
-        }
+
+        ProfileAvatarBox(
+            background = background,
+            avatar = avatar,
+            color = color,
+            username = username,
+            email = email,
+        )
+
         Row(
             modifier = Modifier.padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -340,6 +306,59 @@ fun UserProfile(
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun ProfileAvatarBox(
+    background: String,
+    avatar: String,
+    color: String,
+    username: String,
+    email: String,
+) {
+    Box(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(216.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            modifier = Modifier.fillMaxWidth(),
+            painter = painterResource(BloomBackgrounds.resolve(background)),
+            contentScale = ContentScale.Crop,
+            contentDescription = "background",
+        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Image(
+                modifier = Modifier.size(120.dp),
+                painter = painterResource(BloomAvatars.resolve(avatar)),
+                contentDescription = "avatar",
+            )
+            Box(
+                modifier =
+                    Modifier.background(
+                        color = BloomColors.resolve(color),
+                        shape = ShapeDefaults.ExtraLarge,
+                    ),
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(text = username)
+                    Text(
+                        text = email,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }

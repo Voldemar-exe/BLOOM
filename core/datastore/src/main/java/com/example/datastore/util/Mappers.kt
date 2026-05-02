@@ -1,6 +1,8 @@
 package com.example.datastore.util
 
 import com.example.model.AppSettings
+import com.example.model.CustomizationItem
+import com.example.model.CustomizationType
 import com.example.model.User
 import com.example.model.UserStats
 import proto.AppSettingsProto
@@ -12,11 +14,17 @@ fun UserProto.toDomain() =
         userId = userId,
         email = email,
         username = username,
-        avatar = avatar,
-        background = background,
-        color = color,
-        achievements = achievementsList.toSet(),
-        purchases = purchasesList.map { it.first to it.second },
+        avatarKey = avatar,
+        backgroundKey = background,
+        colorKey = color,
+        ownedAchievements = achievementsList.toSet(),
+        ownedItems =
+            purchasesList.map {
+                CustomizationItem(
+                    it.first,
+                    CustomizationType.valueOf(it.second),
+                )
+            },
     )
 
 fun User.toProto(): UserProto =
@@ -25,16 +33,16 @@ fun User.toProto(): UserProto =
         .setUserId(userId)
         .setEmail(email)
         .setUsername(username)
-        .setAvatar(avatar)
-        .setBackground(background)
-        .setColor(color)
-        .addAllAchievements(achievements)
+        .setAvatar(avatarKey)
+        .setBackground(backgroundKey)
+        .setColor(colorKey)
+        .addAllAchievements(ownedAchievements)
         .addAllPurchases(
-            purchases.map {
+            ownedItems.map {
                 UserProto.Purchase
                     .newBuilder()
-                    .setFirst(it.first)
-                    .setSecond(it.second)
+                    .setFirst(it.key)
+                    .setSecond(it.type.name)
                     .build()
             },
         ).build()

@@ -2,6 +2,7 @@ package com.example.designsystem.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.example.designsystem.picture.BloomBackgrounds
 
 object BloomColors {
     const val GREEN = "green"
@@ -9,13 +10,15 @@ object BloomColors {
     const val PINK = "pink"
 
     @Composable
-    fun resolve(key: String): Color =
-        when (key) {
-            GREEN -> Color(0xFF4CAF50)
-            BLUE -> Color(0xFF2196F3)
-            PINK -> Color(0xFFE91E63)
-            else -> Color(0xFF4CAF50)
-        }
+    fun resolve(colorKey: String): Color =
+        map[colorKey] ?: map.getValue(BloomBackgrounds.DEFAULT_KEY)
+
+    val map: Map<String, Color> =
+        mapOf(
+            GREEN to Color(0xFF4CAF50),
+            BLUE to Color(0xFF2196F3),
+            PINK to Color(0xFFE91E63),
+        )
 
     const val DEFAULT_KEY: String = GREEN
 }

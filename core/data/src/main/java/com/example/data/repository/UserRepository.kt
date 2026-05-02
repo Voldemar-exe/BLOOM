@@ -2,11 +2,13 @@ package com.example.data.repository
 
 import com.example.datastore.datastore.BloomPreferencesDataStore
 import com.example.model.AppSettings
+import com.example.model.CustomizationType
 import com.example.model.User
 import com.example.model.UserStats
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Singleton
+import timber.log.Timber
 
 @Singleton
 interface UserRepository {
@@ -25,6 +27,11 @@ interface UserRepository {
     suspend fun updateEmail(email: String)
 
     suspend fun updatePassword(password: String)
+
+    suspend fun updateCustomization(
+        key: String,
+        type: CustomizationType,
+    )
 
     suspend fun addAchievement(id: Int)
 
@@ -76,6 +83,27 @@ internal class UserRepositoryImpl(private val dataSource: BloomPreferencesDataSt
 
     override suspend fun updatePassword(password: String) {
         // TODO
+    }
+
+    override suspend fun updateCustomization(
+        key: String,
+        type: CustomizationType,
+    ) {
+        val current = user.first() ?: return
+        when (type) {
+            CustomizationType.AVATAR -> {
+                dataSource.setUser(user = current.copy(avatarKey = key))
+            }
+            CustomizationType.BACKGROUND -> {
+                dataSource.setUser(user = current.copy(backgroundKey = key))
+            }
+            CustomizationType.COLOR -> {
+                dataSource.setUser(user = current.copy(colorKey = key))
+            }
+            else -> {
+                Timber.e("Wrong type for customization")
+            }
+        }
     }
 
     override suspend fun addAchievement(id: Int) {

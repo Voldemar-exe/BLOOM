@@ -5,6 +5,7 @@ import androidx.datastore.core.IOException
 import com.example.datastore.util.toDomain
 import com.example.datastore.util.toProto
 import com.example.model.AppSettings
+import com.example.model.CustomizationItem
 import com.example.model.User
 import com.example.model.UserStats
 import kotlinx.coroutines.flow.Flow
@@ -32,12 +33,12 @@ class BloomPreferencesDataStore(private val preferences: DataStore<UserPreferenc
 
     val achievements: Flow<Set<Int>> =
         preferences.data.map { prefs ->
-            if (prefs.hasUser()) prefs.user.toDomain().achievements else emptySet()
+            if (prefs.hasUser()) prefs.user.toDomain().ownedAchievements else emptySet()
         }
 
-    val purchases: Flow<List<Pair<String, String>>> =
+    val purchases: Flow<List<CustomizationItem>> =
         preferences.data.map { prefs ->
-            if (prefs.hasUser()) prefs.user.toDomain().purchases else emptyList()
+            if (prefs.hasUser()) prefs.user.toDomain().ownedItems else emptyList()
         }
 
     suspend fun setUser(user: User) {

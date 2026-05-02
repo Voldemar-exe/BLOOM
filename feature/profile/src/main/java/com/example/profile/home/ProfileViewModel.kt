@@ -80,11 +80,11 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                             userId = 0L,
                             email = "test@mail.com",
                             username = "Voldemar",
-                            avatar = BloomAvatars.DEFAULT_KEY,
-                            background = BloomBackgrounds.DEFAULT_KEY,
-                            color = BloomColors.DEFAULT_KEY,
-                            achievements = emptySet(),
-                            purchases = emptyList(),
+                            avatarKey = BloomAvatars.DEFAULT_KEY,
+                            backgroundKey = BloomBackgrounds.DEFAULT_KEY,
+                            colorKey = BloomColors.DEFAULT_KEY,
+                            ownedAchievements = emptySet(),
+                            ownedItems = emptyList(),
                         ),
                     )
                 }

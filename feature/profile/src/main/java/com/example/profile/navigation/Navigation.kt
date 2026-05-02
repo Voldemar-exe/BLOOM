@@ -4,7 +4,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.example.navigation.Navigator
 import com.example.profile.embedded.achievements.AchievementScreen
-import com.example.profile.embedded.avatar.AvatarChoiceScreen
+import com.example.profile.embedded.avatar.AvatarCustomizeScreen
 import com.example.profile.embedded.leaderboard.LeaderboardScreen
 import com.example.profile.embedded.parameters.ParametersScreen
 import com.example.profile.embedded.settings.SettingsScreen
@@ -51,7 +51,7 @@ fun EntryProviderScope<NavKey>.profileEntry(navigator: Navigator) {
     entry<AchievementsNavKey> { AchievementScreen(onBack = { navigator.goBack() }) }
     entry<SettingsNavKey> { SettingsScreen(onBack = { navigator.goBack() }) }
     entry<ParametersNavKey> { ParametersScreen(onBack = { navigator.goBack() }) }
-    entry<AvatarChoiceNavKey> { AvatarChoiceScreen(onBack = { navigator.goBack() }) }
+    entry<AvatarChoiceNavKey> { AvatarCustomizeScreen(onBack = { navigator.goBack() }) }
     entry<ThemeChoiceNavKey> { ThemeChoiceScreen(onBack = { navigator.goBack() }) }
     entry<StoreNavKey> { StoreScreen(onBack = { navigator.goBack() }) }
     entry<LeaderboardNavKey> { LeaderboardScreen(onBack = { navigator.goBack() }) }
