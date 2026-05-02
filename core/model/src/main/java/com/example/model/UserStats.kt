@@ -15,7 +15,7 @@ data class UserStats(
     companion object {
         fun default() =
             UserStats(
-                level = 0,
+                level = 1,
                 currentExperience = 0,
                 currentCoinsAmount = 0,
                 maxCoinsAmount = 0,

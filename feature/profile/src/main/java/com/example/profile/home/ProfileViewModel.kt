@@ -1,12 +1,11 @@
 package com.example.profile.home
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.UserRepository
 import com.example.designsystem.picture.BloomAvatars
 import com.example.designsystem.picture.BloomBackgrounds
+import com.example.designsystem.theme.BloomColors
 import com.example.model.User
 import com.example.profile.home.ProfileEvent.NavigateTo
 import com.example.profile.navigation.AchievementsNavKey
@@ -81,9 +80,9 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                             userId = 0L,
                             email = "test@mail.com",
                             username = "Voldemar",
-                            avatar = BloomAvatars.VladGuy,
-                            background = BloomBackgrounds.BlackSand,
-                            color = Color.Green.toArgb(),
+                            avatar = BloomAvatars.DEFAULT_KEY,
+                            background = BloomBackgrounds.DEFAULT_KEY,
+                            color = BloomColors.DEFAULT_KEY,
                             achievements = emptySet(),
                             purchases = emptyList(),
                         ),

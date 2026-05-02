@@ -63,7 +63,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bloom.feature.profile.R
+import com.example.designsystem.picture.BloomAvatars
+import com.example.designsystem.picture.BloomBackgrounds
 import com.example.designsystem.picture.BloomIcons
+import com.example.designsystem.theme.BloomColors
 import com.example.model.util.XpRules
 import com.example.ui.logic.CollectOneShotEffect
 import org.koin.compose.viewmodel.koinViewModel
@@ -159,7 +162,7 @@ internal fun ProfileScreen(
                 coins = state.stats.currentCoinsAmount,
                 background = user.background,
                 avatar = user.avatar,
-                color = Color(user.color),
+                color = user.color,
             )
             LazyColumn(Modifier.fillMaxSize()) {
                 item {
@@ -226,9 +229,9 @@ fun UserProfile(
     level: Int,
     experience: Long,
     coins: Int,
-    background: Int,
-    avatar: Int,
-    color: Color,
+    background: String,
+    avatar: String,
+    color: String,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         // TODO: Maybe move in TopBar
@@ -237,7 +240,7 @@ fun UserProfile(
                 Modifier
                     .background(color = Color.Red, shape = ShapeDefaults.Medium)
                     .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
         ) {
             // TODO: Add Rank Title ENUM based on level
             Text(modifier = Modifier.padding(16.dp), text = "Звание")
@@ -251,7 +254,7 @@ fun UserProfile(
         ) {
             Image(
                 modifier = Modifier.fillMaxWidth(),
-                painter = painterResource(background),
+                painter = painterResource(BloomBackgrounds.resolve(background)),
                 contentScale = ContentScale.Crop,
                 contentDescription = "background",
             )
@@ -261,11 +264,15 @@ fun UserProfile(
             ) {
                 Image(
                     modifier = Modifier.size(120.dp),
-                    painter = painterResource(avatar),
+                    painter = painterResource(BloomAvatars.resolve(avatar)),
                     contentDescription = "avatar",
                 )
                 Box(
-                    modifier = Modifier.background(color = color, shape = ShapeDefaults.ExtraLarge),
+                    modifier =
+                        Modifier.background(
+                            color = BloomColors.resolve(color),
+                            shape = ShapeDefaults.ExtraLarge,
+                        ),
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),

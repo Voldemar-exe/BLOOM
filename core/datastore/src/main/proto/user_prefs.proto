@@ -7,9 +7,9 @@ message UserProto {
   int64 userId = 1;
   string email = 2;
   string username = 3;
-  int32 avatar = 4;
-  int32 background = 5;
-  int32 color = 6;
+  string avatar = 4;
+  string background = 5;
+  string color = 6;
   repeated int32 achievements = 7;
 
   message Purchase {
