@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.repository.UserRepository
 import com.example.designsystem.picture.BloomAvatars
 import com.example.designsystem.picture.BloomBackgrounds
-import com.example.designsystem.theme.BloomColors
+import com.example.designsystem.picture.BloomColors
 import com.example.model.CustomizationItem
 import com.example.model.CustomizationType
 import kotlinx.coroutines.flow.SharingStarted

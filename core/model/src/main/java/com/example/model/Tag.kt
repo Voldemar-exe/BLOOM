@@ -1,8 +1,6 @@
 package com.example.model
 
-enum class Tag(
-    override val ru: String,
-) : LocalizedEnum {
+enum class Tag(override val ru: String) : LocalizedEnum {
     WORK("работа"),
     STUDY("учёба"),
     FINANCE("финансы"),

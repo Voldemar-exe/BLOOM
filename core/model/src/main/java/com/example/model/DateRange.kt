@@ -4,13 +4,10 @@ import androidx.compose.runtime.Immutable
 import java.time.LocalDate
 
 @Immutable
-data class DateRange(
-    val start: LocalDate? = null,
-    val end: LocalDate? = null,
-)
+data class DateRange(val start: LocalDate? = null, val end: LocalDate? = null)
 
-fun DateRange.onDateSelected(date: LocalDate): DateRange {
-    return when {
+fun DateRange.onDateSelected(date: LocalDate): DateRange =
+    when {
         start == null -> copy(start = date)
         end == null -> {
             if (date < start) {
@@ -19,6 +16,6 @@ fun DateRange.onDateSelected(date: LocalDate): DateRange {
                 copy(end = date)
             }
         }
+
         else -> DateRange(start = date, end = null)
     }
-}

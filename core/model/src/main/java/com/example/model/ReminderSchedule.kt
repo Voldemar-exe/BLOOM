@@ -28,8 +28,3 @@ data class ReminderSchedule(
                 }
             }
 }
-
-enum class ReminderType {
-    HABIT,
-    TASK,
-}

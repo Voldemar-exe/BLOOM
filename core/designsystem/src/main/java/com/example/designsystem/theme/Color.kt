@@ -1,24 +1,100 @@
 package com.example.designsystem.theme
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.example.designsystem.picture.BloomBackgrounds
 
-object BloomColors {
-    const val GREEN = "green"
-    const val BLUE = "blue"
-    const val PINK = "pink"
+val Purple80 = Color(0xFFD0BCFF)
+val PurpleGrey80 = Color(0xFFCCC2DC)
+val Pink80 = Color(0xFFEFB8C8)
 
-    @Composable
-    fun resolve(colorKey: String): Color =
-        map[colorKey] ?: map.getValue(BloomBackgrounds.DEFAULT_KEY)
+val Purple40 = Color(0xFF6650a4)
+val PurpleGrey40 = Color(0xFF625b71)
+val Pink40 = Color(0xFF7D5260)
 
-    val map: Map<String, Color> =
-        mapOf(
-            GREEN to Color(0xFF4CAF50),
-            BLUE to Color(0xFF2196F3),
-            PINK to Color(0xFFE91E63),
-        )
+val Green40 = Color(0xFF2E7D32)
+val GreenGrey40 = Color(0xFF546E7A)
+val Lime40 = Color(0xFF9CCC65)
 
-    const val DEFAULT_KEY: String = GREEN
-}
+val OceanBlue = Color(0xFF1565C0)
+val OceanTeal = Color(0xFF00838F)
+val OceanAccent = Color(0xFF26C6DA)
+
+val SunsetOrange = Color(0xFFF4511E)
+val SunsetPink = Color(0xFFD81B60)
+val SunsetYellow = Color(0xFFFFB300)
+
+
+// RedVine Color Palette by HEX: #B33B15
+// Light Theme Colors
+internal val primaryLightRedVine = Color(0xFF902500)
+internal val onPrimaryLightRedVine = Color(0xFFFFFFFF)
+internal val primaryContainerLightRedVine = Color(0xFFB33B15)
+internal val onPrimaryContainerLightRedVine = Color(0xFFFFDAD0)
+internal val secondaryLightRedVine = Color(0xFF8E4C39)
+internal val onSecondaryLightRedVine = Color(0xFFFFFFFF)
+internal val secondaryContainerLightRedVine = Color(0xFFFEA991)
+internal val onSecondaryContainerLightRedVine = Color(0xFF793B29)
+internal val tertiaryLightRedVine = Color(0xFF745B00)
+internal val onTertiaryLightRedVine = Color(0xFFFFFFFF)
+internal val tertiaryContainerLightRedVine = Color(0xFFC8A84A)
+internal val onTertiaryContainerLightRedVine = Color(0xFF4F3D00)
+internal val errorLightRedVine = Color(0xFFBA1A1A)
+internal val onErrorLightRedVine = Color(0xFFFFFFFF)
+internal val errorContainerLightRedVine = Color(0xFFFFDAD6)
+internal val onErrorContainerLightRedVine = Color(0xFF93000A)
+internal val backgroundLightRedVine = Color(0xFFFFF8F6)
+internal val onBackgroundLightRedVine = Color(0xFF251915)
+internal val surfaceLightRedVine = Color(0xFFFFF8F6)
+internal val onSurfaceLightRedVine = Color(0xFF251915)
+internal val surfaceVariantLightRedVine = Color(0xFFFEDBD2)
+internal val onSurfaceVariantLightRedVine = Color(0xFF59413B)
+internal val outlineLightRedVine = Color(0xFF8C7169)
+internal val outlineVariantLightRedVine = Color(0xFFE0BFB7)
+internal val scrimLightRedVine = Color(0xFF000000)
+internal val inverseSurfaceLightRedVine = Color(0xFF3C2D29)
+internal val inverseOnSurfaceLightRedVine = Color(0xFFFFEDE8)
+internal val inversePrimaryLightRedVine = Color(0xFFFFB5A0)
+internal val surfaceDimLightRedVine = Color(0xFFEDD5CF)
+internal val surfaceBrightLightRedVine = Color(0xFFFFF8F6)
+internal val surfaceContainerLowestLightRedVine = Color(0xFFFFFFFF)
+internal val surfaceContainerLowLightRedVine = Color(0xFFFFF1ED)
+internal val surfaceContainerLightRedVine = Color(0xFFFFE9E4)
+internal val surfaceContainerHighLightRedVine = Color(0xFFFBE3DD)
+internal val surfaceContainerHighestLightRedVine = Color(0xFFF6DDD7)
+
+// Dark Theme Colors
+internal val primaryDarkRedVine = Color(0xFFFFB5A0)
+internal val onPrimaryDarkRedVine = Color(0xFF5F1500)
+internal val primaryContainerDarkRedVine = Color(0xFFB33B15)
+internal val onPrimaryContainerDarkRedVine = Color(0xFFFFDAD0)
+internal val secondaryDarkRedVine = Color(0xFFFFB5A0)
+internal val onSecondaryDarkRedVine = Color(0xFF552010)
+internal val secondaryContainerDarkRedVine = Color(0xFF713524)
+internal val onSecondaryContainerDarkRedVine = Color(0xFFF4A088)
+internal val tertiaryDarkRedVine = Color(0xFFE5C362)
+internal val onTertiaryDarkRedVine = Color(0xFF3D2F00)
+internal val tertiaryContainerDarkRedVine = Color(0xFFC8A84A)
+internal val onTertiaryContainerDarkRedVine = Color(0xFF4F3D00)
+internal val errorDarkRedVine = Color(0xFFFFB4AB)
+internal val onErrorDarkRedVine = Color(0xFF690005)
+internal val errorContainerDarkRedVine = Color(0xFF93000A)
+internal val onErrorContainerDarkRedVine = Color(0xFFFFDAD6)
+internal val backgroundDarkRedVine = Color(0xFF1C110D)
+internal val onBackgroundDarkRedVine = Color(0xFFF6DDD7)
+internal val surfaceDarkRedVine = Color(0xFF1C110D)
+internal val onSurfaceDarkRedVine = Color(0xFFF6DDD7)
+internal val surfaceVariantDarkRedVine = Color(0xFF59413B)
+internal val onSurfaceVariantDarkRedVine = Color(0xFFE0BFB7)
+internal val outlineDarkRedVine = Color(0xFFA88A82)
+internal val outlineVariantDarkRedVine = Color(0xFF59413B)
+internal val scrimDarkRedVine = Color(0xFF000000)
+internal val inverseSurfaceDarkRedVine = Color(0xFFF6DDD7)
+internal val inverseOnSurfaceDarkRedVine = Color(0xFF3C2D29)
+internal val inversePrimaryDarkRedVine = Color(0xFFAB350F)
+internal val surfaceDimDarkRedVine = Color(0xFF1C110D)
+internal val surfaceBrightDarkRedVine = Color(0xFF453632)
+internal val surfaceContainerLowestDarkRedVine = Color(0xFF160B08)
+internal val surfaceContainerLowDarkRedVine = Color(0xFF251915)
+internal val surfaceContainerDarkRedVine = Color(0xFF291D19)
+internal val surfaceContainerHighDarkRedVine = Color(0xFF352723)
+internal val surfaceContainerHighestDarkRedVine = Color(0xFF40312D)
+

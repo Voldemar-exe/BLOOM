@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.designsystem.picture.BloomAvatars
 import com.example.designsystem.picture.BloomBackgrounds
-import com.example.designsystem.theme.BloomColors
+import com.example.designsystem.picture.BloomColors
 import com.example.model.CustomizationItem
 import com.example.model.CustomizationType
 import com.example.profile.home.ProfileAvatarBox
