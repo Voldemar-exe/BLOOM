@@ -13,14 +13,14 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.designsystem.model.AppTheme
 import com.example.designsystem.util.ThemeProvider
 
-private val DarkColorScheme =
+val DarkColorScheme =
     darkColorScheme(
         primary = Purple80,
         secondary = PurpleGrey80,
         tertiary = Pink80,
     )
 
-private val LightColorScheme =
+val LightColorScheme =
     lightColorScheme(
         primary = Purple40,
         secondary = PurpleGrey40,
@@ -105,6 +105,162 @@ val DarkRedVineColorScheme =
         surfaceContainerHighest = surfaceContainerHighestDarkRedVine,
     )
 
+val LightForestColorScheme =
+    lightColorScheme(
+        primary = primaryLightForest,
+        onPrimary = onPrimaryLightForest,
+        primaryContainer = primaryContainerLightForest,
+        onPrimaryContainer = onPrimaryContainerLightForest,
+        secondary = secondaryLightForest,
+        onSecondary = onSecondaryLightForest,
+        secondaryContainer = secondaryContainerLightForest,
+        onSecondaryContainer = onSecondaryContainerLightForest,
+        tertiary = tertiaryLightForest,
+        onTertiary = onTertiaryLightForest,
+        tertiaryContainer = tertiaryContainerLightForest,
+        onTertiaryContainer = onTertiaryContainerLightForest,
+        error = errorLightForest,
+        onError = onErrorLightForest,
+        errorContainer = errorContainerLightForest,
+        onErrorContainer = onErrorContainerLightForest,
+        background = backgroundLightForest,
+        onBackground = onBackgroundLightForest,
+        surface = surfaceLightForest,
+        onSurface = onSurfaceLightForest,
+        surfaceVariant = surfaceVariantLightForest,
+        onSurfaceVariant = onSurfaceVariantLightForest,
+        outline = outlineLightForest,
+        outlineVariant = outlineVariantLightForest,
+        scrim = scrimLightForest,
+        inverseSurface = inverseSurfaceLightForest,
+        inverseOnSurface = inverseOnSurfaceLightForest,
+        inversePrimary = inversePrimaryLightForest,
+        surfaceDim = surfaceDimLightForest,
+        surfaceBright = surfaceBrightLightForest,
+        surfaceContainerLowest = surfaceContainerLowestLightForest,
+        surfaceContainerLow = surfaceContainerLowLightForest,
+        surfaceContainer = surfaceContainerLightForest,
+        surfaceContainerHigh = surfaceContainerHighLightForest,
+        surfaceContainerHighest = surfaceContainerHighestLightForest,
+    )
+
+val DarkForestColorScheme =
+    darkColorScheme(
+        primary = primaryDarkForest,
+        onPrimary = onPrimaryDarkForest,
+        primaryContainer = primaryContainerDarkForest,
+        onPrimaryContainer = onPrimaryContainerDarkForest,
+        secondary = secondaryDarkForest,
+        onSecondary = onSecondaryDarkForest,
+        secondaryContainer = secondaryContainerDarkForest,
+        onSecondaryContainer = onSecondaryContainerDarkForest,
+        tertiary = tertiaryDarkForest,
+        onTertiary = onTertiaryDarkForest,
+        tertiaryContainer = tertiaryContainerDarkForest,
+        onTertiaryContainer = onTertiaryContainerDarkForest,
+        error = errorDarkForest,
+        onError = onErrorDarkForest,
+        errorContainer = errorContainerDarkForest,
+        onErrorContainer = onErrorContainerDarkForest,
+        background = backgroundDarkForest,
+        onBackground = onBackgroundDarkForest,
+        surface = surfaceDarkForest,
+        onSurface = onSurfaceDarkForest,
+        surfaceVariant = surfaceVariantDarkForest,
+        onSurfaceVariant = onSurfaceVariantDarkForest,
+        outline = outlineDarkForest,
+        outlineVariant = outlineVariantDarkForest,
+        scrim = scrimDarkForest,
+        inverseSurface = inverseSurfaceDarkForest,
+        inverseOnSurface = inverseOnSurfaceDarkForest,
+        inversePrimary = inversePrimaryDarkForest,
+        surfaceDim = surfaceDimDarkForest,
+        surfaceBright = surfaceBrightDarkForest,
+        surfaceContainerLowest = surfaceContainerLowestDarkForest,
+        surfaceContainerLow = surfaceContainerLowDarkForest,
+        surfaceContainer = surfaceContainerDarkForest,
+        surfaceContainerHigh = surfaceContainerHighDarkForest,
+        surfaceContainerHighest = surfaceContainerHighestDarkForest,
+    )
+
+val LightOceanColorScheme =
+    lightColorScheme(
+        primary = primaryLightOcean,
+        onPrimary = onPrimaryLightOcean,
+        primaryContainer = primaryContainerLightOcean,
+        onPrimaryContainer = onPrimaryContainerLightOcean,
+        secondary = secondaryLightOcean,
+        onSecondary = onSecondaryLightOcean,
+        secondaryContainer = secondaryContainerLightOcean,
+        onSecondaryContainer = onSecondaryContainerLightOcean,
+        tertiary = tertiaryLightOcean,
+        onTertiary = onTertiaryLightOcean,
+        tertiaryContainer = tertiaryContainerLightOcean,
+        onTertiaryContainer = onTertiaryContainerLightOcean,
+        error = errorLightOcean,
+        onError = onErrorLightOcean,
+        errorContainer = errorContainerLightOcean,
+        onErrorContainer = onErrorContainerLightOcean,
+        background = backgroundLightOcean,
+        onBackground = onBackgroundLightOcean,
+        surface = surfaceLightOcean,
+        onSurface = onSurfaceLightOcean,
+        surfaceVariant = surfaceVariantLightOcean,
+        onSurfaceVariant = onSurfaceVariantLightOcean,
+        outline = outlineLightOcean,
+        outlineVariant = outlineVariantLightOcean,
+        scrim = scrimLightOcean,
+        inverseSurface = inverseSurfaceLightOcean,
+        inverseOnSurface = inverseOnSurfaceLightOcean,
+        inversePrimary = inversePrimaryLightOcean,
+        surfaceDim = surfaceDimLightOcean,
+        surfaceBright = surfaceBrightLightOcean,
+        surfaceContainerLowest = surfaceContainerLowestLightOcean,
+        surfaceContainerLow = surfaceContainerLowLightOcean,
+        surfaceContainer = surfaceContainerLightOcean,
+        surfaceContainerHigh = surfaceContainerHighLightOcean,
+        surfaceContainerHighest = surfaceContainerHighestLightOcean,
+    )
+
+val DarkOceanColorScheme =
+    darkColorScheme(
+        primary = primaryDarkOcean,
+        onPrimary = onPrimaryDarkOcean,
+        primaryContainer = primaryContainerDarkOcean,
+        onPrimaryContainer = onPrimaryContainerDarkOcean,
+        secondary = secondaryDarkOcean,
+        onSecondary = onSecondaryDarkOcean,
+        secondaryContainer = secondaryContainerDarkOcean,
+        onSecondaryContainer = onSecondaryContainerDarkOcean,
+        tertiary = tertiaryDarkOcean,
+        onTertiary = onTertiaryDarkOcean,
+        tertiaryContainer = tertiaryContainerDarkOcean,
+        onTertiaryContainer = onTertiaryContainerDarkOcean,
+        error = errorDarkOcean,
+        onError = onErrorDarkOcean,
+        errorContainer = errorContainerDarkOcean,
+        onErrorContainer = onErrorContainerDarkOcean,
+        background = backgroundDarkOcean,
+        onBackground = onBackgroundDarkOcean,
+        surface = surfaceDarkOcean,
+        onSurface = onSurfaceDarkOcean,
+        surfaceVariant = surfaceVariantDarkOcean,
+        onSurfaceVariant = onSurfaceVariantDarkOcean,
+        outline = outlineDarkOcean,
+        outlineVariant = outlineVariantDarkOcean,
+        scrim = scrimDarkOcean,
+        inverseSurface = inverseSurfaceDarkOcean,
+        inverseOnSurface = inverseOnSurfaceDarkOcean,
+        inversePrimary = inversePrimaryDarkOcean,
+        surfaceDim = surfaceDimDarkOcean,
+        surfaceBright = surfaceBrightDarkOcean,
+        surfaceContainerLowest = surfaceContainerLowestDarkOcean,
+        surfaceContainerLow = surfaceContainerLowDarkOcean,
+        surfaceContainer = surfaceContainerDarkOcean,
+        surfaceContainerHigh = surfaceContainerHighDarkOcean,
+        surfaceContainerHighest = surfaceContainerHighestDarkOcean,
+    )
+
 @Composable
 fun BLOOMTheme(
     appTheme: AppTheme = AppTheme.SYSTEM,
@@ -124,10 +280,6 @@ fun BLOOMTheme(
                 } else {
                     dynamicLightColorScheme(context)
                 }
-            }
-
-            appTheme == AppTheme.SYSTEM -> {
-                if (darkTheme) DarkColorScheme else LightColorScheme
             }
 
             else -> {

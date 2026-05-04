@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             // TODO: Inject from dataStore
-            val appTheme = AppTheme.RED_VINE
+            val appTheme = AppTheme.SYSTEM
             BLOOMTheme(appTheme = appTheme) {
                 NotificationPermissionRequester()
                 BloomApp()
