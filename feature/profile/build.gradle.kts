@@ -9,4 +9,5 @@ android {
 
 dependencies {
     api(project(":core:navigation"))
+    implementation(project(":core:gamification"))
 }

@@ -1,23 +1,21 @@
 package com.example.designsystem.picture
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-object BloomColors {
-    const val GREEN = "green"
-    const val BLUE = "blue"
-    const val PINK = "pink"
+enum class BloomColors {
+    GREEN,
+    BLUE,
+    PINK,
+    ;
 
-    @Composable
-    fun resolve(colorKey: String): Color =
-        map[colorKey] ?: map.getValue(BloomBackgrounds.DEFAULT_KEY)
+    companion object {
+        val DEFAULT_KEY = GREEN.name
 
-    val map: Map<String, Color> =
-        mapOf(
-            GREEN to Color(0xFF4CAF50),
-            BLUE to Color(0xFF2196F3),
-            PINK to Color(0xFFE91E63),
-        )
-
-    const val DEFAULT_KEY: String = GREEN
+        fun resolve(colorKey: String): Color =
+            when (valueOf(colorKey)) {
+                GREEN -> Color(0xFF4CAF50)
+                BLUE -> Color(0xFF2196F3)
+                PINK -> Color(0xFFE91E63)
+            }
+    }
 }

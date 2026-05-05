@@ -63,7 +63,7 @@ fun AvatarCustomizeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Customization") },
+                title = { Text("Настройка аватара") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -94,11 +94,11 @@ fun AvatarCustomizeScreen(
 
             item {
                 CustomizationSection(
-                    title = "Avatars",
+                    title = "Аватар",
                     items =
-                        BloomAvatars.map.map {
+                        BloomAvatars.entries.map {
                             CustomizationItem(
-                                it.key,
+                                it.name,
                                 CustomizationType.AVATAR,
                             )
                         },
@@ -110,11 +110,11 @@ fun AvatarCustomizeScreen(
 
             item {
                 CustomizationSection(
-                    title = "Backgrounds",
+                    title = "Задний фон",
                     items =
-                        BloomBackgrounds.map.map {
+                        BloomBackgrounds.entries.map {
                             CustomizationItem(
-                                it.key,
+                                it.name,
                                 CustomizationType.BACKGROUND,
                             )
                         },
@@ -126,11 +126,11 @@ fun AvatarCustomizeScreen(
 
             item {
                 CustomizationSection(
-                    title = "Colors",
+                    title = "Цвет",
                     items =
-                        BloomColors.map.map {
+                        BloomColors.entries.map {
                             CustomizationItem(
-                                it.key,
+                                it.name,
                                 CustomizationType.COLOR,
                             )
                         },

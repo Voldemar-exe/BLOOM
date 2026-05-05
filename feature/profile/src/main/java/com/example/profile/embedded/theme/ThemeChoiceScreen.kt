@@ -167,13 +167,6 @@ private fun ThemeItem(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    val borderColor =
-        if (selected) {
-            MaterialTheme.colorScheme.primary
-        } else {
-            MaterialTheme.colorScheme.outlineVariant
-        }
-
     ElevatedCard(
         onClick = onClick,
         modifier =
@@ -221,22 +214,10 @@ private fun ThemePalettePreview(
     darkTheme: Boolean = isSystemInDarkTheme(),
 ) {
     val colors =
-        when (theme) {
-            AppTheme.SYSTEM -> {
-                listOf(
-                    MaterialTheme.colorScheme.primary,
-                    MaterialTheme.colorScheme.secondary,
-                    MaterialTheme.colorScheme.tertiary,
-                )
-            }
-
-            else -> {
-                ThemeProvider
-                    .get(theme)
-                    ?.previewColors(darkTheme)
-                    ?: emptyList()
-            }
-        }
+        ThemeProvider
+            .get(theme)
+            ?.previewColors(darkTheme)
+            ?: emptyList()
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),

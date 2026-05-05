@@ -1,18 +1,17 @@
 package com.example.designsystem.picture
 
-import androidx.compose.runtime.Composable
 import com.example.bloom.core.designsystem.R
 
-object BloomBackgrounds {
-    const val BLACK_SAND = "black_sand"
+enum class BloomBackgrounds {
+    BLACK_SAND,
+    ;
 
-    @Composable
-    fun resolve(backgroundKey: String): Int = map[backgroundKey] ?: map.getValue(DEFAULT_KEY)
+    companion object {
+        val DEFAULT_KEY = BLACK_SAND.name
 
-    val map: Map<String, Int> =
-        mapOf(
-            BLACK_SAND to R.drawable.black_sand_background,
-        )
-
-    const val DEFAULT_KEY: String = BLACK_SAND
+        fun resolve(backgroundKey: String): Int =
+            when (valueOf(backgroundKey)) {
+                BLACK_SAND -> R.drawable.black_sand_background
+            }
+    }
 }
