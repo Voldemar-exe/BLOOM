@@ -12,7 +12,7 @@ data class AppSettings(
     companion object {
         fun default() =
             AppSettings(
-                theme = "system",
+                theme = "SYSTEM",
                 weeklyGoal = 5,
                 streakTarget = 7,
                 emailEnabled = true,

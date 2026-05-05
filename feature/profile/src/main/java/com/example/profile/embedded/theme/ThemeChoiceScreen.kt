@@ -37,19 +37,37 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.designsystem.model.AppTheme
 import com.example.designsystem.model.previewColors
 import com.example.designsystem.util.ThemeProvider
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ThemeChoiceScreen(
-    currentTheme: AppTheme = AppTheme.SYSTEM,
     onBack: () -> Unit = {},
+    viewModel: ThemeChoiceViewModel = koinViewModel(),
+) {
+    val theme by viewModel.theme.collectAsStateWithLifecycle()
+
+    ThemeChoiceScreen(
+        currentTheme = AppTheme.valueOf(theme),
+        onAction = viewModel::onAction,
+        onBack = onBack,
+    )
+}
+
+@Composable
+fun ThemeChoiceScreen(
+    currentTheme: AppTheme,
+    onAction: (ThemeChoiceAction) -> Unit,
+    onBack: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -85,7 +103,7 @@ fun ThemeChoiceScreen(
                 ThemeItem(
                     theme = theme,
                     selected = currentTheme == theme,
-                    onClick = { /*onThemeSelected(theme)*/ },
+                    onClick = { onAction(ThemeChoiceAction.OnThemeItemClick(theme)) },
                 )
             }
         }

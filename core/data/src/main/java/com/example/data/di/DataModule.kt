@@ -8,6 +8,8 @@ import com.example.data.repository.NotificationRepository
 import com.example.data.repository.NotificationRepositoryImpl
 import com.example.data.repository.TaskRepository
 import com.example.data.repository.TaskRepositoryImpl
+import com.example.data.repository.ThemeRepository
+import com.example.data.repository.ThemeRepositoryImpl
 import com.example.data.repository.UserRepository
 import com.example.data.repository.UserRepositoryImpl
 import com.example.database.dao.GamificationDao
@@ -43,6 +45,10 @@ val dataModule =
 
         single<UserRepository> {
             UserRepositoryImpl(get<BloomPreferencesDataStore>())
+        }
+
+        single<ThemeRepository> {
+            ThemeRepositoryImpl(get<BloomPreferencesDataStore>())
         }
 
         single<NotificationRepository> {

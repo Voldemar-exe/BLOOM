@@ -31,6 +31,11 @@ class BloomPreferencesDataStore(private val preferences: DataStore<UserPreferenc
             if (prefs.hasSettings()) prefs.settings.toDomain() else AppSettings.default()
         }
 
+    val theme: Flow<String> =
+        preferences.data.map { prefs ->
+            if (prefs.hasSettings()) prefs.settings.toDomain().theme else AppSettings.default().theme
+        }
+
     val achievements: Flow<Set<Int>> =
         preferences.data.map { prefs ->
             if (prefs.hasUser()) prefs.user.toDomain().ownedAchievements else emptySet()
@@ -86,6 +91,21 @@ class BloomPreferencesDataStore(private val preferences: DataStore<UserPreferenc
             }
         } catch (ioException: IOException) {
             Timber.e(ioException, "Failed to update settings")
+        }
+    }
+
+    suspend fun setTheme(theme: String) {
+        try {
+            preferences.updateData { current ->
+                current.copy {
+                    this.settings =
+                        settings.copy {
+                            this.theme = theme
+                        }
+                }
+            }
+        } catch (ioException: IOException) {
+            Timber.e(ioException, "Failed to update theme")
         }
     }
 
