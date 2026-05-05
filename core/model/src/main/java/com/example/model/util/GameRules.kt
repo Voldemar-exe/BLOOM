@@ -55,9 +55,9 @@ object StreakRules {
 object XpRules {
     private const val BASE_XP = 100
 
-    fun xpToNextLevel(level: Int): Long = BASE_XP * level.toLong()
+    fun xpToNextLevel(level: Int): Int = BASE_XP * level
 
-    fun calculateLevel(totalXp: Long): Int {
+    fun calculateLevel(totalXp: Int): Int {
         var remaining = totalXp
         var level = 1
         while (remaining >= xpToNextLevel(level)) {

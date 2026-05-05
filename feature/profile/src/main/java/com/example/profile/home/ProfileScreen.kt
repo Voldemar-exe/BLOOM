@@ -65,8 +65,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bloom.feature.profile.R
 import com.example.designsystem.picture.BloomAvatars
 import com.example.designsystem.picture.BloomBackgrounds
-import com.example.designsystem.picture.BloomIcons
 import com.example.designsystem.picture.BloomColors
+import com.example.designsystem.picture.BloomIcons
 import com.example.model.util.XpRules
 import com.example.ui.logic.CollectOneShotEffect
 import org.koin.compose.viewmodel.koinViewModel
@@ -227,7 +227,7 @@ fun UserProfile(
     email: String,
 //    rankTitle: String,
     level: Int,
-    experience: Long,
+    experience: Int,
     coins: Int,
     background: String,
     avatar: String,

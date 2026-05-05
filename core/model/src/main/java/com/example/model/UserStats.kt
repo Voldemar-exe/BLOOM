@@ -1,8 +1,11 @@
 package com.example.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class UserStats(
     val level: Int,
-    val currentExperience: Long,
+    val currentExperience: Int,
     val currentCoinsAmount: Int,
     val maxCoinsAmount: Int,
     val totalHabitsCreated: Int,

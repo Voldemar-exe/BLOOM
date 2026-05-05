@@ -22,7 +22,7 @@ message UserProto {
 
 message UserStatsProto {
   int32 level = 1;
-  int64 currentExperience = 2;
+  int32 currentExperience = 2;
   int32 currentCoinsAmount = 3;
   int32 maxCoinsAmount = 4;
   int32 totalHabitsCreated = 5;
