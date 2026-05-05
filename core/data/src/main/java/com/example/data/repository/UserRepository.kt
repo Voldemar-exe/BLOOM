@@ -2,6 +2,7 @@ package com.example.data.repository
 
 import com.example.datastore.datastore.BloomPreferencesDataStore
 import com.example.model.AppSettings
+import com.example.model.CustomizationItem
 import com.example.model.CustomizationType
 import com.example.model.User
 import com.example.model.UserStats
@@ -38,13 +39,9 @@ interface UserRepository {
     suspend fun removeAchievement(id: Int)
 
     suspend fun addPurchase(
-        first: String,
-        second: String,
-    )
-
-    suspend fun removePurchase(
-        first: String,
-        second: String,
+        key: String,
+        type: CustomizationType,
+        price: Int,
     )
 
     suspend fun clearUser()
@@ -94,12 +91,15 @@ internal class UserRepositoryImpl(private val dataSource: BloomPreferencesDataSt
             CustomizationType.AVATAR -> {
                 dataSource.setUser(user = current.copy(avatarKey = key))
             }
+
             CustomizationType.BACKGROUND -> {
                 dataSource.setUser(user = current.copy(backgroundKey = key))
             }
+
             CustomizationType.COLOR -> {
                 dataSource.setUser(user = current.copy(colorKey = key))
             }
+
             else -> {
                 Timber.e("Wrong type for customization")
             }
@@ -115,17 +115,30 @@ internal class UserRepositoryImpl(private val dataSource: BloomPreferencesDataSt
     }
 
     override suspend fun addPurchase(
-        first: String,
-        second: String,
+        key: String,
+        type: CustomizationType,
+        price: Int,
     ) {
-        dataSource.addPurchase(first, second)
-    }
+        val currentUser = user.first() ?: return
+        val currentStats = stats.first()
 
-    override suspend fun removePurchase(
-        first: String,
-        second: String,
-    ) {
-        dataSource.removePurchase(first, second)
+        dataSource.addPurchase(key, type.name)
+        dataSource.setStats(
+            currentStats.copy(
+                currentCoinsAmount =
+                    currentStats.currentCoinsAmount - price,
+            ),
+        )
+        dataSource.setUser(
+            currentUser.copy(
+                ownedItems =
+                    currentUser.ownedItems +
+                        CustomizationItem(
+                            key,
+                            type,
+                        ),
+            ),
+        )
     }
 
     override suspend fun clearUser() {

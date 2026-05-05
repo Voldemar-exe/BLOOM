@@ -3,10 +3,6 @@ package com.example.profile.embedded.avatar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.UserRepository
-import com.example.designsystem.picture.BloomAvatars
-import com.example.designsystem.picture.BloomBackgrounds
-import com.example.designsystem.picture.BloomColors
-import com.example.model.CustomizationItem
 import com.example.model.CustomizationType
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -27,22 +23,7 @@ class AvatarCustomizeViewModel(private val userRepository: UserRepository) : Vie
                     colorKey = user.colorKey,
                     username = user.username,
                     email = user.email,
-                    // TODO: Made it default
-                    ownedItems =
-                        listOf(
-                            CustomizationItem(
-                                BloomAvatars.DEFAULT_KEY,
-                                CustomizationType.AVATAR,
-                            ),
-                            CustomizationItem(
-                                BloomBackgrounds.DEFAULT_KEY,
-                                CustomizationType.BACKGROUND,
-                            ),
-                            CustomizationItem(
-                                BloomColors.DEFAULT_KEY,
-                                CustomizationType.COLOR,
-                            ),
-                        ),
+                    ownedItems = user.ownedItems
                 )
             }.stateIn(
                 scope = viewModelScope,

@@ -6,6 +6,8 @@ import com.example.data.repository.UserRepository
 import com.example.designsystem.picture.BloomAvatars
 import com.example.designsystem.picture.BloomBackgrounds
 import com.example.designsystem.picture.BloomColors
+import com.example.model.CustomizationItem
+import com.example.model.CustomizationType
 import com.example.model.User
 import com.example.profile.home.ProfileEvent.NavigateTo
 import com.example.profile.navigation.AchievementsNavKey
@@ -84,7 +86,21 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                             backgroundKey = BloomBackgrounds.DEFAULT_KEY,
                             colorKey = BloomColors.DEFAULT_KEY,
                             ownedAchievements = emptySet(),
-                            ownedItems = emptyList(),
+                            ownedItems =
+                                listOf(
+                                    CustomizationItem(
+                                        BloomAvatars.DEFAULT_KEY,
+                                        CustomizationType.AVATAR,
+                                    ),
+                                    CustomizationItem(
+                                        BloomBackgrounds.DEFAULT_KEY,
+                                        CustomizationType.BACKGROUND,
+                                    ),
+                                    CustomizationItem(
+                                        BloomColors.DEFAULT_KEY,
+                                        CustomizationType.COLOR,
+                                    ),
+                                ),
                         ),
                     )
                 }

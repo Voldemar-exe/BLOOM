@@ -24,4 +24,5 @@ object BloomIcons {
     val Download = R.drawable.download_24px
     val Random = R.drawable.casino_24px
     val Undo = R.drawable.undo_24px
+    val Circle = R.drawable.circle_24px
 }

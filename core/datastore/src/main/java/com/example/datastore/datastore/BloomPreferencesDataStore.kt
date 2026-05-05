@@ -172,28 +172,6 @@ class BloomPreferencesDataStore(private val preferences: DataStore<UserPreferenc
         }
     }
 
-    suspend fun removePurchase(
-        first: String,
-        second: String,
-    ) {
-        try {
-            preferences.updateData { current ->
-                current.copy {
-                    if (!hasUser()) return@copy
-                    user =
-                        user.copy {
-                            val filtered =
-                                purchases.filterNot { it.first == first && it.second == second }
-                            purchases.clear()
-                            purchases.addAll(filtered)
-                        }
-                }
-            }
-        } catch (ioException: IOException) {
-            Timber.e(ioException, "Failed to remove purchase")
-        }
-    }
-
     suspend fun clearAll() {
         try {
             preferences.updateData {
