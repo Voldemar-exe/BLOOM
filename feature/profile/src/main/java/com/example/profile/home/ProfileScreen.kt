@@ -172,14 +172,6 @@ internal fun ProfileScreen(
                         items =
                             listOf(
                                 MenuItem(
-                                    BloomIcons.EditParameters,
-                                    stringResource(R.string.edit_parameters_label),
-                                ) {
-                                    onAction(
-                                        ProfileAction.OnParametersClick,
-                                    )
-                                },
-                                MenuItem(
                                     BloomIcons.Image,
                                     stringResource(R.string.change_avatar_label),
                                 ) { onAction(ProfileAction.OnAvatarClick) },

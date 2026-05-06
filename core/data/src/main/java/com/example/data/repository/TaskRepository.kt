@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Singleton
 
-@Singleton
 interface TaskRepository {
     fun getTasks(): Flow<List<Task>>
 
@@ -50,7 +49,6 @@ interface TaskRepository {
     suspend fun saveReminder(reminder: Reminder)
 }
 
-@Singleton
 internal class TaskRepositoryImpl(
     val taskDao: TaskDao,
     val subtaskDao: SubtaskDao,

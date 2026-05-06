@@ -7,17 +7,15 @@ import com.example.database.dao.HabitDao
 import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
 import com.example.database.dao.HabitWithRelationDao
+import com.example.database.model.SyncStatus
 import com.example.model.Habit
 import com.example.model.HabitPlant
 import com.example.model.HabitWithRelations
 import com.example.model.Reminder
-import com.example.database.model.SyncStatus
 import com.example.model.Tag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import org.koin.core.annotation.Singleton
 
-@Singleton
 interface HabitRepository {
     fun getHabits(): Flow<List<Habit>>
 
@@ -44,7 +42,6 @@ interface HabitRepository {
     suspend fun saveReminder(reminder: Reminder)
 }
 
-@Singleton
 internal class HabitRepositoryImpl(
     private val habitDao: HabitDao,
     private val plantDao: HabitPlantDao,

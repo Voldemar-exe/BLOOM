@@ -1,5 +1,8 @@
 package com.example.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class AppSettings(
     val theme: String,
     val weeklyGoal: Int,
@@ -22,3 +25,11 @@ data class AppSettings(
             )
     }
 }
+
+data class AppearanceSettings(val theme: String)
+
+data class PreferenceSettings(val weeklyGoal: Int, val streakTarget: Int)
+
+data class NotificationSettings(val emailEnabled: Boolean, val pushEnabled: Boolean)
+
+data class ReminderSettings(val habitRemindersEnabled: Boolean, val taskRemindersEnabled: Boolean)

@@ -13,7 +13,6 @@ import com.example.profile.home.ProfileEvent.NavigateTo
 import com.example.profile.navigation.AchievementsNavKey
 import com.example.profile.navigation.AvatarChoiceNavKey
 import com.example.profile.navigation.LeaderboardNavKey
-import com.example.profile.navigation.ParametersNavKey
 import com.example.profile.navigation.SettingsNavKey
 import com.example.profile.navigation.StoreNavKey
 import com.example.profile.navigation.ThemeChoiceNavKey
@@ -57,9 +56,6 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
             when (action) {
                 ProfileAction.OnSettingsClick ->
                     _events.emit(NavigateTo(SettingsNavKey))
-
-                ProfileAction.OnParametersClick ->
-                    _events.emit(NavigateTo(ParametersNavKey))
 
                 ProfileAction.OnAvatarClick ->
                     _events.emit(NavigateTo(AvatarChoiceNavKey))

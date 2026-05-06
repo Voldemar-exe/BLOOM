@@ -25,7 +25,8 @@ interface GamificationRepository {
     suspend fun isTaskCompletedToday(taskId: Long): Boolean
 }
 
-class GamificationRepositoryImpl(private val dao: GamificationDao) : GamificationRepository {
+internal class GamificationRepositoryImpl(private val dao: GamificationDao) :
+    GamificationRepository {
     override suspend fun recordHabitCompletion(
         habitId: Long,
         experienceEarned: Int,

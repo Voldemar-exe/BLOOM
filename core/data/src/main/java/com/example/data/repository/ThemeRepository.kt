@@ -9,7 +9,8 @@ interface ThemeRepository {
     suspend fun setTheme(theme: String)
 }
 
-class ThemeRepositoryImpl(private val dataSource: BloomPreferencesDataStore) : ThemeRepository {
+internal class ThemeRepositoryImpl(private val dataSource: BloomPreferencesDataStore) :
+    ThemeRepository {
     override val theme: Flow<String> = dataSource.theme
 
     override suspend fun setTheme(theme: String) {

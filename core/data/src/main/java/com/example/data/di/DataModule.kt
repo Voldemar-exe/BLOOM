@@ -6,6 +6,8 @@ import com.example.data.repository.HabitRepository
 import com.example.data.repository.HabitRepositoryImpl
 import com.example.data.repository.NotificationRepository
 import com.example.data.repository.NotificationRepositoryImpl
+import com.example.data.repository.SettingsRepository
+import com.example.data.repository.SettingsRepositoryImpl
 import com.example.data.repository.TaskRepository
 import com.example.data.repository.TaskRepositoryImpl
 import com.example.data.repository.ThemeRepository
@@ -60,5 +62,9 @@ val dataModule =
 
         single<GamificationRepository> {
             GamificationRepositoryImpl(get<GamificationDao>())
+        }
+
+        single<SettingsRepository> {
+            SettingsRepositoryImpl(get<BloomPreferencesDataStore>())
         }
     }

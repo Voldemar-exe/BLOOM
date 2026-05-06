@@ -12,7 +12,7 @@ interface NotificationRepository {
     fun getAllSchedules(): Flow<List<ReminderSchedule>>
 }
 
-class NotificationRepositoryImpl(
+internal class NotificationRepositoryImpl(
     private val habitReminderDao: HabitReminderDao,
     private val taskReminderDao: TaskReminderDao,
 ) : NotificationRepository {
