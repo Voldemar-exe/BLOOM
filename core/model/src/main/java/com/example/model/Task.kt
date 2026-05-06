@@ -4,7 +4,7 @@ data class Task(
     val id: Long,
     val title: String,
     val description: String,
-    val daysOfMonth: List<Int>,
+    val recurrence: Recurrence,
     val priority: Priority,
     val deadline: Long?,
     val tags: Set<Tag>,

@@ -8,7 +8,7 @@ data class ReminderSchedule(
     val title: String,
     val description: String,
     val time: LocalTime,
-    val daysOfMonth: List<Int>,
+    val recurrence: Recurrence,
     val isEnabled: Boolean,
     val type: ReminderType,
 ) {

@@ -16,7 +16,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,14 +23,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.model.RecurrenceType
-import com.example.model.util.monthToWeekDays
-import java.time.YearMonth
 
 @Composable
 fun RecurrenceSection(
     type: RecurrenceType,
-    monthDays: Set<Int>,
-    currentMonth: YearMonth,
+    days: Set<Int>,
     onTypeChange: (RecurrenceType) -> Unit,
     onDaysChange: (Set<Int>) -> Unit,
 ) {
@@ -50,16 +46,15 @@ fun RecurrenceSection(
             }
 
             RecurrenceType.WEEK -> {
-                val weekDays =
-                    remember(monthDays, currentMonth) {
-                        monthToWeekDays(monthDays, currentMonth)
-                    }
-
                 WeekDaysSelector(
-                    selectedDays = weekDays,
+                    selectedDays = days,
                     onDayToggle = { day ->
                         val newSet =
-                            if (day in weekDays) weekDays - day else weekDays + day
+                            if (day in days) {
+                                days - day
+                            } else {
+                                days + day
+                            }
                         onDaysChange(newSet)
                     },
                 )
@@ -67,10 +62,10 @@ fun RecurrenceSection(
 
             RecurrenceType.MONTH -> {
                 MonthDaysSelector(
-                    selectedDays = monthDays,
+                    selectedDays = days,
                     onToggle = { day ->
                         val newSet =
-                            if (day in monthDays) monthDays - day else monthDays + day
+                            if (day in days) days - day else days + day
                         onDaysChange(newSet)
                     },
                 )
@@ -106,8 +101,7 @@ fun MonthDaysSelector(
                                         } else {
                                             Color(0xFFE0E0E0)
                                         },
-                                    )
-                                    .clickable { onToggle(day) },
+                                    ).clickable { onToggle(day) },
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(

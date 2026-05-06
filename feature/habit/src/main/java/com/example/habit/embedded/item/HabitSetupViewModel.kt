@@ -7,7 +7,6 @@ import com.example.model.Habit
 import com.example.model.RecurrenceType
 import com.example.model.Reminder
 import com.example.model.Tag
-import com.example.model.util.weekToMonthDays
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +18,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import timber.log.Timber
 import java.time.LocalTime
-import java.time.YearMonth
 
 @KoinViewModel
 class HabitSetupViewModel(private val habitRepository: HabitRepository) : ViewModel() {
@@ -50,34 +48,17 @@ class HabitSetupViewModel(private val habitRepository: HabitRepository) : ViewMo
                 }
 
             is HabitSetupAction.OnTagClick -> toggleTag(action.tag)
-
-            is HabitSetupAction.SetRecurrenceType -> {
-                _state.update {
-                    it.copy(
-                        recurrenceType = action.type,
-                    )
-                }
-                when (action.type) {
-                    RecurrenceType.DAY -> updateSelectedDays(emptySet())
-                    else -> {}
-                }
-            }
-
+            is HabitSetupAction.SetRecurrenceType -> setRecurrence(action.type)
             is HabitSetupAction.UpdateSelectedDays -> updateSelectedDays(action.days)
-
             is HabitSetupAction.AddReminder -> addReminder(action.time)
             is HabitSetupAction.UpdateReminder -> updateReminder(action.index, action.time)
             is HabitSetupAction.ToggleReminder -> toggleReminder(action.index)
             is HabitSetupAction.RemoveReminder -> removeReminder(action.index)
-
             is HabitSetupAction.AddStep -> addStep(action.title)
             is HabitSetupAction.RemoveStep -> removeStep(action.index)
             is HabitSetupAction.ToggleStep -> toggleStep(action.index)
-
             is HabitSetupAction.SetPlant -> _state.update { it.copy(plant = action.plant) }
-
             HabitSetupAction.OnSaveHabit -> saveHabit()
-
             is HabitSetupAction.LoadHabit -> action.habitId?.let { loadHabit(it) }
         }
     }
@@ -87,17 +68,13 @@ class HabitSetupViewModel(private val habitRepository: HabitRepository) : ViewMo
         _state.update { it.copy(tags = if (tag in current) current - tag else current + tag) }
     }
 
+    private fun setRecurrence(type: RecurrenceType) {
+        _state.update { it.copy(recurrence = it.recurrence.copy(type = type)) }
+        updateSelectedDays(emptySet())
+    }
+
     private fun updateSelectedDays(days: Set<Int>) {
-        val month = YearMonth.now()
-        _state.update { current ->
-            val normalized =
-                when (current.recurrenceType) {
-                    RecurrenceType.DAY -> (1..31).toSet()
-                    RecurrenceType.WEEK -> weekToMonthDays(days, month)
-                    RecurrenceType.MONTH -> days
-                }
-            current.copy(daysOfWeek = normalized)
-        }
+        _state.update { it.copy(recurrence = it.recurrence.copy(values = days)) }
     }
 
     private fun addReminder(time: Pair<Int, Int>) {
@@ -224,7 +201,7 @@ class HabitSetupViewModel(private val habitRepository: HabitRepository) : ViewMo
                         id = info.habit.id,
                         title = info.habit.title,
                         description = info.habit.description,
-                        daysOfWeek = info.habit.daysOfWeek.toSet(),
+                        recurrence = info.habit.recurrence,
                         tags = info.habit.tags,
                         steps = info.habit.steps,
                         reminders = info.reminders,
@@ -246,7 +223,7 @@ class HabitSetupViewModel(private val habitRepository: HabitRepository) : ViewMo
             id = current.id,
             title = current.title,
             description = current.description,
-            daysOfWeek = current.daysOfWeek.toList(),
+            recurrence = current.recurrence,
             tags = current.tags,
             steps = current.steps,
             isChecked = current.isChecked,

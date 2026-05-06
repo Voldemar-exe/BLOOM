@@ -1,31 +1,42 @@
 package com.example.notification.util
 
+import com.example.model.RecurrenceType
 import com.example.model.ReminderSchedule
-import timber.log.Timber
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-
-private const val MAX_TRIGGER_SEARCH_DAYS = 31L
 
 fun ReminderSchedule.nextTriggerMillis(): Long? {
     val zone = ZoneId.systemDefault()
     val now = LocalDateTime.now().withSecond(0).withNano(0)
 
-    for (offset in 0..MAX_TRIGGER_SEARCH_DAYS) {
-        val targetDate = now.toLocalDate().plusDays(offset)
+    fun findNextDate(predicate: (LocalDate) -> Boolean): LocalDateTime? =
+        generateSequence(now.toLocalDate()) { it.plusDays(1) }
+            .firstOrNull(predicate)
+            ?.takeIf { date ->
+                LocalDateTime.of(date, time).isAfter(now)
+            }?.let { LocalDateTime.of(it, time) }
 
-        if (targetDate.dayOfMonth !in daysOfMonth) continue
-
-        val scheduled = LocalDateTime.of(targetDate, time).withNano(0)
-
-        if (scheduled > now) {
-            Timber.d("Next trigger found: %s", scheduled)
-            return scheduled
+    return when (recurrence.type) {
+        RecurrenceType.DAY -> {
+            val today = LocalDate.now()
+            val candidate = LocalDateTime.of(today, time)
+            (candidate.takeIf { it.isAfter(now) } ?: LocalDateTime.of(today.plusDays(1), time))
                 .atZone(zone)
                 .toInstant()
                 .toEpochMilli()
         }
-    }
 
-    return null
+        RecurrenceType.WEEK ->
+            findNextDate { it.dayOfWeek.value - 1 in recurrence.values }
+                ?.atZone(zone)
+                ?.toInstant()
+                ?.toEpochMilli()
+
+        RecurrenceType.MONTH ->
+            findNextDate { it.dayOfMonth - 1 in recurrence.values }
+                ?.atZone(zone)
+                ?.toInstant()
+                ?.toEpochMilli()
+    }
 }

@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.database.model.SyncStatus
 import com.example.model.Priority
+import com.example.model.Recurrence
 import kotlin.time.Clock
 
 @Entity(tableName = "tasks")
@@ -12,7 +13,7 @@ data class TaskEntity(
     val id: Long,
     val title: String,
     val description: String,
-    val daysOfMonth: List<Int>,
+    val recurrence: Recurrence,
     val priority: Priority,
     val deadline: Long?,
     val tags: List<String>,

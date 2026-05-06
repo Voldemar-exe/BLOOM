@@ -22,6 +22,7 @@ import com.example.database.model.entities.TaskCompletionEntity
 import com.example.database.model.entities.TaskEntity
 import com.example.database.model.entities.TaskReminderEntity
 import com.example.database.util.IntListConverter
+import com.example.database.util.RecurrenceConverter
 import com.example.database.util.StringListConverter
 
 @Database(
@@ -43,6 +44,7 @@ import com.example.database.util.StringListConverter
     value = [
         IntListConverter::class,
         StringListConverter::class,
+        RecurrenceConverter::class,
     ],
 )
 internal abstract class BloomDatabase : RoomDatabase() {

@@ -2,6 +2,7 @@ package com.example.task.embedded
 
 import androidx.compose.runtime.Immutable
 import com.example.model.Priority
+import com.example.model.Recurrence
 import com.example.model.RecurrenceType
 import com.example.model.Reminder
 import com.example.model.Subtask
@@ -13,7 +14,7 @@ data class TaskSetupState(
     val title: String = "",
     val description: String = "",
     val priority: Priority = Priority.MEDIUM,
-    val daysOfWeek: Set<Int> = emptySet(),
+    val recurrence: Recurrence = Recurrence(RecurrenceType.WEEK, emptySet()),
     val deadline: Long? = null,
     val reminders: List<Reminder> = emptyList(),
     val remindersToDelete: Set<Long> = emptySet(),
@@ -24,8 +25,7 @@ data class TaskSetupState(
     val isChecked: Boolean = false,
     val subtasks: List<Subtask> = emptyList(),
     val subtasksToDelete: Set<Long> = emptySet(),
-    val recurrenceType: RecurrenceType = RecurrenceType.WEEK,
     val hasEndDate: Boolean = false,
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
 )

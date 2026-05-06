@@ -7,7 +7,7 @@ data class Habit(
     val id: Long,
     val title: String,
     val description: String,
-    val daysOfWeek: List<Int>,
+    val recurrence: Recurrence,
     val tags: Set<Tag>,
     val steps: List<String>,
     val isChecked: Boolean,

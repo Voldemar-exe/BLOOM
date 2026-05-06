@@ -53,7 +53,6 @@ import com.example.ui.components.TextInputDialog
 import com.example.ui.components.convertMillisToDate
 import com.example.ui.logic.CollectOneShotEffect
 import org.koin.compose.viewmodel.koinViewModel
-import java.time.YearMonth
 
 @Composable
 fun TaskItemScreen(
@@ -177,9 +176,8 @@ internal fun TaskItemScreen(
 
             item {
                 RecurrenceSection(
-                    type = state.recurrenceType,
-                    monthDays = state.daysOfWeek,
-                    currentMonth = YearMonth.now(),
+                    type = state.recurrence.type,
+                    days = state.recurrence.values,
                     onTypeChange = { onAction(TaskSetupAction.SetRecurrenceType(it)) },
                     onDaysChange = { onAction(TaskSetupAction.UpdateSelectedDays(it)) },
                 )
@@ -280,7 +278,8 @@ private fun SubtaskRow(
                 .background(
                     MaterialTheme.colorScheme.secondaryContainer,
                     RoundedCornerShape(12.dp),
-                ).padding(12.dp),
+                )
+                .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Checkbox(

@@ -50,7 +50,6 @@ import com.example.ui.components.ReminderSection
 import com.example.ui.components.TextInputDialog
 import com.example.ui.logic.CollectOneShotEffect
 import org.koin.compose.viewmodel.koinViewModel
-import java.time.YearMonth
 
 @Composable
 fun HabitItemScreen(
@@ -196,9 +195,8 @@ internal fun HabitItemScreen(
 
             item {
                 RecurrenceSection(
-                    type = state.recurrenceType,
-                    monthDays = state.daysOfWeek,
-                    currentMonth = YearMonth.now(),
+                    type = state.recurrence.type,
+                    days = state.recurrence.values,
                     onTypeChange = {
                         onAction(
                             HabitSetupAction.SetRecurrenceType(it),

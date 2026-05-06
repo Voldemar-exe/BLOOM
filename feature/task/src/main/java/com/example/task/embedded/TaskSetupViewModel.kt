@@ -9,7 +9,6 @@ import com.example.model.Reminder
 import com.example.model.Subtask
 import com.example.model.Tag
 import com.example.model.Task
-import com.example.model.util.weekToMonthDays
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +20,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import timber.log.Timber
 import java.time.LocalTime
-import java.time.YearMonth
 
 @KoinViewModel
 class TaskSetupViewModel(private val taskRepository: TaskRepository) : ViewModel() {
@@ -79,28 +77,12 @@ class TaskSetupViewModel(private val taskRepository: TaskRepository) : ViewModel
     }
 
     private fun setRecurrence(type: RecurrenceType) {
-        _state.update { it.copy(recurrenceType = type) }
+        _state.update { it.copy(recurrence = it.recurrence.copy(type = type)) }
+        updateSelectedDays(emptySet())
     }
 
     private fun updateSelectedDays(days: Set<Int>) {
-        val month = YearMonth.now()
-        _state.update { current ->
-            val normalizedDays =
-                when (current.recurrenceType) {
-                    RecurrenceType.DAY -> {
-                        (1..31).toSet()
-                    }
-
-                    RecurrenceType.WEEK -> {
-                        weekToMonthDays(days, month)
-                    }
-
-                    RecurrenceType.MONTH -> {
-                        days
-                    }
-                }
-            current.copy(daysOfWeek = normalizedDays)
-        }
+        _state.update { it.copy(recurrence = it.recurrence.copy(values = days)) }
     }
 
     private fun addReminder(time: Pair<Int, Int>) {
@@ -259,7 +241,7 @@ class TaskSetupViewModel(private val taskRepository: TaskRepository) : ViewModel
                         title = taskWithRelations.task.title,
                         description = taskWithRelations.task.description,
                         priority = taskWithRelations.task.priority,
-                        daysOfWeek = taskWithRelations.task.daysOfMonth.toSet(),
+                        recurrence = taskWithRelations.task.recurrence,
                         deadline = taskWithRelations.task.deadline,
                         reminders = taskWithRelations.reminders,
                         tags = taskWithRelations.task.tags,
@@ -280,7 +262,7 @@ class TaskSetupViewModel(private val taskRepository: TaskRepository) : ViewModel
             id = currState.id,
             title = currState.title,
             description = currState.description,
-            daysOfMonth = currState.daysOfWeek.toList(),
+            recurrence = currState.recurrence,
             priority = currState.priority,
             deadline = currState.deadline,
             tags = currState.tags,

@@ -3,6 +3,7 @@ package com.example.database.model.entities
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.database.model.SyncStatus
+import com.example.model.Recurrence
 import kotlin.time.Clock
 
 @Entity(tableName = "habits")
@@ -11,7 +12,7 @@ data class HabitEntity(
     val id: Long,
     val title: String,
     val description: String,
-    val daysOfMonth: List<Int>,
+    val recurrence: Recurrence,
     val tags: List<String>,
     val steps: List<String>,
     val isChecked: Boolean = false,

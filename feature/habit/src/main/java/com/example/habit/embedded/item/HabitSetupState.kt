@@ -3,6 +3,7 @@ package com.example.habit.embedded.item
 import androidx.compose.runtime.Immutable
 import com.example.habit.util.toHabitPlant
 import com.example.model.HabitPlant
+import com.example.model.Recurrence
 import com.example.model.RecurrenceType
 import com.example.model.Reminder
 import com.example.model.Tag
@@ -13,8 +14,7 @@ data class HabitSetupState(
     val id: Long = 0,
     val title: String = "",
     val description: String = "",
-    val daysOfWeek: Set<Int> = emptySet(),
-    val recurrenceType: RecurrenceType = RecurrenceType.WEEK,
+    val recurrence: Recurrence = Recurrence(RecurrenceType.WEEK, emptySet()),
     val tags: Set<Tag> = emptySet(),
     val steps: List<String> = emptyList(),
     val checkedSteps: Set<Int> = emptySet(),
