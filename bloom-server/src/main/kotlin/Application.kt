@@ -1,6 +1,7 @@
 package com.example
 
 import com.example.auth.configureSecurity
+import com.example.db.DatabaseFactory
 import com.example.plugins.configureHttp
 import com.example.plugins.configureSerialization
 import io.ktor.server.application.*
@@ -23,7 +24,7 @@ fun Application.module() {
 //        modules(authModule)
     }
 
-//    DatabaseFactory.init(this)
+    DatabaseFactory.init(environment.config)
 
     configureSerialization()
     configureHttp()

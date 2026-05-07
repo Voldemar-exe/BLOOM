@@ -30,6 +30,7 @@ dependencies {
     implementation(ktorLibs.server.routingOpenapi)
     implementation(ktorLibs.server.swagger)
     implementation(libs.exposed.core)
+    implementation(libs.exposed.dao)
     implementation(libs.exposed.r2dbc)
     implementation(libs.h2database.h2)
     implementation(libs.h2database.r2dbc)
