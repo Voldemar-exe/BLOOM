@@ -1,5 +1,6 @@
 package com.example.db
 
+import com.example.db.tables.*
 import io.ktor.server.config.*
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
@@ -7,6 +8,8 @@ import io.r2dbc.spi.IsolationLevel
 import io.r2dbc.spi.Option
 import org.jetbrains.exposed.v1.r2dbc.R2dbcDatabase
 import org.jetbrains.exposed.v1.r2dbc.R2dbcDatabaseConfig
+import org.jetbrains.exposed.v1.r2dbc.SchemaUtils
+import org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
 
 object DatabaseFactory {
     private lateinit var connectionFactory: ConnectionFactory
@@ -38,5 +41,22 @@ object DatabaseFactory {
         }
 
         R2dbcDatabase.connect(databaseConfig = databaseConfig)
+    }
+
+    suspend fun createTables() {
+        suspendTransaction {
+            SchemaUtils.create(
+                UsersTable,
+                HabitsTable,
+                HabitPlantsTable,
+                HabitRemindersTable,
+                TasksTable,
+                SubtasksTable,
+                TaskRemindersTable,
+                StatsLogsTable,
+                HabitCompletionsTable,
+                TaskCompletionsTable
+            )
+        }
     }
 }

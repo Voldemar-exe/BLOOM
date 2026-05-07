@@ -38,6 +38,9 @@ dependencies {
     implementation(libs.koin.loggerSlf4j)
     implementation(libs.logback.classic)
     implementation(libs.postgresql)
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
+    implementation("io.ktor:ktor-server-config-yaml:2.3.20")
+    implementation("org.postgresql:r2dbc-postgresql:1.1.1.RELEASE")
 
     testImplementation(kotlin("test"))
     testImplementation(ktorLibs.server.testHost)
