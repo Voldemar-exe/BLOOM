@@ -2,6 +2,7 @@ package com.example.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,9 +12,7 @@ import org.koin.core.annotation.KoinViewModel
 import timber.log.Timber
 
 @KoinViewModel
-class AuthViewModel(
-//    private val authRepository: AuthRepository
-) : ViewModel() {
+class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
     private val _authUiState = MutableStateFlow(AuthState())
     val authUiState: StateFlow<AuthState>
         get() = _authUiState.asStateFlow()
@@ -80,25 +79,21 @@ class AuthViewModel(
     ) {
         if (!validateInput(login, password)) return
 
-        // TODO: Add action with AuthService
         viewModelScope.launch {
-            Timber.d("Login successful")
+            authRepository.login(login, password)
         }
     }
 
     private fun handleRegister(
-        login: String?,
+        login: String,
         email: String,
         password: String,
     ) {
         if (!validateInput(email, password)) return
 
         viewModelScope.launch {
-            _authUiState.update { it.copy(isLoading = true, errorMessage = null) }
-
-            // TODO: Add action with AuthService
             viewModelScope.launch {
-                Timber.d("Login successful")
+                authRepository.register(login, email, password)
             }
         }
     }
@@ -131,7 +126,11 @@ class AuthViewModel(
             }
 
             password.length < 6 -> {
-                _authUiState.update { it.copy(errorMessage = "Password must be at least 6 characters") }
+                _authUiState.update {
+                    it.copy(
+                        errorMessage = "Password must be at least 6 characters",
+                    )
+                }
                 false
             }
 

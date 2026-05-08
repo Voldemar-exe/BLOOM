@@ -35,12 +35,12 @@ import com.example.bloom.feature.auth.R
 import com.example.designsystem.component.ImagePlaceholder
 import com.example.designsystem.picture.BloomIcons
 import kotlinx.coroutines.flow.collectLatest
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    // TODO: Replace with koin injection
-    viewModel: AuthViewModel = AuthViewModel(),
+    viewModel: AuthViewModel = koinViewModel(),
 ) {
     val authUiState by viewModel.authUiState.collectAsStateWithLifecycle()
 
@@ -57,9 +57,20 @@ internal fun LoginScreen(
     onAction: (AuthAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val loginState = rememberTextFieldState()
-    val passwordState = rememberTextFieldState()
-    val loginSupportiveText: String = "supportive text"
+    val loginState = rememberTextFieldState(authUiState.login)
+    val passwordState = rememberTextFieldState(authUiState.password)
+
+    LaunchedEffect(loginState) {
+        snapshotFlow { loginState.text.toString() }.collectLatest {
+            onAction(AuthAction.LoginChanged(it))
+        }
+    }
+
+    LaunchedEffect(passwordState) {
+        snapshotFlow { passwordState.text.toString() }.collectLatest {
+            onAction(AuthAction.PasswordChanged(it))
+        }
+    }
 
     Scaffold(
         topBar = {},
@@ -102,13 +113,6 @@ internal fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                val loginState = rememberTextFieldState(authUiState.login)
-                LaunchedEffect(loginState) {
-                    snapshotFlow { loginState.text.toString() }.collectLatest {
-                        onAction(AuthAction.LoginChanged(it))
-                    }
-                }
-
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     state = loginState,
@@ -118,16 +122,9 @@ internal fun LoginScreen(
                     label = { Text(text = stringResource(R.string.login_label)) },
                 )
 
-                val passwordState = rememberTextFieldState(authUiState.password)
-                LaunchedEffect(passwordState) {
-                    snapshotFlow { passwordState.text.toString() }.collectLatest {
-                        onAction(AuthAction.PasswordChanged(it))
-                    }
-                }
-
                 OutlinedSecureTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    state = loginState,
+                    state = passwordState,
                     leadingIcon = {
                         Icon(imageVector = Icons.Outlined.Lock, contentDescription = "password")
                     },

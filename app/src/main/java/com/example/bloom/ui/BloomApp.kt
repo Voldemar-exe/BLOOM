@@ -16,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.example.auth.navigation.authEntry
 import com.example.bloom.navigation.TOP_LEVEL_NAV_ITEMS
 import com.example.habit.navigation.HabitNavKey
 import com.example.habit.navigation.habitEntry
@@ -66,14 +65,18 @@ fun BloomApp() {
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues).consumeWindowInsets(paddingValues)) {
+        Box(
+            modifier =
+                Modifier
+                    .padding(paddingValues)
+                    .consumeWindowInsets(paddingValues),
+        ) {
             val entryProvider =
                 entryProvider {
                     habitEntry(navigator)
                     taskEntry(navigator)
                     statsEntry(navigator)
                     profileEntry(navigator)
-                    authEntry(navigator)
                 }
             NavDisplay(
                 entries = navigationState.toEntries(entryProvider),

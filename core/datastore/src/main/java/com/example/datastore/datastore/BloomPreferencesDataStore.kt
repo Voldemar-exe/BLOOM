@@ -21,6 +21,11 @@ class BloomPreferencesDataStore(private val preferences: DataStore<UserPreferenc
             if (prefs.hasUser()) prefs.user.toDomain() else null
         }
 
+    val token: Flow<String?> =
+        preferences.data.map { prefs ->
+            if (prefs.hasAuthToken()) prefs.authToken.token else null
+        }
+
     val stats: Flow<UserStats> =
         preferences.data.map { prefs ->
             if (prefs.hasStats()) prefs.stats.toDomain() else UserStats.default()
@@ -169,6 +174,33 @@ class BloomPreferencesDataStore(private val preferences: DataStore<UserPreferenc
             }
         } catch (ioException: IOException) {
             Timber.e(ioException, "Failed to add purchase")
+        }
+    }
+
+    suspend fun saveToken(token: String) {
+        try {
+            preferences.updateData { current ->
+                current.copy {
+                    authToken =
+                        authToken.copy {
+                            this.token = token
+                        }
+                }
+            }
+        } catch (ioException: IOException) {
+            Timber.e(ioException, "Failed to save token")
+        }
+    }
+
+    suspend fun clearToken() {
+        try {
+            preferences.updateData { current ->
+                current.copy {
+                    clearToken()
+                }
+            }
+        } catch (ioException: IOException) {
+            Timber.e(ioException, "Failed to clear token")
         }
     }
 

@@ -1,5 +1,7 @@
 package com.example.data.di
 
+import com.example.data.repository.AuthRepository
+import com.example.data.repository.AuthRepositoryImpl
 import com.example.data.repository.GamificationRepository
 import com.example.data.repository.GamificationRepositoryImpl
 import com.example.data.repository.HabitRepository
@@ -24,6 +26,7 @@ import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
 import com.example.datastore.datastore.BloomPreferencesDataStore
+import com.example.network.api.AuthApi
 import org.koin.dsl.module
 
 val dataModule =
@@ -66,5 +69,9 @@ val dataModule =
 
         single<SettingsRepository> {
             SettingsRepositoryImpl(get<BloomPreferencesDataStore>())
+        }
+
+        single<AuthRepository> {
+            AuthRepositoryImpl( get<AuthApi>(), get<BloomPreferencesDataStore>())
         }
     }

@@ -37,12 +37,12 @@ import com.example.bloom.feature.auth.R
 import com.example.designsystem.component.ImagePlaceholder
 import com.example.designsystem.picture.BloomIcons
 import kotlinx.coroutines.flow.collectLatest
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RegisterScreen(
     modifier: Modifier = Modifier,
-    // TODO: Replace with koin injection
-    viewModel: AuthViewModel = AuthViewModel(),
+    viewModel: AuthViewModel = koinViewModel(),
 ) {
     val authUiState by viewModel.authUiState.collectAsStateWithLifecycle()
 

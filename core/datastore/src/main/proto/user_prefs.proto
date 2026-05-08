@@ -43,8 +43,13 @@ message AppSettingsProto {
   bool taskRemindersEnabled = 7;
 }
 
+message AuthToken {
+  string token = 1;
+}
+
 message UserPreferences {
   UserProto user = 1;
   UserStatsProto stats = 2;
   AppSettingsProto settings = 3;
+  AuthToken authToken = 4;
 }

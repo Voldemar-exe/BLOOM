@@ -2,6 +2,7 @@ package com.example.routing
 
 import com.example.auth.AuthService
 import com.example.model.LoginRequest
+import com.example.model.LoginResponse
 import com.example.model.RegisterRequest
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -18,7 +19,7 @@ fun Application.configureAuthRouting() {
             val request = call.receive<LoginRequest>()
             val result = authService.login(request.login, request.password)
             result.fold(
-                onSuccess = { call.respond(it) },
+                onSuccess = { call.respond(LoginResponse(it)) },
                 onFailure = {
                     call.respond(
                         HttpStatusCode.Unauthorized,
@@ -31,7 +32,7 @@ fun Application.configureAuthRouting() {
             val request = call.receive<RegisterRequest>()
             val result = authService.register(request.login, request.email, request.password)
             result.fold(
-                onSuccess = { call.respond(it) },
+                onSuccess = { call.respond(LoginResponse(it)) },
                 onFailure = {
                     call.respond(HttpStatusCode.Unauthorized, it.toString())
                 },
