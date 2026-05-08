@@ -1,46 +1,42 @@
 package com.example.db
 
 import com.example.db.tables.*
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.config.*
-import io.r2dbc.spi.ConnectionFactory
-import io.r2dbc.spi.ConnectionFactoryOptions
-import io.r2dbc.spi.IsolationLevel
-import io.r2dbc.spi.Option
-import org.jetbrains.exposed.v1.r2dbc.R2dbcDatabase
-import org.jetbrains.exposed.v1.r2dbc.R2dbcDatabaseConfig
-import org.jetbrains.exposed.v1.r2dbc.SchemaUtils
-import org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.SchemaUtils
+import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 
 object DatabaseFactory {
-    private lateinit var connectionFactory: ConnectionFactory
-
     fun init(config: ApplicationConfig) {
         val dbConfig = config.config("database")
+        val host = dbConfig.property("host").getString()
+        val port = dbConfig.property("port").getString().toInt()
+        val name = dbConfig.property("name").getString()
+        val user = dbConfig.property("user").getString()
+        val password = dbConfig.property("password").getString()
+        val ssl = dbConfig.propertyOrNull("ssl")?.getString()?.toBoolean() ?: false
+        val poolSize = dbConfig.propertyOrNull("poolSize")?.getString()?.toIntOrNull() ?: 10
 
-        val options = ConnectionFactoryOptions.builder()
-            .option(ConnectionFactoryOptions.DRIVER, "postgresql")
-            .option(ConnectionFactoryOptions.HOST, dbConfig.property("host").getString())
-            .option(ConnectionFactoryOptions.PORT, dbConfig.property("port").getString().toInt())
-            .option(ConnectionFactoryOptions.DATABASE, dbConfig.property("database").getString())
-            .option(ConnectionFactoryOptions.USER, dbConfig.property("user").getString())
-            .option(ConnectionFactoryOptions.PASSWORD, dbConfig.property("password").getString())
-            .option(
-                ConnectionFactoryOptions.SSL,
-                dbConfig.propertyOrNull("ssl")?.getString()?.toBoolean() ?: false
-            )
-            .apply {
-                val poolSize = dbConfig.propertyOrNull("poolSize")?.getString()?.toIntOrNull() ?: 10
-                option(Option.valueOf("option"), "MAX_CONNECTIONS=$poolSize")
+        val jdbcUrl =
+            "jdbc:postgresql://$host:$port/$name?sslmode=${if (ssl) "require" else "disable"}"
+
+        val hikariConfig =
+            HikariConfig().apply {
+                this.jdbcUrl = jdbcUrl
+                driverClassName = "org.postgresql.Driver"
+                this.username = user
+                this.password = password
+                maximumPoolSize = poolSize
+                connectionTimeout = 30000
+                maxLifetime = 1800000
+                validate()
             }
-            .build()
 
-        val databaseConfig = R2dbcDatabaseConfig {
-            defaultMaxAttempts = 1
-            defaultR2dbcIsolationLevel = IsolationLevel.READ_UNCOMMITTED
-            connectionFactoryOptions = options
-        }
-
-        R2dbcDatabase.connect(databaseConfig = databaseConfig)
+        Database.connect(
+            HikariDataSource(hikariConfig),
+        )
     }
 
     suspend fun createTables() {
@@ -55,7 +51,7 @@ object DatabaseFactory {
                 TaskRemindersTable,
                 StatsLogsTable,
                 HabitCompletionsTable,
-                TaskCompletionsTable
+                TaskCompletionsTable,
             )
         }
     }

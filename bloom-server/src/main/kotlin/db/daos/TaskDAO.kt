@@ -14,7 +14,7 @@ class TaskDAO(id: EntityID<Long>) : LongEntity(id) {
     var recurrence by TasksTable.recurrence
     var priority by TasksTable.priority
     var deadline by TasksTable.deadline
-    var tags by TasksTable.tags // jsonb: List<String>?
+    var tags by TasksTable.tags
     var isChecked by TasksTable.isChecked
     var isArchived by TasksTable.isArchived
     var isPaused by TasksTable.isPaused

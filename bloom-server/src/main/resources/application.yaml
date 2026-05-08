@@ -1,6 +1,6 @@
 ktor:
   deployment:
-    port: 8080
+    port: 8088
   application:
     modules:
       - com.example.ApplicationKt.module
@@ -8,7 +8,7 @@ ktor:
 database:
   host: $DB_HOST
   port: $DB_PORT
-  database: $DB_NAME
+  name: $DB_NAME
   user: $DB_USER
   password: $DB_PASSWORD
   poolSize: $DB_POOL_SIZE
