@@ -1,11 +1,21 @@
 package com.example.auth
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
@@ -39,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bloom.feature.auth.R
+import com.example.designsystem.component.AnimatedText
 import com.example.designsystem.component.ImagePlaceholder
 import com.example.designsystem.picture.BloomIcons
 import kotlinx.coroutines.flow.collectLatest
@@ -51,7 +62,7 @@ fun AuthScreen(
 ) {
     val state by viewModel.authUiState.collectAsStateWithLifecycle()
 
-    AuthScreenContent(
+    AuthScreen(
         state = state,
         onAction = viewModel::onAction,
         modifier = modifier,
@@ -59,7 +70,7 @@ fun AuthScreen(
 }
 
 @Composable
-internal fun AuthScreenContent(
+internal fun AuthScreen(
     state: AuthState,
     onAction: (AuthAction) -> Unit,
     modifier: Modifier = Modifier,
@@ -78,13 +89,30 @@ internal fun AuthScreenContent(
                     .padding(bottom = 4.dp),
         )
 
-        if (!state.isRegisterMode) {
-            LoginForm(state, onAction)
-        } else {
-            RegisterForm(state, onAction)
+        AnimatedContent(
+            targetState = state.isRegisterMode,
+            transitionSpec = {
+                (
+                    scaleIn(tween(300, easing = LinearOutSlowInEasing), initialScale = 0.96f) +
+                        fadeIn(
+                            tween(300, easing = LinearOutSlowInEasing),
+                        )
+                ).togetherWith(
+                    scaleOut(
+                        tween(300, easing = FastOutSlowInEasing),
+                        targetScale = 0.96f,
+                    ) + fadeOut(tween(300, easing = FastOutSlowInEasing)),
+                )
+            },
+        ) { isRegister ->
+            AuthFormCard(modifier = Modifier.padding(vertical = 16.dp)) {
+                if (!isRegister) {
+                    LoginForm(state, onAction)
+                } else {
+                    RegisterForm(state, onAction)
+                }
+            }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
@@ -105,7 +133,7 @@ internal fun AuthScreenContent(
         ) {
             Icon(painterResource(BloomIcons.Login), contentDescription = null)
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text(
+            AnimatedText(
                 stringResource(
                     if (!state.isRegisterMode) {
                         R.string.login_button
@@ -121,7 +149,7 @@ internal fun AuthScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Text(
+            AnimatedText(
                 stringResource(
                     if (!state.isRegisterMode) {
                         R.string.login_to_register_text
@@ -145,7 +173,7 @@ internal fun AuthScreenContent(
                     contentDescription = null,
                 )
                 Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                Text(
+                AnimatedText(
                     stringResource(
                         if (!state.isRegisterMode) {
                             R.string.login_to_register_text_button
@@ -155,16 +183,37 @@ internal fun AuthScreenContent(
                     ),
                 )
             }
-            if (!state.isRegisterMode) {
-                Button(onClick = { onAction(AuthAction.SkipAuth) }) {
-                    Icon(
-                        painterResource(BloomIcons.Login),
-                        contentDescription = null,
-                    )
-                    Text(stringResource(R.string.login_skip_button))
-                }
+        }
+
+        Spacer(Modifier.weight(1f))
+
+        AnimatedVisibility(
+            visible = !state.isRegisterMode,
+        ) {
+            Button(onClick = { onAction(AuthAction.SkipAuth) }) {
+                Icon(
+                    painterResource(BloomIcons.Login),
+                    contentDescription = null,
+                )
+                Text(stringResource(R.string.login_skip_button))
             }
         }
+    }
+}
+
+@Composable
+private fun AuthFormCard(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .animateContentSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        content()
     }
 }
 
@@ -313,7 +362,7 @@ internal fun AuthLoginPreview() {
             confirmPassword = "",
             isRegisterMode = false,
         )
-    AuthScreenContent(state = mockState, onAction = {})
+    AuthScreen(state = mockState, onAction = {})
 }
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -327,5 +376,5 @@ internal fun AuthRegisterPreview() {
             confirmPassword = "",
             isRegisterMode = true,
         )
-    AuthScreenContent(state = mockState, onAction = {})
+    AuthScreen(state = mockState, onAction = {})
 }
