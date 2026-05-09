@@ -21,9 +21,16 @@ class BloomPreferencesDataStore(private val preferences: DataStore<UserPreferenc
             if (prefs.hasUser()) prefs.user.toDomain() else null
         }
 
-    val token: Flow<String?> =
+    val token: Flow<Pair<String, Boolean>?> =
         preferences.data.map { prefs ->
-            if (prefs.hasAuthToken()) prefs.authToken.token else null
+            if (prefs.hasAuthToken()) {
+                Pair(
+                    prefs.authToken.token,
+                    prefs.authToken.isSkipped,
+                )
+            } else {
+                null
+            }
         }
 
     val stats: Flow<UserStats> =
@@ -177,13 +184,17 @@ class BloomPreferencesDataStore(private val preferences: DataStore<UserPreferenc
         }
     }
 
-    suspend fun saveToken(token: String) {
+    suspend fun saveToken(
+        token: String,
+        isSkipped: Boolean = false,
+    ) {
         try {
             preferences.updateData { current ->
                 current.copy {
                     authToken =
                         authToken.copy {
                             this.token = token
+                            this.isSkipped = isSkipped
                         }
                 }
             }

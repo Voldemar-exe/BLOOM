@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
-import timber.log.Timber
 
 @KoinViewModel
 class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
@@ -52,7 +51,7 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
             }
 
             AuthAction.SkipAuth -> {
-                navigateTo()
+                skipAuth()
             }
         }
     }
@@ -101,13 +100,14 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
     private fun toggleAuthMode() {
         _authUiState.update {
             it.copy(
-                isRegistrationMode = !it.isRegistrationMode,
+                isRegisterMode = !it.isRegisterMode,
                 errorMessage = null,
             )
         }
     }
 
-    private fun navigateTo() {
+    private fun skipAuth() {
+        viewModelScope.launch { authRepository.skipAuth() }
     }
 
     private fun validateInput(

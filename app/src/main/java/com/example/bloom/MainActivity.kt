@@ -12,7 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.auth.RegisterScreen
+import com.example.auth.AuthScreen
 import com.example.bloom.ui.BloomApp
 import com.example.bloom.ui.NotificationPermissionRequester
 import com.example.data.repository.ThemeRepository
@@ -53,7 +53,14 @@ class MainActivity : ComponentActivity() {
                         BloomApp()
                     }
 
-                    is AuthState.Unauthorized -> RegisterScreen()
+                    is AuthState.Unauthorized -> {
+                        if ((authState as AuthState.Unauthorized).isSkipped) {
+                            NotificationPermissionRequester()
+                            BloomApp()
+                        } else {
+                            AuthScreen()
+                        }
+                    }
                 }
             }
         }

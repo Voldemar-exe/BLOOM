@@ -46,7 +46,7 @@ class HttpClientProvider(
                 bearer {
                     loadTokens {
                         val token = dataStore.token.first()
-                        token?.let { BearerTokens(accessToken = it, refreshToken = null) }
+                        token?.let { BearerTokens(accessToken = it.first, refreshToken = null) }
                     }
                 }
             }

@@ -3,10 +3,11 @@ package com.example.data.repository
 import com.example.datastore.datastore.BloomPreferencesDataStore
 import com.example.network.api.AuthApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 interface AuthRepository {
-    fun isAuthorized(): Flow<Boolean>
+    val authToken: Flow<Pair<String, Boolean>?>
+
+    suspend fun skipAuth()
 
     suspend fun login(
         login: String,
@@ -26,7 +27,11 @@ class AuthRepositoryImpl(
     private val authApi: AuthApi,
     private val dataStore: BloomPreferencesDataStore,
 ) : AuthRepository {
-    override fun isAuthorized(): Flow<Boolean> = dataStore.token.map { it?.isNotEmpty() ?: false }
+    override val authToken: Flow<Pair<String, Boolean>?> = dataStore.token
+
+    override suspend fun skipAuth() {
+        dataStore.saveToken(token = "", isSkipped = true)
+    }
 
     override suspend fun login(
         login: String,

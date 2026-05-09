@@ -19,7 +19,7 @@ sealed interface AuthState {
 
     object Authorized : AuthState
 
-    object Unauthorized : AuthState
+    data class Unauthorized(val isSkipped: Boolean) : AuthState
 }
 
 class MainViewModel(
@@ -30,12 +30,12 @@ class MainViewModel(
 ) : ViewModel() {
     val authState: StateFlow<AuthState> =
         authRepository
-            .isAuthorized()
+            .authToken
             .map {
-                if (it) {
+                if (!it?.first.isNullOrBlank()) {
                     AuthState.Authorized
                 } else {
-                    AuthState.Unauthorized
+                    AuthState.Unauthorized(it?.second ?: false)
                 }
             }.stateIn(
                 scope = viewModelScope,

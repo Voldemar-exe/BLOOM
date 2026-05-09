@@ -45,6 +45,7 @@ message AppSettingsProto {
 
 message AuthToken {
   string token = 1;
+  bool isSkipped = 2;
 }
 
 message UserPreferences {

@@ -5,7 +5,7 @@ import com.example.bloom.core.designsystem.R
 object BloomIcons {
     val Login = R.drawable.login_24px
     val PersonAdd = R.drawable.person_add_24px
-    val PersonShiel = R.drawable.person_shield_24px
+    val PersonShield = R.drawable.person_shield_24px
     val PiggyBank = R.drawable.savings_24px
     val Customization = R.drawable.display_settings_24px
     val EditParameters = R.drawable.edit_attributes_24px
