@@ -44,7 +44,9 @@ fun TimePickDialog(
             ) {
                 TimeInput(
                     state = timePickerState,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
                 )
             }
         },

@@ -1,5 +1,6 @@
 package com.example.ui.components
 
+import androidx.compose.animation.animateBounds
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,20 +8,23 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.model.RecurrenceType
 
@@ -38,12 +42,7 @@ fun RecurrenceSection(
         )
 
         when (type) {
-            RecurrenceType.DAY -> {
-                Text(
-                    "Каждый день",
-                    modifier = Modifier.padding(16.dp),
-                )
-            }
+            RecurrenceType.DAY -> {}
 
             RecurrenceType.WEEK -> {
                 WeekDaysSelector(
@@ -74,66 +73,53 @@ fun RecurrenceSection(
     }
 }
 
-@Composable
-fun MonthDaysSelector(
-    selectedDays: Set<Int>,
-    onToggle: (Int) -> Unit,
-) {
-    Column(modifier = Modifier.padding(16.dp)) {
-        (0 until 5).forEach { row ->
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                (1..7).forEach { col ->
-                    val day = row * 7 + col
-
-                    if (day <= 31) {
-                        val selected = day in selectedDays
-
-                        Box(
-                            modifier =
-                                Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        if (selected) {
-                                            Color(0xFF6750A4)
-                                        } else {
-                                            Color(0xFFE0E0E0)
-                                        },
-                                    ).clickable { onToggle(day) },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(
-                                day.toString(),
-                                color = if (selected) Color.White else Color.Black,
-                            )
-                        }
-                    }
-                }
-            }
-            Spacer(Modifier.height(8.dp))
-        }
-    }
-}
-
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun RecurrenceTabs(
     selectedType: RecurrenceType,
     onTypeChange: (RecurrenceType) -> Unit,
 ) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        RecurrenceType.entries.forEach { type ->
-            FilterChip(
-                selected = selectedType == type,
-                onClick = { onTypeChange(type) },
-                label = {
+    LookaheadScope {
+        Row(
+            modifier =
+                Modifier
+                    .padding(horizontal = 8.dp)
+                    .fillMaxWidth(),
+            horizontalArrangement =
+                Arrangement.spacedBy(
+                    ButtonGroupDefaults.ConnectedSpaceBetween,
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            RecurrenceType.entries.forEach { type ->
+                ToggleButton(
+                    checked = selectedType == type,
+                    onCheckedChange = { onTypeChange(type) },
+                    shapes =
+                        when (type) {
+                            RecurrenceType.DAY ->
+                                ButtonGroupDefaults
+                                    .connectedLeadingButtonShapes()
+
+                            RecurrenceType.WEEK ->
+                                ButtonGroupDefaults
+                                    .connectedMiddleButtonShapes()
+
+                            RecurrenceType.MONTH ->
+                                ButtonGroupDefaults
+                                    .connectedTrailingButtonShapes()
+                        },
+                    modifier =
+                        Modifier
+                            .weight(
+                                if (selectedType == type) {
+                                    1.5f
+                                } else {
+                                    1f
+                                },
+                            ).semantics { role = Role.RadioButton }
+                            .animateBounds(this@LookaheadScope),
+                ) {
                     Text(
                         when (type) {
                             RecurrenceType.DAY -> "День"
@@ -141,48 +127,93 @@ private fun RecurrenceTabs(
                             RecurrenceType.MONTH -> "Месяц"
                         },
                     )
-                },
-                modifier = Modifier.weight(1f),
-                colors =
-                    FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = Color(0xFFD1C4E9),
-                        selectedLabelColor = Color(0xFF673AB7),
-                    ),
-            )
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun WeekDaysSelector(
+fun MonthDaysSelector(
+    selectedDays: Set<Int>,
+    onToggle: (Int) -> Unit,
+) {
+    DaysGrid(
+        days = (1..31).map { it.toString() to it },
+        selectedIds = selectedDays,
+        onToggle = onToggle,
+    )
+}
+
+@Composable
+fun WeekDaysSelector(
     selectedDays: Set<Int>,
     onDayToggle: (Int) -> Unit,
 ) {
-    val days = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
+    val weekLabels =
+        listOf(
+            "Пн" to 0,
+            "Вт" to 1,
+            "Ср" to 2,
+            "Чт" to 3,
+            "Пт" to 4,
+            "Сб" to 5,
+            "Вс" to 6,
+        )
+    DaysGrid(
+        days = weekLabels,
+        selectedIds = selectedDays,
+        onToggle = onDayToggle,
+    )
+}
 
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+@Composable
+private fun DaysGrid(
+    days: List<Pair<String, Int>>,
+    selectedIds: Set<Int>,
+    onToggle: (Int) -> Unit,
+) {
+    Column(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        days.forEachIndexed { index, label ->
-            val isSelected = selectedDays.contains(index)
-            Box(
-                modifier =
-                    Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(if (isSelected) Color(0xFF6750A4) else Color(0xFFE0E0E0))
-                        .clickable { onDayToggle(index) },
-                contentAlignment = Alignment.Center,
+        days.chunked(7).forEach { rowItems ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text(
-                    label,
-                    color = if (isSelected) Color.White else Color.Black,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                )
+                rowItems.forEach { (label, id) ->
+                    val isSelected = id in selectedIds
+                    Box(
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .aspectRatio(1f)
+                                .clip(CircleShape)
+                                .background(
+                                    color =
+                                        if (isSelected) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.surfaceDim
+                                        },
+                                ).clickable { onToggle(id) },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = label,
+                            color =
+                                if (isSelected) {
+                                    MaterialTheme.colorScheme.onPrimary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                },
+                        )
+                    }
+                }
+                repeat(7 - rowItems.size) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
             }
         }
     }

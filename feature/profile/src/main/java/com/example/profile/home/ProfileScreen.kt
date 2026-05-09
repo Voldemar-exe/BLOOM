@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -113,7 +112,11 @@ internal fun ProfileScreen(
                 navigationIcon = {
                     var showDialog by remember { mutableStateOf(false) }
                     IconButton(onClick = { showDialog = true }) {
-                        Icon(Icons.Default.Edit, contentDescription = "edit")
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "edit",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
 
                     if (showDialog) {
@@ -268,8 +271,8 @@ fun UserProfile(
             }
             Surface(
                 shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             ) {
                 Box(
                     modifier = Modifier.size(40.dp),
@@ -284,19 +287,24 @@ fun UserProfile(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier =
                     Modifier
-                        .background(Color(0xFFE8EAF6), RoundedCornerShape(16.dp))
+                        .background(
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            shape = ShapeDefaults.Medium,
+                        )
                         .padding(horizontal = 8.dp, vertical = 6.dp)
                         .wrapContentSize(),
             ) {
                 Icon(
                     painter = painterResource(BloomIcons.PiggyBank),
                     contentDescription = "coins",
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = coins.toString(),
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
             }
         }
@@ -371,10 +379,15 @@ private fun ProfileMenuSection(
                     .padding(bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(painter = painterResource(icon), contentDescription = "icon")
+            Icon(
+                painter = painterResource(icon),
+                contentDescription = "icon",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             Spacer(Modifier.padding(horizontal = 4.dp))
             Text(
                 text = title,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Card(
@@ -384,7 +397,7 @@ private fun ProfileMenuSection(
                     .padding(horizontal = 16.dp),
             colors =
                 CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
         ) {
             items.forEach { item ->
@@ -399,7 +412,7 @@ private fun ProfileMenuSection(
                     Icon(
                         painter = painterResource(item.icon),
                         contentDescription = item.title,
-                        tint = Color(0xFF7E57C2),
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
                         modifier = Modifier.size(24.dp),
                     )
                     Spacer(modifier = Modifier.width(16.dp))
@@ -409,11 +422,15 @@ private fun ProfileMenuSection(
                     )
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
                         contentDescription = "Navigate",
                     )
                 }
                 if (item != items.last()) {
-                    HorizontalDivider(Modifier, thickness = 1.dp)
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    )
                 }
             }
         }
@@ -453,7 +470,7 @@ fun EditProfileDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = "Edit profile")
+            Text(text = "Изменить данные")
         },
         text = {
             Column(
@@ -496,7 +513,7 @@ fun EditProfileDialog(
                     onValueChange = onPasswordChange,
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    label = { Text("Если замена нужна") },
+                    label = { Text("Если нужна замена") },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions =
                         KeyboardOptions(
@@ -513,12 +530,12 @@ fun EditProfileDialog(
         },
         confirmButton = {
             TextButton(onClick = onSaveClick) {
-                Text("Save")
+                Text("Сохранить")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("Отмена")
             }
         },
     )

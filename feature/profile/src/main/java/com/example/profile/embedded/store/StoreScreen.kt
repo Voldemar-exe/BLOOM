@@ -2,33 +2,41 @@ package com.example.profile.embedded.store
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.designsystem.picture.BloomBackgrounds
@@ -70,16 +78,29 @@ fun StoreScreen(
                     }
                 },
                 actions = {
-                    AssistChip(
-                        onClick = {},
-                        label = { Text(state.currency.toString()) },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(BloomIcons.PiggyBank),
-                                contentDescription = null,
-                            )
-                        },
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier =
+                            Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.secondaryContainer,
+                                    shape = ShapeDefaults.Medium,
+                                ).padding(horizontal = 8.dp, vertical = 6.dp)
+                                .wrapContentSize(),
+                    ) {
+                        Icon(
+                            painter = painterResource(BloomIcons.PiggyBank),
+                            contentDescription = "coins",
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = state.currency.toString(),
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        )
+                    }
                 },
             )
         },
@@ -113,7 +134,7 @@ fun StoreScreen(
                     onPurchase = { onAction(StoreAction.PurchaseBackground(it)) },
                 ) { storeItem ->
                     Image(
-                        modifier = Modifier.padding(vertical = 4.dp),
+                        modifier = Modifier.size(56.dp),
                         painter =
                             painterResource(
                                 BloomBackgrounds.resolve(storeItem.item.key),
@@ -176,31 +197,67 @@ fun ShopGridItem(
     onClick: () -> Unit,
     content: @Composable (StoreItem) -> Unit,
 ) {
-    Column(
-        modifier =
-            Modifier
-                .size(56.dp, 92.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = ShapeDefaults.Medium,
-                ).padding(vertical = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
+    Surface(
+        modifier = Modifier.size(56.dp, 100.dp),
+        shape = ShapeDefaults.Medium,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        tonalElevation = 1.dp,
     ) {
-        Box(
-            modifier = Modifier.size(56.dp),
-            contentAlignment = Alignment.Center,
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            content(item)
+            Box(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                content(item)
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(32.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .background(
+                            color =
+                                if (isPurchased) {
+                                    MaterialTheme.colorScheme.surfaceContainerHighest
+                                } else {
+                                    MaterialTheme.colorScheme.primary
+                                },
+                        ).clickable { onClick() },
+            ) {
+                if (isPurchased) {
+                    Text(
+                        text = "Куплено",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                } else {
+                    Text(
+                        text = item.price.toString(),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "C",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                }
+            }
         }
-        AssistChip(
-            onClick = onClick,
-            label = {
-                Text(
-                    text = if (isPurchased) "Есть" else item.price.toString(),
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            },
-        )
     }
 }

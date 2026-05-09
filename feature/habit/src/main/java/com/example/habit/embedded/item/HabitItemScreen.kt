@@ -138,19 +138,9 @@ internal fun HabitItemScreen(
                 ) {
                     Text("Изменить растение")
                 }
-
-                Text(
-                    text =
-                        "preset=${state.plant.presetId}, " +
-                            "iter=${state.plant.iterations}, var=${state.plant.variability}",
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    style = MaterialTheme.typography.bodySmall,
-                )
             }
 
             item {
-                Spacer(modifier = Modifier.height(16.dp))
-
                 InputFieldWithClear(
                     label = "Измените название",
                     value = state.title,
@@ -180,6 +170,7 @@ internal fun HabitItemScreen(
                         },
                     onSelect = { onAction(HabitSetupAction.OnTagClick(it as Tag)) },
                     items = Tag.entries,
+                    selectedItems = state.tags.toList(),
                 )
             }
 

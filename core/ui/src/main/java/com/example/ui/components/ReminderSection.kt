@@ -33,9 +33,7 @@ import com.example.model.Reminder
 private sealed interface ReminderPickerState {
     data object Add : ReminderPickerState
 
-    data class Edit(
-        val index: Int,
-    ) : ReminderPickerState
+    data class Edit(val index: Int) : ReminderPickerState
 }
 
 @Composable
@@ -183,4 +181,3 @@ private fun ReminderItem(
         }
     }
 }
-

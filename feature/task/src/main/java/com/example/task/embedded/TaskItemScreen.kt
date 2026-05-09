@@ -1,7 +1,8 @@
 package com.example.task.embedded
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -140,6 +141,7 @@ internal fun TaskItemScreen(
                         onAction(TaskSetupAction.OnPriorityClick(it as Priority))
                     },
                     items = Priority.entries,
+                    selectedItems = listOf(state.priority),
                 )
             }
 
@@ -161,26 +163,29 @@ internal fun TaskItemScreen(
                         onAction(TaskSetupAction.OnTagClick(it as Tag))
                     },
                     items = Tag.entries,
+                    selectedItems = state.tags.toList(),
                 )
             }
 
             item {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    "Интервал и повторение",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
+                AnimatedVisibility(visible = !state.hasEndDate) {
+                    Column {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            "Интервал и повторение",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            fontWeight = FontWeight.SemiBold,
+                        )
 
-            item {
-                RecurrenceSection(
-                    type = state.recurrence.type,
-                    days = state.recurrence.values,
-                    onTypeChange = { onAction(TaskSetupAction.SetRecurrenceType(it)) },
-                    onDaysChange = { onAction(TaskSetupAction.UpdateSelectedDays(it)) },
-                )
+                        RecurrenceSection(
+                            type = state.recurrence.type,
+                            days = state.recurrence.values,
+                            onTypeChange = { onAction(TaskSetupAction.SetRecurrenceType(it)) },
+                            onDaysChange = { onAction(TaskSetupAction.UpdateSelectedDays(it)) },
+                        )
+                    }
+                }
             }
 
             item {
@@ -191,7 +196,7 @@ internal fun TaskItemScreen(
             }
 
             item {
-                if (state.hasEndDate) {
+                AnimatedVisibility(state.hasEndDate) {
                     EndDateField(
                         dateMillis = state.deadline,
                         onDateSelected = {
@@ -200,7 +205,8 @@ internal fun TaskItemScreen(
                             }
                         },
                     )
-                } else {
+                }
+                AnimatedVisibility(!state.hasEndDate) {
                     ReminderSection(
                         reminders = state.reminders,
                         onAdd = { onAction(TaskSetupAction.AddReminder(it)) },
@@ -345,19 +351,19 @@ fun EndDateToggle(
     onToggle: () -> Unit,
 ) {
     Row(
-        modifier =
-            Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .clickable { onToggle() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Checkbox(
-            checked = checked,
-            onCheckedChange = { onToggle() },
-        )
         Text(
             "Или выбрать конечную дату",
             modifier = Modifier.padding(start = 8.dp),
+        )
+        Checkbox(
+            checked = checked,
+            onCheckedChange = { onToggle() },
         )
     }
 }

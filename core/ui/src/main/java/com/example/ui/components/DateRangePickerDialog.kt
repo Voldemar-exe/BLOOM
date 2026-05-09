@@ -116,7 +116,9 @@ fun MonthDateGrid(
 private fun WeekdayHeader(colors: ColorScheme) {
     val weekdays = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         weekdays.forEach { day ->
@@ -168,7 +170,8 @@ private fun DateCell(
                         DateCellStatus.Range -> backgroundColor
                         else -> Color.Transparent
                     },
-                ).clickable(enabled = isCurrentMonth) { onClick() },
+                )
+                .clickable(enabled = isCurrentMonth) { onClick() },
         contentAlignment = Alignment.Center,
     ) {
         if (status == DateCellStatus.Start || status == DateCellStatus.End) {

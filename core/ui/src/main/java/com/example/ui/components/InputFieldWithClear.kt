@@ -45,7 +45,8 @@ fun InputFieldWithClear(
                     .background(
                         MaterialTheme.colorScheme.secondaryContainer,
                         RoundedCornerShape(12.dp),
-                    ).padding(end = 8.dp),
+                    )
+                    .padding(end = 8.dp),
         )
     }
 }
