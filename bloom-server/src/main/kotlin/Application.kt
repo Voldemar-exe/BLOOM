@@ -6,6 +6,7 @@ import com.example.plugins.configureHttp
 import com.example.plugins.configureKoin
 import com.example.plugins.configureSerialization
 import com.example.routing.configureAuthRouting
+import com.example.routing.configureSyncRouting
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
@@ -46,8 +47,6 @@ fun Application.module() {
     configureSerialization()
     configureHttp()
     configureSecurity()
-//    configureMonitoring()
-//    configureFrameworks()
     configureAuthRouting()
-//    configureDataRouting()
+    configureSyncRouting()
 }

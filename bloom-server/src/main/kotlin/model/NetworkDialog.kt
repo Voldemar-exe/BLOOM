@@ -21,6 +21,7 @@ data class SyncPushRequest(
     val tasks: List<TaskDto> = emptyList(),
     val habitReminders: List<HabitReminderDto> = emptyList(),
     val taskReminders: List<TaskReminderDto> = emptyList(),
+    val statsLogs: List<StatsLogDto> = emptyList(),
     val habitCompletions: List<HabitCompletionDto> = emptyList(),
     val taskCompletions: List<TaskCompletionDto> = emptyList(),
     val lastSyncTimestamp: Long = 0L,
@@ -32,8 +33,8 @@ data class SyncPullResponse(
     val tasks: List<TaskDto> = emptyList(),
     val habitReminders: List<HabitReminderDto> = emptyList(),
     val taskReminders: List<TaskReminderDto> = emptyList(),
+    val statsLogs: List<StatsLogDto> = emptyList(),
     val habitCompletions: List<HabitCompletionDto> = emptyList(),
     val taskCompletions: List<TaskCompletionDto> = emptyList(),
-    val deletedIds: List<Long> = emptyList(),
     val serverTimestamp: Long,
 )

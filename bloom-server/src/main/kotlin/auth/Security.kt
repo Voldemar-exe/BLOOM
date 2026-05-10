@@ -12,7 +12,7 @@ fun Application.configureSecurity() {
     val jwtRealm = dotenv["JWT_REALM"]
 
     authentication {
-        jwt {
+        jwt("jwt") {
             realm = jwtRealm
 
             verifier(JwtConfig.verifier)
