@@ -7,7 +7,7 @@ import com.example.database.dao.HabitDao
 import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
 import com.example.database.dao.HabitWithRelationDao
-import com.example.database.model.SyncStatus
+import com.example.database.util.SyncTracker
 import com.example.model.Habit
 import com.example.model.HabitPlant
 import com.example.model.HabitWithRelations
@@ -47,6 +47,7 @@ internal class HabitRepositoryImpl(
     private val plantDao: HabitPlantDao,
     private val reminderDao: HabitReminderDao,
     private val relationDao: HabitWithRelationDao,
+    private val tracker: SyncTracker
 ) : HabitRepository {
     override fun getHabits(): Flow<List<Habit>> =
         habitDao.getHabits().map { it.map { entity -> entity.asModel() } }
@@ -87,7 +88,7 @@ internal class HabitRepositoryImpl(
     }
 
     override suspend fun deleteHabit(habitId: Long) {
-        relationDao.softDeleteHabitCascade(habitId)
+        relationDao.softDeleteHabitCascade(habitDao.getHabitById(habitId)!!, tracker)
     }
 
     override suspend fun deleteRemindersByIds(ids: List<Long>) {
@@ -97,10 +98,9 @@ internal class HabitRepositoryImpl(
     override suspend fun saveHabit(
         habit: Habit,
         plant: HabitPlant,
-    ): Long = plantDao.upsertHabitWithPlant(habit.asEntity(), plant.asEntity())
+    ): Long = plantDao.upsertHabitWithPlant(habit.asEntity(), plant.asEntity(), tracker)
 
     override suspend fun saveReminder(reminder: Reminder) {
-        habitDao.updateSyncStatus(reminder.parentId, SyncStatus.CHANGED)
         reminderDao.upsert(reminder.asHabitEntity())
     }
 }

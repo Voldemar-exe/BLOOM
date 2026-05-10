@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "com.example.bloom.core.sync"
 }
+
+dependencies {
+    implementation(project(":core:data"))
+}

@@ -6,8 +6,10 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.example.database.model.SyncTypes
 import com.example.database.model.entities.HabitReminderEntity
 import com.example.database.model.relationships.HabitWithReminders
+import com.example.database.util.SyncTracker
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,7 +22,7 @@ interface HabitReminderDao {
     fun getAllHabitsWithReminders(): Flow<List<HabitWithReminders>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(reminder: HabitReminderEntity)
+    suspend fun upsert(reminder: HabitReminderEntity): Long
 
     @Update
     suspend fun update(reminder: HabitReminderEntity)
@@ -29,20 +31,11 @@ interface HabitReminderDao {
     suspend fun deleteById(id: Long)
 
     @Transaction
-    suspend fun upsertWithParentSync(
+    suspend fun upsertWithHabit(
         reminder: HabitReminderEntity,
-        habitDao: HabitDao,
+        tracker: SyncTracker,
     ) {
-        upsert(reminder)
-        habitDao.updateSyncStatus(reminder.habitId)
-    }
-
-    @Transaction
-    suspend fun updateWithParentSync(
-        reminder: HabitReminderEntity,
-        habitDao: HabitDao,
-    ) {
-        update(reminder)
-        habitDao.updateSyncStatus(reminder.habitId)
+        val reminderId = upsert(reminder)
+        tracker.trackUpsert(SyncTypes.HABIT_REMINDER, reminderId, reminder)
     }
 }

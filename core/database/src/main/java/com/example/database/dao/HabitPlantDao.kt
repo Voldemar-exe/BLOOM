@@ -5,23 +5,15 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import androidx.room.Update
+import com.example.database.model.SyncTypes
 import com.example.database.model.entities.HabitEntity
 import com.example.database.model.entities.HabitPlantEntity
+import com.example.database.util.SyncTracker
 
 @Dao
 interface HabitPlantDao {
     @Query("SELECT * FROM habit_plants WHERE habitId = :habitId")
     suspend fun getByHabitId(habitId: Long): HabitPlantEntity?
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(entity: HabitPlantEntity): Long
-
-    @Update
-    suspend fun update(entity: HabitPlantEntity)
-
-    @Query("DELETE FROM habit_plants WHERE habitId = :habitId")
-    suspend fun deleteByHabitId(habitId: Long)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertHabit(entity: HabitEntity): Long
@@ -33,9 +25,11 @@ interface HabitPlantDao {
     suspend fun upsertHabitWithPlant(
         habit: HabitEntity,
         plant: HabitPlantEntity,
+        tracker: SyncTracker,
     ): Long {
         val habitId = upsertHabit(habit)
         upsertPlant(plant.copy(habitId = habitId))
+        tracker.trackUpsert(SyncTypes.HABIT, habitId, habit)
         return habitId
     }
 }

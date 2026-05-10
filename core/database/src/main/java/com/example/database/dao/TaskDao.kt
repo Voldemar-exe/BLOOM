@@ -6,8 +6,10 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.example.database.model.entities.TaskEntity
 import com.example.database.model.SyncStatus
+import com.example.database.model.SyncTypes
+import com.example.database.model.entities.TaskEntity
+import com.example.database.util.SyncTracker
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 
@@ -21,6 +23,16 @@ interface TaskDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(taskEntity: TaskEntity): Long
+
+    @Transaction
+    suspend fun upsertWithSync(
+        taskEntity: TaskEntity,
+        tracker: SyncTracker,
+    ): Long {
+        val taskId = upsert(taskEntity)
+        tracker.trackUpsert(SyncTypes.TASK, taskId, taskEntity)
+        return taskId
+    }
 
     @Update
     suspend fun update(taskEntity: TaskEntity)

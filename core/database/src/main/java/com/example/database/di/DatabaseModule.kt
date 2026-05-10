@@ -8,9 +8,12 @@ import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
 import com.example.database.dao.HabitWithRelationDao
 import com.example.database.dao.SubtaskDao
+import com.example.database.dao.SyncQueueDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
+import com.example.database.util.SyncTracker
+import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 
 val databaseModule =
@@ -23,31 +26,15 @@ val databaseModule =
                     "bloom-database",
                 ).build()
         }
-        single<TaskDao> {
-            get<BloomDatabase>().taskDao()
-        }
-        single<SubtaskDao> {
-            get<BloomDatabase>().subtaskDao()
-        }
-        single<TaskReminderDao> {
-            get<BloomDatabase>().taskReminderDao()
-        }
-        single<TaskWithRelationDao> {
-            get<BloomDatabase>().taskWithRelationDao()
-        }
-        single<HabitDao> {
-            get<BloomDatabase>().habitDao()
-        }
-        single<HabitPlantDao> {
-            get<BloomDatabase>().habitPlantDao()
-        }
-        single<HabitReminderDao> {
-            get<BloomDatabase>().habitReminderDao()
-        }
-        single<HabitWithRelationDao> {
-            get<BloomDatabase>().habitWithRelationDao()
-        }
-        single<GamificationDao> {
-            get<BloomDatabase>().gamificationDao()
-        }
+        single<TaskDao> { get<BloomDatabase>().taskDao() }
+        single<SubtaskDao> { get<BloomDatabase>().subtaskDao() }
+        single<TaskReminderDao> { get<BloomDatabase>().taskReminderDao() }
+        single<TaskWithRelationDao> { get<BloomDatabase>().taskWithRelationDao() }
+        single<HabitDao> { get<BloomDatabase>().habitDao() }
+        single<HabitPlantDao> { get<BloomDatabase>().habitPlantDao() }
+        single<HabitReminderDao> { get<BloomDatabase>().habitReminderDao() }
+        single<HabitWithRelationDao> { get<BloomDatabase>().habitWithRelationDao() }
+        single<GamificationDao> { get<BloomDatabase>().gamificationDao() }
+        single<SyncQueueDao> { get<BloomDatabase>().syncQueueDao() }
+        single<SyncTracker> { SyncTracker(get<SyncQueueDao>(), get<Json>()) }
     }

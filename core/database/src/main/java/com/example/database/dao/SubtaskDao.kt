@@ -37,15 +37,6 @@ interface SubtaskDao {
         updateParentTaskCompletion(taskDao, subtaskEntity.taskId)
     }
 
-    @Transaction
-    suspend fun updateWithParentSync(
-        subtaskEntity: SubtaskEntity,
-        taskDao: TaskDao,
-    ) {
-        update(subtaskEntity)
-        updateParentTaskCompletion(taskDao, subtaskEntity.taskId)
-    }
-
     private suspend fun updateParentTaskCompletion(
         taskDao: TaskDao,
         taskId: Long,

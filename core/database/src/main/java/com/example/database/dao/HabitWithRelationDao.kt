@@ -3,9 +3,12 @@ package com.example.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import com.example.database.model.SyncStatus
+import com.example.database.model.SyncTypes
+import com.example.database.model.entities.HabitEntity
 import com.example.database.model.relationships.HabitWithPlant
 import com.example.database.model.relationships.HabitWithPlantAndReminders
-import com.example.database.model.SyncStatus
+import com.example.database.util.SyncTracker
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 
@@ -66,11 +69,15 @@ interface HabitWithRelationDao {
     suspend fun deleteRemindersByHabitId(habitId: Long)
 
     @Transaction
-    suspend fun softDeleteHabitCascade(habitId: Long) {
+    suspend fun softDeleteHabitCascade(
+        habit: HabitEntity,
+        tracker: SyncTracker,
+    ) {
         val now = Clock.System.now().toEpochMilliseconds()
 
-        softDeleteHabit(habitId, now, SyncStatus.DELETED)
-        deletePlantByHabitId(habitId)
-        deleteRemindersByHabitId(habitId)
+        softDeleteHabit(habit.id, now, SyncStatus.DELETED)
+        tracker.trackDelete(SyncTypes.HABIT, habit.id)
+        deletePlantByHabitId(habit.id)
+        deleteRemindersByHabitId(habit.id)
     }
 }

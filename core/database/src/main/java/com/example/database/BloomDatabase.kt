@@ -9,6 +9,7 @@ import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
 import com.example.database.dao.HabitWithRelationDao
 import com.example.database.dao.SubtaskDao
+import com.example.database.dao.SyncQueueDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
@@ -18,6 +19,7 @@ import com.example.database.model.entities.HabitPlantEntity
 import com.example.database.model.entities.HabitReminderEntity
 import com.example.database.model.entities.StatsLogEntity
 import com.example.database.model.entities.SubtaskEntity
+import com.example.database.model.entities.SyncQueueEntity
 import com.example.database.model.entities.TaskCompletionEntity
 import com.example.database.model.entities.TaskEntity
 import com.example.database.model.entities.TaskReminderEntity
@@ -36,6 +38,7 @@ import com.example.database.util.StringListConverter
         StatsLogEntity::class,
         HabitCompletionEntity::class,
         TaskCompletionEntity::class,
+        SyncQueueEntity::class
     ],
     version = 1,
     exportSchema = true,
@@ -65,4 +68,6 @@ internal abstract class BloomDatabase : RoomDatabase() {
     abstract fun habitWithRelationDao(): HabitWithRelationDao
 
     abstract fun gamificationDao(): GamificationDao
+
+    abstract fun syncQueueDao(): SyncQueueDao
 }

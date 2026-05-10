@@ -9,6 +9,7 @@ import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
 import com.example.database.model.SyncStatus
 import com.example.database.model.relationships.TaskWithSubtasks
+import com.example.database.util.SyncTracker
 import com.example.model.Reminder
 import com.example.model.Subtask
 import com.example.model.Tag
@@ -16,7 +17,6 @@ import com.example.model.Task
 import com.example.model.TaskWithRelations
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import org.koin.core.annotation.Singleton
 
 interface TaskRepository {
     fun getTasks(): Flow<List<Task>>
@@ -54,6 +54,7 @@ internal class TaskRepositoryImpl(
     val subtaskDao: SubtaskDao,
     val taskReminderDao: TaskReminderDao,
     val taskWithRelationDao: TaskWithRelationDao,
+    val tracker: SyncTracker,
 ) : TaskRepository {
     override fun getTasks(): Flow<List<Task>> =
         taskDao.getTasks().map { entities -> entities.map { it.asModel() } }
@@ -107,7 +108,7 @@ internal class TaskRepositoryImpl(
 
     override suspend fun toggleSubtask(subtaskId: Long): Long? =
         subtaskDao.findById(subtaskId)?.let {
-            subtaskDao.updateWithParentSync(it.copy(isChecked = !it.isChecked), taskDao)
+            subtaskDao.upsertWithParentSync(it.copy(isChecked = !it.isChecked), taskDao)
             taskDao.getTaskById(it.taskId)?.let { task ->
                 if (task.isChecked) return@let task.id
                 null
@@ -115,7 +116,10 @@ internal class TaskRepositoryImpl(
         }
 
     override suspend fun saveTask(task: Task): Long =
-        taskDao.upsert(task.asEntity().copy(syncStatus = SyncStatus.CHANGED))
+        taskDao.upsertWithSync(
+            task.asEntity().copy(syncStatus = SyncStatus.CHANGED),
+            tracker,
+        )
 
     override suspend fun saveSubtask(subtask: Subtask) {
         taskDao.updateSyncStatus(subtask.taskId, SyncStatus.CHANGED)

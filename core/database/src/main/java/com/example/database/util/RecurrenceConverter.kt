@@ -6,11 +6,11 @@ import com.example.model.RecurrenceType
 
 class RecurrenceConverter {
     @TypeConverter
-    fun fromPattern(recurrence: Recurrence): String =
+    fun fromRecurrence(recurrence: Recurrence): String =
         "${recurrence.type.name}:${recurrence.values.joinToString(",")}"
 
     @TypeConverter
-    fun toPattern(value: String): Recurrence {
+    fun toRecurrence(value: String): Recurrence {
         val (typeStr, valuesStr) =
             value.split(":", limit = 2).let {
                 it.first() to it.getOrElse(1) { "" }

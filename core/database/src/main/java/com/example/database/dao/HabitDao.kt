@@ -1,12 +1,9 @@
 package com.example.database.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
-import com.example.database.model.entities.HabitEntity
 import com.example.database.model.SyncStatus
+import com.example.database.model.entities.HabitEntity
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 
@@ -28,12 +25,6 @@ interface HabitDao {
     """,
     )
     suspend fun getHabitById(habitId: Long): HabitEntity?
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(habit: HabitEntity): Long
-
-    @Update
-    suspend fun update(habit: HabitEntity)
 
     @Query(
         """

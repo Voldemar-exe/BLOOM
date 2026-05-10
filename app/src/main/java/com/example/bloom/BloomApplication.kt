@@ -14,6 +14,7 @@ import com.example.habit.di.habitModule
 import com.example.network.di.networkModule
 import com.example.notification.di.notificationModule
 import com.example.profile.di.profileModule
+import com.example.sync.di.syncModule
 import com.example.task.di.taskModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -41,6 +42,7 @@ class BloomApplication : Application() {
                 taskModule,
                 habitModule,
                 profileModule,
+                syncModule,
                 appModule,
             )
         }

@@ -10,6 +10,8 @@ import com.example.data.repository.NotificationRepository
 import com.example.data.repository.NotificationRepositoryImpl
 import com.example.data.repository.SettingsRepository
 import com.example.data.repository.SettingsRepositoryImpl
+import com.example.data.repository.SyncRepository
+import com.example.data.repository.SyncRepositoryImpl
 import com.example.data.repository.TaskRepository
 import com.example.data.repository.TaskRepositoryImpl
 import com.example.data.repository.ThemeRepository
@@ -22,9 +24,11 @@ import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
 import com.example.database.dao.HabitWithRelationDao
 import com.example.database.dao.SubtaskDao
+import com.example.database.dao.SyncQueueDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
+import com.example.database.util.SyncTracker
 import com.example.datastore.datastore.BloomPreferencesDataStore
 import com.example.network.api.AuthApi
 import org.koin.dsl.module
@@ -37,6 +41,7 @@ val dataModule =
                 get<SubtaskDao>(),
                 get<TaskReminderDao>(),
                 get<TaskWithRelationDao>(),
+                get<SyncTracker>(),
             )
         }
         single<HabitRepository> {
@@ -45,6 +50,7 @@ val dataModule =
                 get<HabitPlantDao>(),
                 get<HabitReminderDao>(),
                 get<HabitWithRelationDao>(),
+                get<SyncTracker>(),
             )
         }
 
@@ -72,6 +78,7 @@ val dataModule =
         }
 
         single<AuthRepository> {
-            AuthRepositoryImpl( get<AuthApi>(), get<BloomPreferencesDataStore>())
+            AuthRepositoryImpl(get<AuthApi>(), get<BloomPreferencesDataStore>())
         }
+        single<SyncRepository> { SyncRepositoryImpl(get<SyncQueueDao>()) }
     }

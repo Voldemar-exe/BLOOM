@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:navigation"))
     implementation(project(":core:notification"))
+    implementation(project(":core:sync"))
     // TODO: Maybe replace with transitive
     implementation(project(":core:gamification"))
 
