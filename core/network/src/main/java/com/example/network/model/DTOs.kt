@@ -68,6 +68,7 @@ data class TaskDto(
     val isMuted: Boolean = false,
     val createdAt: Long,
     val updatedAt: Long,
+    val subtasks: List<SubtaskDto> = listOf(),
 )
 
 @Serializable
