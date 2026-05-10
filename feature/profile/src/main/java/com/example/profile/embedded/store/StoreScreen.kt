@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,8 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
@@ -71,22 +72,19 @@ fun StoreScreen(
                 title = { Text("Магазин") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            "Назад",
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Назад")
                     }
                 },
                 actions = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier =
-                            Modifier
-                                .background(
-                                    color = MaterialTheme.colorScheme.secondaryContainer,
-                                    shape = ShapeDefaults.Medium,
-                                ).padding(horizontal = 8.dp, vertical = 6.dp)
-                                .wrapContentSize(),
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                shape = ShapeDefaults.Medium,
+                            )
+                            .padding(horizontal = 8.dp, vertical = 6.dp)
+                            .wrapContentSize(),
                     ) {
                         Icon(
                             painter = painterResource(BloomIcons.PiggyBank),
@@ -105,20 +103,22 @@ fun StoreScreen(
             )
         },
     ) { padding ->
-        LazyColumn(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(4),
+            modifier = Modifier.fillMaxSize().padding(padding),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
         ) {
-            item {
-                StoreSection(
-                    title = "Цвет",
-                    items = state.colors,
-                    onPurchase = { onAction(StoreAction.PurchaseColor(it)) },
-                ) { storeItem ->
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                SectionTitle("Цвет")
+            }
+            items(state.colors, key = { it.item.key }) { storeItem ->
+                ShopGridItem(
+                    item = storeItem,
+                    isPurchased = storeItem.isPurchased,
+                    onClick = { onAction(StoreAction.PurchaseColor(storeItem.item.key)) },
+                ) {
                     Icon(
                         painter = painterResource(BloomIcons.Circle),
                         tint = BloomColors.resolve(storeItem.item.key),
@@ -127,30 +127,33 @@ fun StoreScreen(
                 }
             }
 
-            item {
-                StoreSection(
-                    title = "Фон",
-                    items = state.backgrounds,
-                    onPurchase = { onAction(StoreAction.PurchaseBackground(it)) },
-                ) { storeItem ->
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                SectionTitle("Фон")
+            }
+            items(state.backgrounds, key = { it.item.key }) { storeItem ->
+                ShopGridItem(
+                    item = storeItem,
+                    isPurchased = storeItem.isPurchased,
+                    onClick = { onAction(StoreAction.PurchaseBackground(storeItem.item.key)) },
+                ) {
                     Image(
                         modifier = Modifier.size(56.dp),
-                        painter =
-                            painterResource(
-                                BloomBackgrounds.resolve(storeItem.item.key),
-                            ),
+                        painter = painterResource(BloomBackgrounds.resolve(storeItem.item.key)),
                         contentDescription = null,
                         contentScale = ContentScale.FillBounds,
                     )
                 }
             }
 
-            item {
-                StoreSection(
-                    title = "Растения",
-                    items = state.plants,
-                    onPurchase = { onAction(StoreAction.PurchasePlant(it)) },
-                ) { storeItem ->
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                SectionTitle("Растения")
+            }
+            items(state.plants, key = { it.item.key }) { storeItem ->
+                ShopGridItem(
+                    item = storeItem,
+                    isPurchased = storeItem.isPurchased,
+                    onClick = { onAction(StoreAction.PurchasePlant(storeItem.item.key)) },
+                ) {
                     Text(text = storeItem.item.key)
                 }
             }
@@ -159,35 +162,15 @@ fun StoreScreen(
 }
 
 @Composable
-private fun StoreSection(
-    title: String,
-    items: List<StoreItem>,
-    onPurchase: (String) -> Unit,
-    content: @Composable (StoreItem) -> Unit,
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-        )
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(4),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.height(200.dp),
-        ) {
-            items(items) { storeItem ->
-                ShopGridItem(
-                    item = storeItem,
-                    isPurchased = storeItem.isPurchased,
-                    onClick = { onPurchase(storeItem.item.key) },
-                    content = content,
-                )
-            }
-        }
-    }
+private fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+    )
 }
 
 @Composable
@@ -204,18 +187,12 @@ fun ShopGridItem(
         tonalElevation = 1.dp,
     ) {
         Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(4.dp),
+            modifier = Modifier.fillMaxSize().padding(4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Box(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
+                modifier = Modifier.weight(1f).fillMaxWidth(),
                 contentAlignment = Alignment.Center,
             ) {
                 content(item)
@@ -224,19 +201,18 @@ fun ShopGridItem(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(32.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .background(
-                            color =
-                                if (isPurchased) {
-                                    MaterialTheme.colorScheme.surfaceContainerHighest
-                                } else {
-                                    MaterialTheme.colorScheme.primary
-                                },
-                        ).clickable { onClick() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(32.dp)
+                    .clip(MaterialTheme.shapes.small)
+                    .background(
+                        color = if (isPurchased) {
+                            MaterialTheme.colorScheme.surfaceContainerHighest
+                        } else {
+                            MaterialTheme.colorScheme.primary
+                        },
+                    )
+                    .clickable { onClick() },
             ) {
                 if (isPurchased) {
                     Text(
