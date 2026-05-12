@@ -38,7 +38,7 @@ import com.example.database.util.StringListConverter
         StatsLogEntity::class,
         HabitCompletionEntity::class,
         TaskCompletionEntity::class,
-        SyncQueueEntity::class
+        SyncQueueEntity::class,
     ],
     version = 1,
     exportSchema = true,

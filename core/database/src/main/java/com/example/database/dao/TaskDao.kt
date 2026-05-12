@@ -30,7 +30,7 @@ interface TaskDao {
         tracker: SyncTracker,
     ): Long {
         val taskId = upsert(taskEntity)
-        tracker.trackUpsert(SyncTypes.TASK, taskId, taskEntity)
+        tracker.trackSync(SyncTypes.TASK, taskId)
         return taskId
     }
 
@@ -73,7 +73,10 @@ interface TaskDao {
     )
 
     @Transaction
-    suspend fun toggleTaskWithSubtasks(taskId: Long) {
+    suspend fun toggleTaskWithSubtasks(
+        taskId: Long,
+        tracker: SyncTracker,
+    ) {
         val task = getTaskById(taskId) ?: return
         val newCheckState = !task.isChecked
         val now = Clock.System.now().toEpochMilliseconds()
@@ -85,6 +88,7 @@ interface TaskDao {
                 syncStatus = SyncStatus.CHANGED,
             ),
         )
+        tracker.trackSync(SyncTypes.TASK, taskId)
         updateSubtasksCheckState(taskId, newCheckState, now)
     }
 }

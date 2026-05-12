@@ -7,7 +7,9 @@ import com.example.database.dao.SubtaskDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
+import com.example.database.model.SyncOperation
 import com.example.database.model.SyncStatus
+import com.example.database.model.SyncTypes
 import com.example.database.model.relationships.TaskWithSubtasks
 import com.example.database.util.SyncTracker
 import com.example.model.Reminder
@@ -89,26 +91,32 @@ internal class TaskRepositoryImpl(
         }
 
     override suspend fun toggleTask(taskId: Long) {
-        taskDao.toggleTaskWithSubtasks(taskId)
+        taskDao.toggleTaskWithSubtasks(taskId, tracker)
     }
 
     override suspend fun deleteTask(taskId: Long) {
-        taskWithRelationDao.softDeleteTaskCascade(taskId)
+        taskWithRelationDao.softDeleteTaskCascade(taskId, tracker)
     }
 
     override suspend fun deleteRemindersByIds(remindersToDelete: List<Long>) {
-        remindersToDelete.forEach { taskReminderDao.deleteById(it) }
+        remindersToDelete.forEach {
+            taskReminderDao.deleteById(it)
+            tracker.trackSync(SyncTypes.TASK_REMINDER, it, SyncOperation.DELETE)
+        }
     }
 
     override suspend fun deleteSubtasksByIds(subtasksToDelete: List<Long>) {
-        subtasksToDelete.forEach { subtaskDao.deleteById(it) }
+        subtasksToDelete.forEach {
+            subtaskDao.deleteById(it)
+            tracker.trackSync(SyncTypes.SUBTASK, it, SyncOperation.DELETE)
+        }
     }
 
     override suspend fun getTaskById(taskId: Long): Task? = taskDao.getTaskById(taskId)?.asModel()
 
     override suspend fun toggleSubtask(subtaskId: Long): Long? =
         subtaskDao.findById(subtaskId)?.let {
-            subtaskDao.upsertWithParentSync(it.copy(isChecked = !it.isChecked), taskDao)
+            subtaskDao.upsertWithParentSync(it.copy(isChecked = !it.isChecked), taskDao, tracker)
             taskDao.getTaskById(it.taskId)?.let { task ->
                 if (task.isChecked) return@let task.id
                 null
@@ -123,11 +131,11 @@ internal class TaskRepositoryImpl(
 
     override suspend fun saveSubtask(subtask: Subtask) {
         taskDao.updateSyncStatus(subtask.taskId, SyncStatus.CHANGED)
-        subtaskDao.upsert(subtask.asEntity())
+        subtaskDao.upsertWithSync(subtask.asEntity(), tracker)
     }
 
     override suspend fun saveReminder(reminder: Reminder) {
         taskDao.updateSyncStatus(reminder.parentId, SyncStatus.CHANGED)
-        taskReminderDao.upsert(reminder.asTaskEntity())
+        taskReminderDao.upsertWithSync(reminder.asTaskEntity(), tracker)
     }
 }

@@ -70,7 +70,7 @@ val dataModule =
         }
 
         single<GamificationRepository> {
-            GamificationRepositoryImpl(get<GamificationDao>())
+            GamificationRepositoryImpl(get<GamificationDao>(), get<SyncTracker>())
         }
 
         single<SettingsRepository> {

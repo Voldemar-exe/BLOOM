@@ -3,6 +3,7 @@ package com.example.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import com.example.database.model.SyncOperation
 import com.example.database.model.SyncStatus
 import com.example.database.model.SyncTypes
 import com.example.database.model.entities.HabitEntity
@@ -76,7 +77,7 @@ interface HabitWithRelationDao {
         val now = Clock.System.now().toEpochMilliseconds()
 
         softDeleteHabit(habit.id, now, SyncStatus.DELETED)
-        tracker.trackDelete(SyncTypes.HABIT, habit.id)
+        tracker.trackSync(SyncTypes.HABIT, habit.id, SyncOperation.DELETE)
         deletePlantByHabitId(habit.id)
         deleteRemindersByHabitId(habit.id)
     }

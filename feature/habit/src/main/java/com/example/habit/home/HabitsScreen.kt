@@ -232,12 +232,7 @@ fun HabitItem(
                                     Icons.Outlined.AddCircle
                                 },
                             contentDescription = "toggle",
-                            tint =
-                                if (habit.isChecked) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
+                            tint = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                 }

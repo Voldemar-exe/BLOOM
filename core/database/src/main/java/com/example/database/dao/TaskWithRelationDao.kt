@@ -3,9 +3,12 @@ package com.example.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import com.example.database.model.SyncOperation
 import com.example.database.model.SyncStatus
+import com.example.database.model.SyncTypes
 import com.example.database.model.relationships.TaskWithSubtasks
 import com.example.database.model.relationships.TaskWithSubtasksAndReminders
+import com.example.database.util.SyncTracker
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 
@@ -61,13 +64,17 @@ interface TaskWithRelationDao {
     )
 
     @Transaction
-    suspend fun softDeleteTaskCascade(taskId: Long) {
+    suspend fun softDeleteTaskCascade(
+        taskId: Long,
+        tracker: SyncTracker,
+    ) {
         val now = Clock.System.now().toEpochMilliseconds()
         softDeleteTask(
             taskId,
             now,
             SyncStatus.DELETED,
         )
+        tracker.trackSync(SyncTypes.TASK, taskId, SyncOperation.DELETE)
         deleteSubtasksByTaskId(taskId)
         deleteRemindersByTaskId(taskId)
     }

@@ -7,6 +7,5 @@ data class SyncQueue(
     val entityType: String,
     val entityId: Long,
     val operation: SyncOperation,
-    val payload: String,
     val createdAt: Long,
 )

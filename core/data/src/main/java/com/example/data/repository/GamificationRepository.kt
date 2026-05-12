@@ -5,6 +5,7 @@ import com.example.database.model.StatsSourceType
 import com.example.database.model.entities.HabitCompletionEntity
 import com.example.database.model.entities.StatsLogEntity
 import com.example.database.model.entities.TaskCompletionEntity
+import com.example.database.util.SyncTracker
 import timber.log.Timber
 
 interface GamificationRepository {
@@ -25,8 +26,10 @@ interface GamificationRepository {
     suspend fun isTaskCompletedToday(taskId: Long): Boolean
 }
 
-internal class GamificationRepositoryImpl(private val dao: GamificationDao) :
-    GamificationRepository {
+internal class GamificationRepositoryImpl(
+    private val dao: GamificationDao,
+    private val tracker: SyncTracker,
+) : GamificationRepository {
     override suspend fun recordHabitCompletion(
         habitId: Long,
         experienceEarned: Int,
@@ -40,7 +43,7 @@ internal class GamificationRepositoryImpl(private val dao: GamificationDao) :
                 experienceEarned = experienceEarned,
                 coinsEarned = coinsEarned,
             )
-        dao.insertHabitCompletion(completion)
+        dao.insertHabitCompletionWithSync(completion, tracker)
         recordStatsLogInternal(
             sourceType = StatsSourceType.HABIT,
             sourceId = habitId,
@@ -65,7 +68,7 @@ internal class GamificationRepositoryImpl(private val dao: GamificationDao) :
                 experienceEarned = experienceEarned,
                 coinsEarned = coinsEarned,
             )
-        dao.insertTaskCompletion(completion)
+        dao.insertTaskCompletionWithSync(completion, tracker)
         recordStatsLogInternal(
             sourceType = StatsSourceType.TASK,
             sourceId = taskId,
@@ -91,7 +94,7 @@ internal class GamificationRepositoryImpl(private val dao: GamificationDao) :
                 coinsDelta = coinsDelta,
                 createdAt = System.currentTimeMillis(),
             )
-        dao.insertStatsLog(log)
+        dao.insertStatLogWithSync(log, tracker)
     }
 
     override suspend fun isHabitCompletedToday(habitId: Long): Boolean {

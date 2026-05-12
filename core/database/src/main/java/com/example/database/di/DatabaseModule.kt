@@ -36,5 +36,5 @@ val databaseModule =
         single<HabitWithRelationDao> { get<BloomDatabase>().habitWithRelationDao() }
         single<GamificationDao> { get<BloomDatabase>().gamificationDao() }
         single<SyncQueueDao> { get<BloomDatabase>().syncQueueDao() }
-        single<SyncTracker> { SyncTracker(get<SyncQueueDao>(), get<Json>()) }
+        single<SyncTracker> { SyncTracker(get<SyncQueueDao>()) }
     }

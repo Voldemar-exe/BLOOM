@@ -6,8 +6,10 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.example.database.model.SyncTypes
 import com.example.database.model.entities.TaskReminderEntity
 import com.example.database.model.relationships.TaskWithReminders
+import com.example.database.util.SyncTracker
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -21,7 +23,7 @@ interface TaskReminderDao {
     fun getAllTasksWithReminders(): Flow<List<TaskWithReminders>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(reminder: TaskReminderEntity)
+    suspend fun upsert(reminder: TaskReminderEntity): Long
 
     @Update
     suspend fun update(reminder: TaskReminderEntity)
@@ -30,20 +32,12 @@ interface TaskReminderDao {
     suspend fun deleteById(taskReminderId: Long)
 
     @Transaction
-    suspend fun upsertWithParentSync(
+    suspend fun upsertWithSync(
         reminder: TaskReminderEntity,
-        taskDao: TaskDao,
+        tracker: SyncTracker,
     ) {
-        upsert(reminder)
-        taskDao.updateSyncStatus(reminder.taskId)
-    }
-
-    @Transaction
-    suspend fun updateWithParentSync(
-        reminder: TaskReminderEntity,
-        taskDao: TaskDao,
-    ) {
-        update(reminder)
-        taskDao.updateSyncStatus(reminder.taskId)
+        val reminderId = upsert(reminder)
+        tracker.trackSync(SyncTypes.TASK_REMINDER, reminderId)
+        tracker.trackSync(SyncTypes.TASK, reminder.taskId)
     }
 }

@@ -7,6 +7,8 @@ import com.example.database.dao.HabitDao
 import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
 import com.example.database.dao.HabitWithRelationDao
+import com.example.database.model.SyncOperation
+import com.example.database.model.SyncTypes
 import com.example.database.util.SyncTracker
 import com.example.model.Habit
 import com.example.model.HabitPlant
@@ -47,7 +49,7 @@ internal class HabitRepositoryImpl(
     private val plantDao: HabitPlantDao,
     private val reminderDao: HabitReminderDao,
     private val relationDao: HabitWithRelationDao,
-    private val tracker: SyncTracker
+    private val tracker: SyncTracker,
 ) : HabitRepository {
     override fun getHabits(): Flow<List<Habit>> =
         habitDao.getHabits().map { it.map { entity -> entity.asModel() } }
@@ -83,7 +85,7 @@ internal class HabitRepositoryImpl(
 
     override suspend fun toggleHabit(habitId: Long) {
         habitDao.getHabitById(habitId)?.let {
-            habitDao.updateHabitCompletion(habitId, !it.isChecked)
+            habitDao.toggleHabit(habitId, !it.isChecked, tracker)
         }
     }
 
@@ -92,7 +94,10 @@ internal class HabitRepositoryImpl(
     }
 
     override suspend fun deleteRemindersByIds(ids: List<Long>) {
-        ids.forEach { reminderDao.deleteById(it) }
+        ids.forEach {
+            reminderDao.deleteById(it)
+            tracker.trackSync(SyncTypes.HABIT_REMINDER, it, SyncOperation.DELETE)
+        }
     }
 
     override suspend fun saveHabit(
@@ -101,6 +106,6 @@ internal class HabitRepositoryImpl(
     ): Long = plantDao.upsertHabitWithPlant(habit.asEntity(), plant.asEntity(), tracker)
 
     override suspend fun saveReminder(reminder: Reminder) {
-        reminderDao.upsert(reminder.asHabitEntity())
+        reminderDao.upsertWithSync(reminder.asHabitEntity(), tracker)
     }
 }

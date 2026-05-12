@@ -31,11 +31,11 @@ interface HabitReminderDao {
     suspend fun deleteById(id: Long)
 
     @Transaction
-    suspend fun upsertWithHabit(
+    suspend fun upsertWithSync(
         reminder: HabitReminderEntity,
         tracker: SyncTracker,
     ) {
         val reminderId = upsert(reminder)
-        tracker.trackUpsert(SyncTypes.HABIT_REMINDER, reminderId, reminder)
+        tracker.trackSync(SyncTypes.HABIT_REMINDER, reminderId)
     }
 }

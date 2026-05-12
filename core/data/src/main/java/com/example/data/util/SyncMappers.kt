@@ -9,7 +9,6 @@ fun SyncQueueEntity.toDomain() =
         entityType = entityType,
         entityId = entityId,
         operation = operation,
-        payload = payload,
         createdAt = createdAt,
     )
 
@@ -19,6 +18,5 @@ fun SyncQueue.toEntity() =
         entityType = entityType,
         entityId = entityId,
         operation = operation,
-        payload = payload,
         createdAt = createdAt,
     )

@@ -2,8 +2,11 @@ package com.example.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import com.example.database.model.SyncStatus
+import com.example.database.model.SyncTypes
 import com.example.database.model.entities.HabitEntity
+import com.example.database.util.SyncTracker
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 
@@ -42,8 +45,7 @@ interface HabitDao {
         """
         UPDATE habits 
         SET isChecked = :isChecked,
-            updatedAt = :now,
-            syncStatus = :syncStatus
+            updatedAt = :now
         WHERE id = :habitId
     """,
     )
@@ -51,6 +53,15 @@ interface HabitDao {
         habitId: Long,
         isChecked: Boolean,
         now: Long = Clock.System.now().toEpochMilliseconds(),
-        syncStatus: SyncStatus = SyncStatus.CHANGED,
     )
+
+    @Transaction
+    suspend fun toggleHabit(
+        habitId: Long,
+        isChecked: Boolean,
+        tracker: SyncTracker,
+    ) {
+        updateHabitCompletion(habitId, isChecked)
+        tracker.trackSync(SyncTypes.HABIT, habitId)
+    }
 }

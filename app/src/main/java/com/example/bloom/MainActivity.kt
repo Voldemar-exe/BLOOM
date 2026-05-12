@@ -18,12 +18,15 @@ import com.example.bloom.ui.NotificationPermissionRequester
 import com.example.data.repository.ThemeRepository
 import com.example.designsystem.model.AppTheme
 import com.example.designsystem.theme.BLOOMTheme
+import com.example.sync.SyncViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
     private val themeRepository: ThemeRepository by inject()
     private val mainViewModel: MainViewModel by viewModel()
+
+    private val syncViewModel: SyncViewModel by viewModel()
 
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +41,9 @@ class MainActivity : ComponentActivity() {
                 initialValue = "SYSTEM",
                 lifecycle = lifecycle,
             )
+
+            syncViewModel
+
             BLOOMTheme(appTheme = AppTheme.valueOf(appTheme)) {
                 when (authState) {
                     is AuthState.Loading ->

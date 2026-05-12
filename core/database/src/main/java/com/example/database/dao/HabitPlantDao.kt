@@ -29,7 +29,7 @@ interface HabitPlantDao {
     ): Long {
         val habitId = upsertHabit(habit)
         upsertPlant(plant.copy(habitId = habitId))
-        tracker.trackUpsert(SyncTypes.HABIT, habitId, habit)
+        tracker.trackSync(SyncTypes.HABIT, habitId)
         return habitId
     }
 }

@@ -6,7 +6,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.example.database.model.SyncTypes
 import com.example.database.model.entities.SubtaskEntity
+import com.example.database.util.SyncTracker
 
 @Dao
 interface SubtaskDao {
@@ -14,7 +16,16 @@ interface SubtaskDao {
     suspend fun findById(subtaskId: Long): SubtaskEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(subtaskEntity: SubtaskEntity)
+    suspend fun upsert(subtaskEntity: SubtaskEntity): Long
+
+    @Transaction
+    suspend fun upsertWithSync(
+        subtaskEntity: SubtaskEntity,
+        tracker: SyncTracker,
+    ) {
+        val subtaskId = upsert(subtaskEntity)
+        tracker.trackSync(SyncTypes.SUBTASK, subtaskId)
+    }
 
     @Update
     suspend fun update(subtaskEntity: SubtaskEntity)
@@ -32,9 +43,11 @@ interface SubtaskDao {
     suspend fun upsertWithParentSync(
         subtaskEntity: SubtaskEntity,
         taskDao: TaskDao,
+        tracker: SyncTracker,
     ) {
-        upsert(subtaskEntity)
+        upsertWithSync(subtaskEntity, tracker)
         updateParentTaskCompletion(taskDao, subtaskEntity.taskId)
+        tracker.trackSync(SyncTypes.TASK, subtaskEntity.taskId)
     }
 
     private suspend fun updateParentTaskCompletion(
