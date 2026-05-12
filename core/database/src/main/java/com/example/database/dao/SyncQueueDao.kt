@@ -13,6 +13,9 @@ interface SyncQueueDao {
     @Query("SELECT * FROM sync_queue ORDER BY createdAt ASC")
     fun observeSyncQueue(): Flow<List<SyncQueueEntity>>
 
+    @Query("SELECT * FROM sync_queue ORDER BY createdAt ASC")
+    suspend fun getPendingList(): List<SyncQueueEntity>
+
     @Query("DELETE FROM sync_queue WHERE id IN (:ids)")
     suspend fun deleteByIds(ids: List<Long>)
 

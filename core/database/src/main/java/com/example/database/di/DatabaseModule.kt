@@ -8,12 +8,12 @@ import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
 import com.example.database.dao.HabitWithRelationDao
 import com.example.database.dao.SubtaskDao
+import com.example.database.dao.SyncDao
 import com.example.database.dao.SyncQueueDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
 import com.example.database.util.SyncTracker
-import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 
 val databaseModule =
@@ -36,5 +36,6 @@ val databaseModule =
         single<HabitWithRelationDao> { get<BloomDatabase>().habitWithRelationDao() }
         single<GamificationDao> { get<BloomDatabase>().gamificationDao() }
         single<SyncQueueDao> { get<BloomDatabase>().syncQueueDao() }
+        single<SyncDao> { get<BloomDatabase>().syncDao() }
         single<SyncTracker> { SyncTracker(get<SyncQueueDao>()) }
     }

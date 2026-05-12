@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,20 +36,20 @@ class HabitViewModel(
         Timber.d("Start with ${_habitState.value}")
 
         viewModelScope.launch {
-            searchQueryFlow
-                .combine(filterTagsFlow) { query, tags -> query to tags }
+            combine(searchQueryFlow, filterTagsFlow) { query, tags -> query to tags }
+                .distinctUntilChanged()
                 .flatMapLatest { (query, tags) ->
+                    habitRepository.searchHabitsWithRelations(query, tags)
+                }.distinctUntilChanged()
+                .collect { habits ->
+                    Timber.d("Collected habits: ${habits.size}")
                     _habitState.update {
                         it.copy(
-                            searchQuery = query,
-                            selectedFilterTags = tags,
+                            searchQuery = searchQueryFlow.value,
+                            selectedFilterTags = filterTagsFlow.value,
+                            habits = habits,
                         )
                     }
-
-                    habitRepository.searchHabitsWithRelations(query, tags)
-                }.collect { habits ->
-                    Timber.d("Collected habits: $habits")
-                    _habitState.update { it.copy(habits = habits) }
                 }
         }
     }

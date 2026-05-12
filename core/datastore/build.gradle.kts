@@ -32,4 +32,5 @@ dependencies {
     implementation(project(":core:model"))
     api(libs.protobuf.kotlin.lite)
     api(libs.androidx.dataStore)
+    api(libs.androidx.datastore.preferences)
 }

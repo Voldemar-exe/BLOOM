@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,15 +19,13 @@ import com.example.bloom.ui.NotificationPermissionRequester
 import com.example.data.repository.ThemeRepository
 import com.example.designsystem.model.AppTheme
 import com.example.designsystem.theme.BLOOMTheme
-import com.example.sync.SyncViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
     private val themeRepository: ThemeRepository by inject()
     private val mainViewModel: MainViewModel by viewModel()
-
-    private val syncViewModel: SyncViewModel by viewModel()
 
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +41,12 @@ class MainActivity : ComponentActivity() {
                 lifecycle = lifecycle,
             )
 
-            syncViewModel
+            LaunchedEffect(authState) {
+                if (authState is AuthState.Authorized) {
+                    Timber.d("$authState")
+//                    SyncScheduler.enqueueImmediateSync(application.applicationContext)
+                }
+            }
 
             BLOOMTheme(appTheme = AppTheme.valueOf(appTheme)) {
                 when (authState) {

@@ -10,6 +10,8 @@ import com.example.data.repository.NotificationRepository
 import com.example.data.repository.NotificationRepositoryImpl
 import com.example.data.repository.SettingsRepository
 import com.example.data.repository.SettingsRepositoryImpl
+import com.example.data.repository.SyncMetadataRepository
+import com.example.data.repository.SyncMetadataRepositoryImpl
 import com.example.data.repository.SyncRepository
 import com.example.data.repository.SyncRepositoryImpl
 import com.example.data.repository.TaskRepository
@@ -24,6 +26,7 @@ import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
 import com.example.database.dao.HabitWithRelationDao
 import com.example.database.dao.SubtaskDao
+import com.example.database.dao.SyncDao
 import com.example.database.dao.SyncQueueDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
@@ -31,6 +34,7 @@ import com.example.database.dao.TaskWithRelationDao
 import com.example.database.util.SyncTracker
 import com.example.datastore.datastore.BloomPreferencesDataStore
 import com.example.network.api.AuthApi
+import com.example.network.api.SyncApi
 import org.koin.dsl.module
 
 val dataModule =
@@ -80,5 +84,12 @@ val dataModule =
         single<AuthRepository> {
             AuthRepositoryImpl(get<AuthApi>(), get<BloomPreferencesDataStore>())
         }
-        single<SyncRepository> { SyncRepositoryImpl(get<SyncQueueDao>()) }
+        single<SyncRepository> {
+            SyncRepositoryImpl(
+                get<SyncQueueDao>(),
+                get<SyncDao>(),
+                get<SyncApi>(),
+            )
+        }
+        single<SyncMetadataRepository> { SyncMetadataRepositoryImpl(get()) }
     }

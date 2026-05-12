@@ -23,7 +23,11 @@ fun Application.configureSyncRouting() {
                             call.respond(HttpStatusCode.Unauthorized)
                             return@post
                         }
-                    val userId = principal.payload.getClaim("userId").asLong()
+                    val userId =
+                        principal.payload
+                            .getClaim("userId")
+                            .asString()
+                            .toLong()
                     val request = call.receive<SyncPushRequest>()
 
                     syncService
@@ -37,13 +41,17 @@ fun Application.configureSyncRouting() {
                         }
                 }
 
-                post("/pull") {
+                get("/pull") {
                     val principal =
                         call.principal<JWTPrincipal>() ?: run {
                             call.respond(HttpStatusCode.Unauthorized)
-                            return@post
+                            return@get
                         }
-                    val userId = principal.payload.getClaim("userId").asLong()
+                    val userId =
+                        principal.payload
+                            .getClaim("userId")
+                            .asString()
+                            .toLong()
                     val lastSync = call.request.queryParameters["lastSync"]?.toLongOrNull() ?: 0L
 
                     val response = syncService.pull(userId, lastSync)

@@ -39,4 +39,6 @@ dependencies {
     implementation(project(":feature:stats"))
     implementation(project(":feature:profile"))
     implementation(project(":feature:auth"))
+
+    implementation(libs.koin.androidx.workmanager)
 }

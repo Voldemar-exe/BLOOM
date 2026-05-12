@@ -9,6 +9,7 @@ import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
 import com.example.database.dao.HabitWithRelationDao
 import com.example.database.dao.SubtaskDao
+import com.example.database.dao.SyncDao
 import com.example.database.dao.SyncQueueDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
@@ -70,4 +71,6 @@ internal abstract class BloomDatabase : RoomDatabase() {
     abstract fun gamificationDao(): GamificationDao
 
     abstract fun syncQueueDao(): SyncQueueDao
+
+    abstract fun syncDao(): SyncDao
 }
