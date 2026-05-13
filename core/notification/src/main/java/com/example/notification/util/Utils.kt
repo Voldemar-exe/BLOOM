@@ -27,16 +27,26 @@ fun ReminderSchedule.nextTriggerMillis(): Long? {
                 .toEpochMilli()
         }
 
-        RecurrenceType.WEEK ->
+        RecurrenceType.WEEK -> {
+            require(recurrence.values.isNotEmpty()) {
+                "Weekly recurrence requires at least one weekday"
+            }
+
             findNextDate { it.dayOfWeek.value - 1 in recurrence.values }
                 ?.atZone(zone)
                 ?.toInstant()
                 ?.toEpochMilli()
+        }
 
-        RecurrenceType.MONTH ->
+        RecurrenceType.MONTH -> {
+            require(recurrence.values.isNotEmpty()) {
+                "Monthly recurrence requires at least one day"
+            }
+
             findNextDate { it.dayOfMonth - 1 in recurrence.values }
                 ?.atZone(zone)
                 ?.toInstant()
                 ?.toEpochMilli()
+        }
     }
 }

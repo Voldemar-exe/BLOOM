@@ -32,6 +32,7 @@ import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
 import com.example.database.util.SyncTracker
+import com.example.database.util.TransactionRunner
 import com.example.datastore.datastore.BloomPreferencesDataStore
 import com.example.network.api.AuthApi
 import com.example.network.api.SyncApi
@@ -89,6 +90,7 @@ val dataModule =
                 get<SyncQueueDao>(),
                 get<SyncDao>(),
                 get<SyncApi>(),
+                get<TransactionRunner>(),
             )
         }
         single<SyncMetadataRepository> { SyncMetadataRepositoryImpl(get()) }

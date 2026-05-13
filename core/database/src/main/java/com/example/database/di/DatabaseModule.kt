@@ -13,7 +13,9 @@ import com.example.database.dao.SyncQueueDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
+import com.example.database.util.RoomTransactionRunner
 import com.example.database.util.SyncTracker
+import com.example.database.util.TransactionRunner
 import org.koin.dsl.module
 
 val databaseModule =
@@ -38,4 +40,5 @@ val databaseModule =
         single<SyncQueueDao> { get<BloomDatabase>().syncQueueDao() }
         single<SyncDao> { get<BloomDatabase>().syncDao() }
         single<SyncTracker> { SyncTracker(get<SyncQueueDao>()) }
+        single<TransactionRunner> { RoomTransactionRunner(get<BloomDatabase>()) }
     }

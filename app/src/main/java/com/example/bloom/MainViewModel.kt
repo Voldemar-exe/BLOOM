@@ -6,9 +6,11 @@ import com.example.data.repository.AuthRepository
 import com.example.data.repository.NotificationRepository
 import com.example.data.repository.SettingsRepository
 import com.example.notification.NotificationManager
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -47,6 +49,7 @@ class MainViewModel(
         observeNotifications()
     }
 
+    @OptIn(FlowPreview::class)
     private fun observeNotifications() {
         viewModelScope.launch {
             combine(
@@ -54,7 +57,8 @@ class MainViewModel(
                 notificationRepository.getAllSchedules(),
             ) { settings, reminders ->
                 settings to reminders
-            }.distinctUntilChanged()
+            }.debounce(300)
+                .distinctUntilChanged()
                 .collect { (settings, reminders) ->
                     notificationManager.sync(
                         settings = settings,

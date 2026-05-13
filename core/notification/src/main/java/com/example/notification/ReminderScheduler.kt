@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import com.example.model.ReminderSchedule
 import com.example.notification.util.nextTriggerMillis
+import timber.log.Timber
 
 interface ReminderScheduler {
     fun schedule(reminder: ReminderSchedule)
@@ -20,6 +21,7 @@ class AlarmReminderScheduler(private val context: Context) : ReminderScheduler {
         context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     override fun schedule(reminder: ReminderSchedule) {
+        Timber.d("$reminder")
         val triggerAt = reminder.nextTriggerMillis() ?: return
 
         alarmManager.setAndAllowWhileIdle(

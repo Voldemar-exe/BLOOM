@@ -19,6 +19,7 @@ import com.example.bloom.ui.NotificationPermissionRequester
 import com.example.data.repository.ThemeRepository
 import com.example.designsystem.model.AppTheme
 import com.example.designsystem.theme.BLOOMTheme
+import com.example.sync.SyncScheduler
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(authState) {
                 if (authState is AuthState.Authorized) {
                     Timber.d("$authState")
-//                    SyncScheduler.enqueueImmediateSync(application.applicationContext)
+                    SyncScheduler.enqueuePeriodicSync(application.applicationContext)
                 }
             }
 

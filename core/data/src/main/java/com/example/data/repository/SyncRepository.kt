@@ -6,11 +6,13 @@ import com.example.data.util.toDto
 import com.example.data.util.toEntity
 import com.example.database.dao.SyncDao
 import com.example.database.dao.SyncQueueDao
+import com.example.database.model.SyncTimestamp
 import com.example.database.model.SyncTypes
 import com.example.database.model.entities.HabitEntity
 import com.example.database.model.entities.HabitPlantEntity
 import com.example.database.model.entities.SubtaskEntity
 import com.example.database.model.entities.TaskEntity
+import com.example.database.util.TransactionRunner
 import com.example.network.api.SyncApi
 import com.example.network.model.HabitCompletionDto
 import com.example.network.model.HabitDto
@@ -21,10 +23,8 @@ import com.example.network.model.SyncPushRequest
 import com.example.network.model.TaskCompletionDto
 import com.example.network.model.TaskDto
 import com.example.network.model.TaskReminderDto
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface SyncRepository {
@@ -43,6 +43,7 @@ class SyncRepositoryImpl(
     private val dao: SyncQueueDao,
     private val syncDao: SyncDao,
     private val api: SyncApi,
+    private val transactionRunner: TransactionRunner,
 ) : SyncRepository {
     override fun observePending(): Flow<List<SyncQueue>> =
         dao.observeSyncQueue().map { entities -> entities.map { it.toDomain() } }
@@ -55,97 +56,128 @@ class SyncRepositoryImpl(
         dao.insert(entity.toEntity())
     }
 
-    // TODO: Optimize this
-    override suspend fun pushChanges(): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            val pendingEntities = dao.getPendingList()
-            if (pendingEntities.isEmpty()) return@withContext Result.success(Unit)
+    override suspend fun pushChanges(): Result<Unit> {
+        val pendingEntities = dao.getPendingList()
+        if (pendingEntities.isEmpty()) return Result.success(Unit)
 
-            val pending = pendingEntities.map { it.toDomain() }
+        val pending = pendingEntities.map { it.toDomain() }
+        val collection = collectPushData(pending)
 
-            val habits = mutableListOf<HabitDto>()
-            val tasks = mutableListOf<TaskDto>()
-            val habitReminders = mutableListOf<HabitReminderDto>()
-            val taskReminders = mutableListOf<TaskReminderDto>()
-            val statsLogs = mutableListOf<StatsLogDto>()
-            val habitCompletions = mutableListOf<HabitCompletionDto>()
-            val taskCompletions = mutableListOf<TaskCompletionDto>()
-            val processedIds = mutableListOf<Long>()
+        if (collection.processedIds.isEmpty()) {
+            return Result.success(Unit)
+        }
 
-            for (item in pending) {
-                when (item.entityType) {
-                    SyncTypes.HABIT ->
-                        syncDao
-                            .getHabitById(item.entityId)
-                            ?.toDto(syncDao.getHabitPlantByHabitId(item.entityId)!!)
-                            ?.let {
-                                habits += it
-                                processedIds += item.id
-                            }
+        return runCatching {
+            api.push(collection.request).getOrThrow()
+            dao.deleteByIds(collection.processedIds)
+        }.onFailure {
+            Timber.e(it, "Sync push failed for ${collection.processedIds.size} items")
+        }
+    }
 
-                    SyncTypes.TASK ->
-                        syncDao
-                            .getTaskById(item.entityId)
-                            ?.toDto(syncDao.getSubtaskByTaskId(item.entityId))
-                            ?.let {
-                                tasks += it
-                                processedIds += item.id
-                            }
+    override suspend fun pullChanges(lastSyncTimestamp: Long): Result<SyncPullResponse> =
+        runCatching {
+            val response = api.pull(lastSyncTimestamp).getOrThrow()
+            applyPullResponse(response)
+            response
+        }.onFailure {
+            Timber.e(it, "Sync pull failed at timestamp $lastSyncTimestamp")
+        }
 
-                    SyncTypes.HABIT_REMINDER ->
-                        syncDao
-                            .getHabitReminderById(item.entityId)
-                            ?.toDto()
-                            ?.let {
-                                habitReminders += it
-                                processedIds += item.id
-                            }
+    private suspend fun collectPushData(pending: List<SyncQueue>): PushCollection {
+        val habits = mutableListOf<HabitDto>()
+        val tasks = mutableListOf<TaskDto>()
+        val habitReminders = mutableListOf<HabitReminderDto>()
+        val taskReminders = mutableListOf<TaskReminderDto>()
+        val statsLogs = mutableListOf<StatsLogDto>()
+        val habitCompletions = mutableListOf<HabitCompletionDto>()
+        val taskCompletions = mutableListOf<TaskCompletionDto>()
+        val processedIds = mutableListOf<Long>()
 
-                    SyncTypes.TASK_REMINDER ->
-                        syncDao
-                            .getTaskReminderById(item.entityId)
-                            ?.toDto()
-                            ?.let {
-                                taskReminders += it
-                                processedIds += item.id
-                            }
+        pending.forEach { item ->
+            when (item.entityType) {
+                SyncTypes.HABIT -> {
+                    val habit = syncDao.getHabitById(item.entityId)
+                    val plant = syncDao.getHabitPlantByHabitId(item.entityId)
 
-                    SyncTypes.STATS_LOG ->
-                        syncDao
-                            .getStatsLogById(item.entityId)
-                            ?.toDto()
-                            ?.let {
-                                statsLogs += it
-                                processedIds += item.id
-                            }
+                    if (habit != null && plant != null) {
+                        habits += habit.toDto(plant)
+                        processedIds += item.id
+                    }
+                }
 
-                    SyncTypes.HABIT_COMPLETION ->
-                        syncDao
-                            .getHabitCompletionById(item.entityId)
-                            ?.toDto()
-                            ?.let {
-                                habitCompletions += it
-                                processedIds += item.id
-                            }
+                SyncTypes.TASK -> {
+                    val task = syncDao.getTaskById(item.entityId)
+                    if (task != null) {
+                        val subtasks = syncDao.getSubtaskByTaskId(item.entityId)
+                        tasks += task.toDto(subtasks)
+                        processedIds += item.id
+                    }
+                }
 
-                    SyncTypes.TASK_COMPLETION ->
-                        syncDao
-                            .getTaskCompletionById(item.entityId)
-                            ?.toDto()
-                            ?.let {
-                                taskCompletions += it
-                                processedIds += item.id
-                            }
+                SyncTypes.HABIT_REMINDER -> {
+                    syncDao
+                        .getHabitReminderById(item.entityId)
+                        ?.toDto()
+                        ?.let {
+                            habitReminders += it
+                            processedIds += item.id
+                        }
+                }
 
-                    SyncTypes.SUBTASK -> { /* they stored in TASK */ }
+                SyncTypes.TASK_REMINDER -> {
+                    syncDao
+                        .getTaskReminderById(item.entityId)
+                        ?.toDto()
+                        ?.let {
+                            taskReminders += it
+                            processedIds += item.id
+                        }
+                }
 
-                    else -> Timber.w("Unknown sync entity type: ${item.entityType}")
+                SyncTypes.STATS_LOG -> {
+                    syncDao
+                        .getStatsLogById(item.entityId)
+                        ?.toDto()
+                        ?.let {
+                            statsLogs += it
+                            processedIds += item.id
+                        }
+                }
+
+                SyncTypes.HABIT_COMPLETION -> {
+                    syncDao
+                        .getHabitCompletionById(item.entityId)
+                        ?.toDto()
+                        ?.let {
+                            habitCompletions += it
+                            processedIds += item.id
+                        }
+                }
+
+                SyncTypes.TASK_COMPLETION -> {
+                    syncDao
+                        .getTaskCompletionById(item.entityId)
+                        ?.toDto()
+                        ?.let {
+                            taskCompletions += it
+                            processedIds += item.id
+                        }
+                }
+
+                SyncTypes.SUBTASK -> Unit
+
+                else -> {
+                    Timber.w("Unknown sync entity type: ${item.entityType}")
+                    processedIds += item.id
                 }
             }
+        }
 
-            if (processedIds.isEmpty()) return@withContext Result.success(Unit)
+        val processedItems = pending.filter { it.id in processedIds }
 
-            val request =
+        return PushCollection(
+            request =
                 SyncPushRequest(
                     habits = habits,
                     tasks = tasks,
@@ -154,91 +186,106 @@ class SyncRepositoryImpl(
                     statsLogs = statsLogs,
                     habitCompletions = habitCompletions,
                     taskCompletions = taskCompletions,
-                    lastSyncTimestamp = pending.maxOfOrNull { it.createdAt } ?: 0L,
-                )
+                    lastSyncTimestamp = processedItems.maxOfOrNull { it.createdAt } ?: 0L,
+                ),
+            processedIds = processedIds,
+        )
+    }
 
-            return@withContext runCatching {
-                api.push(request)
-                dao.deleteByIds(processedIds)
-            }.onFailure {
-                Timber.e(it, "Sync push failed for ${processedIds.size} items")
+    private suspend fun applyPullResponse(response: SyncPullResponse) {
+        transactionRunner.run {
+            val habitTsMap =
+                syncDao
+                    .getHabitsTimestamps(response.habits.map { it.id })
+                    .associateBy { it.id }
+
+            val habitsToUpsert = mutableListOf<HabitEntity>()
+            val plantsToUpsert = mutableListOf<HabitPlantEntity>()
+
+            filterNewer(
+                remote = response.habits,
+                localMap = habitTsMap,
+                idSelector = { it.id },
+                updatedAtSelector = { it.updatedAt },
+            ).forEach { dto ->
+                habitsToUpsert += dto.toEntity()
+                plantsToUpsert += dto.plantDto.toEntity()
             }
+
+            if (habitsToUpsert.isNotEmpty()) syncDao.upsertHabits(habitsToUpsert)
+            if (plantsToUpsert.isNotEmpty()) syncDao.upsertHabitPlants(plantsToUpsert)
+
+            val taskTsMap =
+                syncDao
+                    .getTasksTimestamps(response.tasks.map { it.id })
+                    .associateBy { it.id }
+
+            val tasksToUpsert = mutableListOf<TaskEntity>()
+            val subtasksToUpsert = mutableListOf<SubtaskEntity>()
+
+            filterNewer(
+                remote = response.tasks,
+                localMap = taskTsMap,
+                idSelector = { it.id },
+                updatedAtSelector = { it.updatedAt },
+            ).forEach { dto ->
+                tasksToUpsert += dto.toEntity()
+                subtasksToUpsert += dto.subtasks.map { it.toEntity() }
+            }
+
+            if (tasksToUpsert.isNotEmpty()) syncDao.upsertTasks(tasksToUpsert)
+            if (subtasksToUpsert.isNotEmpty()) syncDao.upsertSubtasks(subtasksToUpsert)
+
+            val habitReminderTsMap =
+                syncDao
+                    .getHabitRemindersTimestamps(response.habitReminders.map { it.id })
+                    .associateBy { it.id }
+
+            val habitRemindersToUpsert =
+                filterNewer(
+                    remote = response.habitReminders,
+                    localMap = habitReminderTsMap,
+                    idSelector = { it.id },
+                    updatedAtSelector = { it.updatedAt },
+                ).map { it.toEntity() }
+
+            if (habitRemindersToUpsert.isNotEmpty()) {
+                syncDao.upsertHabitReminders(habitRemindersToUpsert)
+            }
+
+            val taskReminderTsMap =
+                syncDao
+                    .getTaskRemindersTimestamps(response.taskReminders.map { it.id })
+                    .associateBy { it.id }
+
+            val taskRemindersToUpsert =
+                filterNewer(
+                    remote = response.taskReminders,
+                    localMap = taskReminderTsMap,
+                    idSelector = { it.id },
+                    updatedAtSelector = { it.updatedAt },
+                ).map { it.toEntity() }
+
+            if (taskRemindersToUpsert.isNotEmpty()) {
+                syncDao.upsertTaskReminders(taskRemindersToUpsert)
+            }
+
+            syncDao.upsertStatsLogs(response.statsLogs.map { it.toEntity() })
+            syncDao.upsertHabitCompletions(response.habitCompletions.map { it.toEntity() })
+            syncDao.upsertTaskCompletions(response.taskCompletions.map { it.toEntity() })
+        }
+    }
+
+    private inline fun <T, K> filterNewer(
+        remote: List<T>,
+        localMap: Map<K, SyncTimestamp>,
+        idSelector: (T) -> K,
+        updatedAtSelector: (T) -> Long,
+    ): List<T> =
+        remote.filter { item ->
+            val local = localMap[idSelector(item)]
+            local == null || updatedAtSelector(item) > local.updatedAt
         }
 
-    override suspend fun pullChanges(lastSyncTimestamp: Long): Result<SyncPullResponse> =
-        withContext(Dispatchers.IO) {
-            try {
-                val response =
-                    api.pull(lastSyncTimestamp).getOrElse {
-                        return@withContext Result.failure(it)
-                    }
-
-                Timber.d("$response")
-
-                val habitTsMap =
-                    syncDao
-                        .getHabitsTimestamps(response.habits.map { it.id })
-                        .associateBy { it.id }
-                val habitsToUpsert = mutableListOf<HabitEntity>()
-                val plantsToUpsert = mutableListOf<HabitPlantEntity>()
-                response.habits.forEach { dto ->
-                    val local = habitTsMap[dto.id]
-                    if (local == null || dto.updatedAt > local.updatedAt) {
-                        habitsToUpsert.add(dto.toEntity())
-                        plantsToUpsert.add(dto.plantDto.toEntity())
-                    }
-                }
-                if (habitsToUpsert.isNotEmpty()) syncDao.upsertHabits(habitsToUpsert)
-                if (plantsToUpsert.isNotEmpty()) syncDao.upsertHabitPlants(plantsToUpsert)
-
-                val taskTsMap =
-                    syncDao
-                        .getTasksTimestamps(response.tasks.map { it.id })
-                        .associateBy { it.id }
-                val tasksToUpsert = mutableListOf<TaskEntity>()
-                val subtasksToUpsert = mutableListOf<SubtaskEntity>()
-                response.tasks.forEach { dto ->
-                    val local = taskTsMap[dto.id]
-                    if (local == null || dto.updatedAt > local.updatedAt) {
-                        tasksToUpsert.add(dto.toEntity())
-                        subtasksToUpsert.addAll(dto.subtasks.map { it.toEntity() })
-                    }
-                }
-                if (tasksToUpsert.isNotEmpty()) syncDao.upsertTasks(tasksToUpsert)
-                if (subtasksToUpsert.isNotEmpty()) syncDao.upsertSubtasks(subtasksToUpsert)
-
-                val hRemTsMap =
-                    syncDao
-                        .getHabitRemindersTimestamps(response.habitReminders.map { it.id })
-                        .associateBy { it.id }
-                val hRemsToUpsert =
-                    response.habitReminders
-                        .filter { dto ->
-                            val local = hRemTsMap[dto.id]
-                            local == null || dto.updatedAt > local.updatedAt
-                        }.map { it.toEntity() }
-                if (hRemsToUpsert.isNotEmpty()) syncDao.upsertHabitReminders(hRemsToUpsert)
-
-                val tRemTsMap =
-                    syncDao
-                        .getTaskRemindersTimestamps(response.taskReminders.map { it.id })
-                        .associateBy { it.id }
-                val tRemsToUpsert =
-                    response.taskReminders
-                        .filter { dto ->
-                            val local = tRemTsMap[dto.id]
-                            local == null || dto.updatedAt > local.updatedAt
-                        }.map { it.toEntity() }
-                if (tRemsToUpsert.isNotEmpty()) syncDao.upsertTaskReminders(tRemsToUpsert)
-
-                syncDao.upsertStatsLogs(response.statsLogs.map { it.toEntity() })
-                syncDao.upsertHabitCompletions(response.habitCompletions.map { it.toEntity() })
-                syncDao.upsertTaskCompletions(response.taskCompletions.map { it.toEntity() })
-
-                Result.success(response)
-            } catch (e: Exception) {
-                Timber.e(e, "Sync pull failed at timestamp $lastSyncTimestamp")
-                Result.failure(e)
-            }
-        }
+    private data class PushCollection(val request: SyncPushRequest, val processedIds: List<Long>)
 }

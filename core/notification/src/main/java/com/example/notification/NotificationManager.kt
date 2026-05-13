@@ -23,7 +23,6 @@ class NotificationManager(private val scheduler: ReminderScheduler) {
                             settings.taskRemindersEnabled
                 }
             }
-
         syncInternal(filteredReminders)
     }
 
@@ -49,7 +48,7 @@ class NotificationManager(private val scheduler: ReminderScheduler) {
             val oldReminder = currentReminders[id]
             val newReminder = newMap[id]
 
-            if (oldReminder != newReminder && newReminder != null) {
+            if (newReminder != null && oldReminder?.isScheduleEquivalent(newReminder) == false) {
                 scheduler.cancel(id)
                 scheduler.schedule(newReminder)
             }
@@ -58,3 +57,9 @@ class NotificationManager(private val scheduler: ReminderScheduler) {
         currentReminders = newMap
     }
 }
+
+private fun ReminderSchedule.isScheduleEquivalent(other: ReminderSchedule): Boolean =
+    id == other.id &&
+        time == other.time &&
+        recurrence == other.recurrence &&
+        isEnabled == other.isEnabled
