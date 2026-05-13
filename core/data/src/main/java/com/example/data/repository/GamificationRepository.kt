@@ -94,7 +94,7 @@ internal class GamificationRepositoryImpl(
                 coinsDelta = coinsDelta,
                 createdAt = System.currentTimeMillis(),
             )
-        dao.insertStatLogWithSync(log, tracker)
+        dao.insertStatsLogWithSync(log, tracker)
     }
 
     override suspend fun isHabitCompletedToday(habitId: Long): Boolean {

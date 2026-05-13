@@ -61,11 +61,11 @@ internal class HabitRepositoryImpl(
         relationDao
             .searchHabitsWithRelations(query)
             .map { entities -> entities.map { it.asModel() } }
-            .map { tasks ->
+            .map { habits ->
                 if (filterTags.isEmpty()) {
-                    tasks
+                    habits
                 } else {
-                    tasks.filter {
+                    habits.filter {
                         it.habit.tags.containsAll(filterTags)
                     }
                 }

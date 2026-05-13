@@ -11,5 +11,4 @@ dependencies {
     implementation(project(":core:database"))
     implementation(project(":core:datastore"))
     implementation(project(":core:network"))
-    implementation(libs.kotlinx.coroutines.android)
 }

@@ -1,5 +1,10 @@
 package com.example.data.di
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import com.example.data.repository.AuthRepository
 import com.example.data.repository.AuthRepositoryImpl
 import com.example.data.repository.GamificationRepository
@@ -92,6 +97,11 @@ val dataModule =
                 get<SyncApi>(),
                 get<TransactionRunner>(),
             )
+        }
+        single<DataStore<Preferences>> {
+            PreferenceDataStoreFactory.create {
+                get<Context>().preferencesDataStoreFile("sync_preferences")
+            }
         }
         single<SyncMetadataRepository> { SyncMetadataRepositoryImpl(get()) }
     }

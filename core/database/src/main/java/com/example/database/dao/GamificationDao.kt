@@ -48,7 +48,7 @@ interface GamificationDao {
     suspend fun insertStatsLog(entity: StatsLogEntity): Long
 
     @Transaction
-    suspend fun insertStatLogWithSync(
+    suspend fun insertStatsLogWithSync(
         entity: StatsLogEntity,
         tracker: SyncTracker,
     ) {

@@ -19,6 +19,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             requireNotNull(libraryExtension).apply {
                 buildFeatures {
                     buildConfig = true
+                    defaultConfig.testInstrumentationRunner =
+                        "androidx.test.runner.AndroidJUnitRunner"
                 }
 
                 configureKotlin()
@@ -28,6 +30,13 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             dependencies {
                 "implementation"(libs.findLibrary("kotlinx.serialization.json").get())
                 "implementation"(libs.findLibrary("timber").get())
+                "implementation"(libs.findLibrary("core-ktx").get())
+                "implementation"(libs.findLibrary("kotlinx-coroutines-android").get())
+                "testImplementation"(libs.findLibrary("junit").get())
+                "testImplementation"(libs.findLibrary("robolectric").get())
+                "testImplementation"(libs.findLibrary("mockk").get())
+                "testImplementation"(libs.findLibrary("kotlinx-coroutines-test").get())
+                "testImplementation"(libs.findLibrary("slf4j-simple").get())
             }
 
             configureJUnit()

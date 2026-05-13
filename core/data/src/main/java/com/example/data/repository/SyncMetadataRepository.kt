@@ -1,17 +1,12 @@
 package com.example.data.repository
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
 import timber.log.Timber
 import kotlin.coroutines.cancellation.CancellationException
-
-private const val SYNC_PREFS_NAME = "sync_preferences"
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = SYNC_PREFS_NAME)
 
 interface SyncMetadataRepository {
     suspend fun getLastSyncTimestamp(): Long
@@ -19,8 +14,8 @@ interface SyncMetadataRepository {
     suspend fun saveLastSyncTimestamp(timestamp: Long)
 }
 
-class SyncMetadataRepositoryImpl(context: Context) : SyncMetadataRepository {
-    private val dataStore = context.dataStore
+class SyncMetadataRepositoryImpl(private val dataStore: DataStore<Preferences>) :
+    SyncMetadataRepository {
     private val key = longPreferencesKey("last_sync_timestamp")
 
     override suspend fun getLastSyncTimestamp(): Long {
