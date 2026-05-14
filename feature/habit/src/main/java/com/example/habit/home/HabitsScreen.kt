@@ -37,9 +37,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bloom.feature.habit.R
+import com.example.designsystem.model.AppTheme
+import com.example.designsystem.theme.BLOOMTheme
+import com.example.designsystem.util.ThemePreviewProvider
 import com.example.habit.PlantCanvas
 import com.example.habit.util.toHabitPlant
 import com.example.habit.util.toPlantConfig
@@ -202,7 +206,7 @@ fun HabitItem(
                     style = MaterialTheme.typography.titleSmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
 
                 Row(
@@ -216,7 +220,7 @@ fun HabitItem(
                         style = MaterialTheme.typography.labelSmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                         fontWeight = FontWeight.Medium,
                     )
 
@@ -241,35 +245,75 @@ fun HabitItem(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-private fun HabitsPreview() {
-    HabitScreen(
-        state =
-            HabitState(
-                habits =
-                    listOf(
-                        HabitWithRelations(
-                            habit =
-                                Habit(
-                                    id = 0L,
-                                    title = "Пример привычки",
-                                    description = "Описание для превью",
-                                    recurrence = Recurrence(RecurrenceType.WEEK, emptySet()),
-                                    tags = emptySet(),
-                                    steps = emptyList(),
-                                    isArchived = false,
-                                    isPaused = false,
-                                    isMuted = false,
-                                    isChecked = false,
-                                ),
-                            plant =
-                                PresetLibrary.getExamples().first().toHabitPlant(),
-                            reminders = emptyList(),
+private fun HabitPreview(
+    @PreviewParameter(ThemePreviewProvider::class)
+    appTheme: AppTheme,
+) {
+    val presets = PresetLibrary.getExamples().take(3)
+
+    BLOOMTheme(appTheme = appTheme) {
+        HabitScreen(
+            state =
+                HabitState(
+                    habits =
+                        listOf(
+                            HabitWithRelations(
+                                habit =
+                                    Habit(
+                                        id = 1L,
+                                        title = "Ежедневная привычка",
+                                        description = "Выполняется каждый день",
+                                        recurrence = Recurrence(RecurrenceType.DAY, emptySet()),
+                                        tags = emptySet(),
+                                        steps = listOf("Подготовить место", "Выполнить действие"),
+                                        isArchived = false,
+                                        isPaused = false,
+                                        isMuted = false,
+                                        isChecked = true,
+                                    ),
+                                plant = presets[0].toHabitPlant(),
+                                reminders = emptyList(),
+                            ),
+                            HabitWithRelations(
+                                habit =
+                                    Habit(
+                                        id = 2L,
+                                        title = "Привычка на паузе",
+                                        description = "Временно приостановлена",
+                                        recurrence = Recurrence(RecurrenceType.WEEK, emptySet()),
+                                        tags = emptySet(),
+                                        steps = emptyList(),
+                                        isArchived = false,
+                                        isPaused = true,
+                                        isMuted = false,
+                                        isChecked = false,
+                                    ),
+                                plant = presets[1].toHabitPlant(),
+                                reminders = emptyList(),
+                            ),
+                            HabitWithRelations(
+                                habit =
+                                    Habit(
+                                        id = 3L,
+                                        title = "Архивная привычка",
+                                        description = "Больше не используется",
+                                        recurrence = Recurrence(RecurrenceType.MONTH, emptySet()),
+                                        tags = emptySet(),
+                                        steps = emptyList(),
+                                        isArchived = true,
+                                        isPaused = false,
+                                        isMuted = true,
+                                        isChecked = false,
+                                    ),
+                                plant = presets[2].toHabitPlant(),
+                                reminders = emptyList(),
+                            ),
                         ),
-                    ),
-            ),
-        onAction = {},
-        onOpenHabitSetup = {},
-    )
+                ),
+            onAction = {},
+            onOpenHabitSetup = {},
+        )
+    }
 }

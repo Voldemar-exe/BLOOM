@@ -12,7 +12,5 @@ data class HabitState(
     val selectedTabTime: DayTimeInterval = DayTimeInterval.TODAY,
     val selectedDate: DateRange = DateRange(null, null),
     val searchQuery: String = "",
-    val selectedFilterTags: Set<Tag> = emptySet(),
-    val isLoading: Boolean = false,
-    val error: String = "",
+    val selectedFilterTags: Set<Tag> = emptySet()
 )

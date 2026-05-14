@@ -32,6 +32,9 @@ internal fun Project.configureAndroidCompose(commonExtension: CommonExtension<*,
             "implementation"(libs.findLibrary("androidx-compose-ui").get())
             "implementation"(libs.findLibrary("androidx-compose-ui-graphics").get())
             "implementation"(libs.findLibrary("androidx-compose-material3").get())
+//            "implementation"(libs.findLibrary("androidx-compose-material3-adaptive").get())
+//            "implementation"(libs.findLibrary("androidx-compose-material3-adaptive-layout").get())
+//            "implementation"(libs.findLibrary("androidx-compose-material3-window-size-class1").get())
             "debugImplementation"(libs.findLibrary("androidx-compose-ui-tooling").get())
         }
     }
