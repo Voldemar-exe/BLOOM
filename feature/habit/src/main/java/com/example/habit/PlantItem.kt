@@ -46,7 +46,7 @@ fun PlantCloseUp(
                     .border(1.dp, Color.Gray),
         ) {
             PlantCanvas(
-                randomizer = Randomizer(seed),
+                seed = seed,
                 variability = variability,
                 config = plantConfig,
                 onAnimate = {},

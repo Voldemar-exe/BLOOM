@@ -3,7 +3,6 @@ package com.example.db.tables
 import org.jetbrains.exposed.v1.core.dao.id.LongIdTable
 
 object HabitPlantsTable : LongIdTable("habit_plants") {
-    val userId = reference("user_id", UsersTable.id).index()
     val habitId = reference("habit_id", HabitsTable.id).index()
     val presetId = integer("preset_id")
     val iterations = integer("iterations")

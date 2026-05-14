@@ -2,7 +2,6 @@ package com.example.db.daos
 
 import com.example.db.tables.HabitPlantsTable
 import com.example.db.tables.HabitsTable
-import com.example.db.tables.UsersTable
 import com.example.model.HabitPlantDto
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
@@ -13,7 +12,6 @@ import org.jetbrains.exposed.v1.dao.LongEntityClass
 class HabitPlantDAO(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<HabitPlantDAO>(HabitPlantsTable)
 
-    var userId by HabitPlantsTable.userId
     var habitId by HabitPlantsTable.habitId
     var presetId by HabitPlantsTable.presetId
     var iterations by HabitPlantsTable.iterations
@@ -40,12 +38,10 @@ fun HabitPlantDAO.Companion.findByIdAndHabit(
     find { HabitPlantsTable.id eq id and (HabitPlantsTable.habitId eq habitId) }.firstOrNull()
 
 fun HabitPlantDAO.Companion.create(
-    userId: Long,
     habitId: Long,
     dto: HabitPlantDto,
 ): HabitPlantDAO =
     HabitPlantDAO.new(dto.id.takeIf { it > 0 }) {
-        this.userId = EntityID(userId, UsersTable)
         this.habitId = EntityID(habitId, HabitsTable)
         updateFrom(dto)
         createdAt = dto.createdAt

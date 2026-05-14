@@ -2,7 +2,6 @@ package com.example.db.daos
 
 import com.example.db.tables.HabitCompletionsTable
 import com.example.db.tables.HabitsTable
-import com.example.db.tables.UsersTable
 import com.example.model.HabitCompletionDto
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.LongEntity
@@ -11,7 +10,6 @@ import org.jetbrains.exposed.v1.dao.LongEntityClass
 class HabitCompletionDAO(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<HabitCompletionDAO>(HabitCompletionsTable)
 
-    var userId by HabitCompletionsTable.userId
     var habitId by HabitCompletionsTable.habitId
     var completedAt by HabitCompletionsTable.completedAt
     var experienceEarned by HabitCompletionsTable.experienceEarned
@@ -20,12 +18,10 @@ class HabitCompletionDAO(id: EntityID<Long>) : LongEntity(id) {
 }
 
 fun HabitCompletionDAO.Companion.create(
-    userId: Long,
     habitId: Long,
     dto: HabitCompletionDto,
 ): HabitCompletionDAO =
     HabitCompletionDAO.new(dto.id.takeIf { it > 0 }) {
-        this.userId = EntityID(userId, UsersTable)
         this.habitId = EntityID(habitId, HabitsTable)
         completedAt = dto.completedAt
         experienceEarned = dto.experienceEarned

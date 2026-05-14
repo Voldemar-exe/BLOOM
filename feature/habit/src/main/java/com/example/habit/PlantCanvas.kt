@@ -25,12 +25,13 @@ import com.example.plant.utils.Randomizer
 fun PlantCanvas(
     modifier: Modifier = Modifier,
     innerCanvasPadding: Float = 10f,
-    randomizer: Randomizer,
+    seed: Long,
     variability: Float,
     config: PlantConfig,
     onAnimate: () -> Unit,
     onStopAnimate: () -> Unit,
 ) {
+    val randomizer = remember { Randomizer(seed) }
     val lSystemInterpreter = remember { LSystemInterpreterImpl() }
     val pathBuilder = remember { PathBuilderImpl() }
     val plantRenderer = remember { PlantRendererImpl() }

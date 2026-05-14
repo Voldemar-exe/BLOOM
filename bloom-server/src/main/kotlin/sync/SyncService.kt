@@ -8,6 +8,7 @@ import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greater
 import org.jetbrains.exposed.v1.core.inList
+import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import utils.syncEntities
 
@@ -34,8 +35,8 @@ class SyncServiceImpl : SyncService {
             syncHabitReminders(userId, request.habitReminders)
             syncTaskReminders(userId, request.taskReminders)
             syncStatsLogs(userId, request.statsLogs)
-            syncHabitCompletions(userId, request.habitCompletions)
-            syncTaskCompletions(userId, request.taskCompletions)
+            syncHabitCompletions(request.habitCompletions)
+            syncTaskCompletions(request.taskCompletions)
             Result.success(Unit)
         }
 
@@ -98,7 +99,7 @@ class SyncServiceImpl : SyncService {
             create = { dto ->
                 HabitDAO.create(userId, dto).also { dao ->
                     dto.plantDto.takeIf { it.id > 0 }?.let { plant ->
-                        HabitPlantDAO.create(userId, dao.id.value, plant)
+                        HabitPlantDAO.create(dao.id.value, plant)
                     }
                 }
             },
@@ -108,7 +109,7 @@ class SyncServiceImpl : SyncService {
                     HabitPlantDAO
                         .findByIdAndHabit(plant.id, dao.id.value)
                         ?.updateFrom(plant)
-                        ?: HabitPlantDAO.create(userId, dao.id.value, plant)
+                        ?: HabitPlantDAO.create(dao.id.value, plant)
                 }
             },
         )
@@ -130,7 +131,7 @@ class SyncServiceImpl : SyncService {
             create = { dto ->
                 TaskDAO.create(userId, dto).also { dao ->
                     dto.subtasks.forEach { sub ->
-                        SubtaskDAO.create(userId, dao.id.value, sub)
+                        SubtaskDAO.create(dao.id.value, sub)
                     }
                 }
             },
@@ -141,7 +142,7 @@ class SyncServiceImpl : SyncService {
                         .find { SubtasksTable.taskId eq dao.id.value }
                         .firstOrNull()
                         ?.updateFrom(sub)
-                        ?: SubtaskDAO.create(userId, dao.id.value, sub)
+                        ?: SubtaskDAO.create(dao.id.value, sub)
                 }
             },
         )
@@ -156,13 +157,18 @@ class SyncServiceImpl : SyncService {
             extractId = { it.id },
             loadExisting = { ids ->
                 HabitReminderDAO
-                    .find {
-                        (HabitRemindersTable.userId eq userId) and
-                            (HabitRemindersTable.id inList ids)
-                    }.associateBy { it.id.value }
+                    .wrapRows(
+                        HabitRemindersTable
+                            .innerJoin(HabitsTable)
+                            .select(HabitRemindersTable.columns)
+                            .where {
+                                (HabitRemindersTable.id inList ids) and
+                                    (HabitsTable.userId eq userId)
+                            }.withDistinct(),
+                    ).associateBy { it.id.value }
             },
             shouldUpdate = { dto, dao -> dto.updatedAt > dao.updatedAt },
-            create = { dto -> HabitReminderDAO.create(userId, dto.habitId, dto) },
+            create = { dto -> HabitReminderDAO.create(dto.habitId, dto) },
             update = { dto, dao -> dao.updateFrom(dto) },
         )
     }
@@ -176,13 +182,18 @@ class SyncServiceImpl : SyncService {
             extractId = { it.id },
             loadExisting = { ids ->
                 TaskReminderDAO
-                    .find {
-                        (TaskRemindersTable.userId eq userId) and
-                            (TaskRemindersTable.id inList ids)
-                    }.associateBy { it.id.value }
+                    .wrapRows(
+                        TaskRemindersTable
+                            .innerJoin(TasksTable)
+                            .select(TaskRemindersTable.columns)
+                            .where {
+                                (TaskRemindersTable.id inList ids) and
+                                    (TasksTable.userId eq userId)
+                            }.withDistinct(),
+                    ).associateBy { it.id.value }
             },
             shouldUpdate = { dto, dao -> dto.updatedAt > dao.updatedAt },
-            create = { dto -> TaskReminderDAO.create(userId, dto.taskId, dto) },
+            create = { dto -> TaskReminderDAO.create(dto.taskId, dto) },
             update = { dto, dao -> dao.updateFrom(dto) },
         )
     }
@@ -202,10 +213,7 @@ class SyncServiceImpl : SyncService {
         }
     }
 
-    private fun syncHabitCompletions(
-        userId: Long,
-        dtos: List<HabitCompletionDto>,
-    ) {
+    private fun syncHabitCompletions(dtos: List<HabitCompletionDto>) {
         val existingIds =
             HabitCompletionDAO
                 .find { HabitCompletionsTable.id inList dtos.map { it.id } }
@@ -213,14 +221,11 @@ class SyncServiceImpl : SyncService {
                 .toSet()
 
         dtos.filter { it.id !in existingIds }.forEach { dto ->
-            HabitCompletionDAO.create(userId, dto.habitId, dto)
+            HabitCompletionDAO.create(dto.habitId, dto)
         }
     }
 
-    private fun syncTaskCompletions(
-        userId: Long,
-        dtos: List<TaskCompletionDto>,
-    ) {
+    private fun syncTaskCompletions(dtos: List<TaskCompletionDto>) {
         val existingIds =
             TaskCompletionDAO
                 .find { TaskCompletionsTable.id inList dtos.map { it.id } }
@@ -228,7 +233,7 @@ class SyncServiceImpl : SyncService {
                 .toSet()
 
         dtos.filter { it.id !in existingIds }.forEach { dto ->
-            TaskCompletionDAO.create(userId, dto.taskId, dto)
+            TaskCompletionDAO.create(dto.taskId, dto)
         }
     }
 }
@@ -246,12 +251,28 @@ private fun TaskDAO.Companion.findUpdatedSince(
 private fun HabitReminderDAO.Companion.findUpdatedSince(
     userId: Long,
     ts: Long,
-) = find { (HabitRemindersTable.userId eq userId) and (HabitRemindersTable.updatedAt greater ts) }
+) = wrapRows(
+    HabitRemindersTable
+        .innerJoin(HabitsTable)
+        .select(HabitRemindersTable.columns)
+        .where {
+            (HabitRemindersTable.updatedAt greater ts) and
+                (HabitsTable.userId eq userId)
+        }.withDistinct(),
+)
 
 private fun TaskReminderDAO.Companion.findUpdatedSince(
     userId: Long,
     ts: Long,
-) = find { (TaskRemindersTable.userId eq userId) and (TaskRemindersTable.updatedAt greater ts) }
+) = wrapRows(
+    TaskRemindersTable
+        .innerJoin(TasksTable)
+        .select(TaskRemindersTable.columns)
+        .where {
+            (TaskRemindersTable.updatedAt greater ts) and
+                (TasksTable.userId eq userId)
+        }.withDistinct(),
+)
 
 private fun StatsLogDAO.Companion.findCreatedSince(
     userId: Long,
@@ -261,11 +282,25 @@ private fun StatsLogDAO.Companion.findCreatedSince(
 private fun HabitCompletionDAO.Companion.findCreatedSince(
     userId: Long,
     ts: Long,
-) = find {
-    (HabitCompletionsTable.userId eq userId) and (HabitCompletionsTable.createdAt greater ts)
-}
+) = wrapRows(
+    HabitCompletionsTable
+        .innerJoin(HabitsTable)
+        .select(HabitCompletionsTable.columns)
+        .where {
+            (HabitCompletionsTable.createdAt greater ts) and
+                (HabitsTable.userId eq userId)
+        }.withDistinct(),
+)
 
 private fun TaskCompletionDAO.Companion.findCreatedSince(
     userId: Long,
     ts: Long,
-) = find { (TaskCompletionsTable.userId eq userId) and (TaskCompletionsTable.createdAt greater ts) }
+) = wrapRows(
+    TaskCompletionsTable
+        .innerJoin(TasksTable)
+        .select(TaskCompletionsTable.columns)
+        .where {
+            (TaskCompletionsTable.createdAt greater ts) and
+                (TasksTable.userId eq userId)
+        }.withDistinct(),
+)

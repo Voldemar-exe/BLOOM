@@ -1,8 +1,9 @@
 package com.example.plant
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
-
+@Immutable
 data class PlantConfig(
     val lSystemSentence: String,
     val leafConfig: LeafConfig,
