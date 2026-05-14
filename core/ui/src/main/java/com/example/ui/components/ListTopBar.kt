@@ -42,9 +42,17 @@ fun ListTopBar(
         },
         actions = {
             var isDatePickVisible by remember { mutableStateOf(false) }
+
             IconButton(onClick = { isDatePickVisible = true }) {
                 Icon(
-                    painter = painterResource(BloomIcons.CalendarMonth),
+                    painter =
+                        painterResource(
+                            if (selectedDateRange.start == null) {
+                                BloomIcons.CalendarMonth
+                            } else {
+                                BloomIcons.CalendarCheck
+                            },
+                        ),
                     contentDescription = "date",
                 )
             }
@@ -54,6 +62,7 @@ fun ListTopBar(
                 selected = selectedDateRange,
                 onChange = onDateRangeSelect,
                 onDismiss = { isDatePickVisible = false },
+                onClear = { onDateRangeSelect(DateRange(null, null)) },
             )
 
             IconButton(onClick = onAddClick) {

@@ -6,14 +6,15 @@ import com.example.data.repository.HabitRepository
 import com.example.habit.usecases.CompleteHabitUseCase
 import com.example.model.DateRange
 import com.example.model.DayTimeInterval
+import com.example.model.FilterParams
 import com.example.model.Tag
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
@@ -25,30 +26,38 @@ class HabitViewModel(
     private val habitRepository: HabitRepository,
     private val completeHabitUseCase: CompleteHabitUseCase,
 ) : ViewModel() {
-    private val _habitState = MutableStateFlow(HabitState())
-    val habitState: StateFlow<HabitState>
-        get() = _habitState.asStateFlow()
+    private val _state = MutableStateFlow(HabitState())
+    val state: StateFlow<HabitState>
+        get() = _state.asStateFlow()
 
-    private val searchQueryFlow = MutableStateFlow("")
-    private val filterTagsFlow = MutableStateFlow(emptySet<Tag>())
+    private val filtersFlow =
+        state
+            .map { state ->
+                FilterParams(
+                    query = state.searchQuery,
+                    tags = state.selectedFilterTags,
+                    tabTime = state.selectedTabTime,
+                    dateRange = state.selectedDate,
+                )
+            }.distinctUntilChanged()
 
     init {
-        Timber.d("Start with ${_habitState.value}")
+        Timber.d("Start with ${_state.value}")
 
         viewModelScope.launch {
-            combine(searchQueryFlow, filterTagsFlow) { query, tags -> query to tags }
-                .distinctUntilChanged()
-                .flatMapLatest { (query, tags) ->
-                    habitRepository.searchHabitsWithRelations(query, tags)
+            filtersFlow
+                .flatMapLatest { filters ->
+                    habitRepository.searchHabitsWithRelations(
+                        query = filters.query,
+                        filterTags = filters.tags,
+                        timeInterval = filters.tabTime,
+                        dateRange = filters.dateRange,
+                    )
                 }.distinctUntilChanged()
                 .collect { habits ->
-                    Timber.d("Collected habits: ${habits.size}")
-                    _habitState.update {
-                        it.copy(
-                            searchQuery = searchQueryFlow.value,
-                            selectedFilterTags = filterTagsFlow.value,
-                            habits = habits,
-                        )
+                    Timber.d("Collected habits: $habits")
+                    _state.update {
+                        it.copy(habits = habits)
                     }
                 }
         }
@@ -68,7 +77,7 @@ class HabitViewModel(
     }
 
     private fun handleSelectTimeInterval(timeInterval: DayTimeInterval) {
-        _habitState.update { it.copy(selectedTabTime = timeInterval) }
+        _state.update { it.copy(selectedTabTime = timeInterval) }
     }
 
     private fun handleToggleHabit(habitId: Long) {
@@ -84,16 +93,23 @@ class HabitViewModel(
     }
 
     private fun handleSearch(query: String) {
-        searchQueryFlow.value = query.trim()
+        _state.update { it.copy(searchQuery = query.trim()) }
     }
 
     private fun handleTagSelect(tag: Tag) {
-        filterTagsFlow.update {
-            if (tag in it) it - tag else it + tag
+        _state.update { state ->
+            state.copy(
+                selectedFilterTags =
+                    if (tag in state.selectedFilterTags) {
+                        state.selectedFilterTags - tag
+                    } else {
+                        state.selectedFilterTags + tag
+                    },
+            )
         }
     }
 
     private fun handleDateSelection(dateRange: DateRange) {
-        _habitState.update { it.copy(selectedDate = dateRange) }
+        _state.update { it.copy(selectedDate = dateRange) }
     }
 }

@@ -3,6 +3,7 @@ package com.example.data.repository
 import com.example.data.util.asEntity
 import com.example.data.util.asHabitEntity
 import com.example.data.util.asModel
+import com.example.data.util.occursInRange
 import com.example.database.dao.HabitDao
 import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
@@ -10,6 +11,8 @@ import com.example.database.dao.HabitWithRelationDao
 import com.example.database.model.SyncOperation
 import com.example.database.model.SyncTypes
 import com.example.database.util.SyncTracker
+import com.example.model.DateRange
+import com.example.model.DayTimeInterval
 import com.example.model.Habit
 import com.example.model.HabitPlant
 import com.example.model.HabitWithRelations
@@ -17,6 +20,7 @@ import com.example.model.Reminder
 import com.example.model.Tag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.LocalDate
 
 interface HabitRepository {
     fun getHabits(): Flow<List<Habit>>
@@ -24,6 +28,8 @@ interface HabitRepository {
     fun searchHabitsWithRelations(
         query: String,
         filterTags: Set<Tag>,
+        timeInterval: DayTimeInterval,
+        dateRange: DateRange,
     ): Flow<List<HabitWithRelations>>
 
     suspend fun getHabitWithRelations(habitId: Long): HabitWithRelations?
@@ -57,19 +63,64 @@ internal class HabitRepositoryImpl(
     override fun searchHabitsWithRelations(
         query: String,
         filterTags: Set<Tag>,
+        timeInterval: DayTimeInterval,
+        dateRange: DateRange,
     ): Flow<List<HabitWithRelations>> =
         relationDao
             .searchHabitsWithRelations(query)
             .map { entities -> entities.map { it.asModel() } }
             .map { habits ->
-                if (filterTags.isEmpty()) {
-                    habits
-                } else {
-                    habits.filter {
-                        it.habit.tags.containsAll(filterTags)
-                    }
-                }
+                habits
+                    .filterByTags(filterTags)
+                    .filterByTimeInterval(timeInterval)
+                    .filterByDateRange(dateRange)
             }
+
+    private fun List<HabitWithRelations>.filterByTags(
+        filterTags: Set<Tag>,
+    ): List<HabitWithRelations> {
+        if (filterTags.isEmpty()) return this
+
+        return filter { habit ->
+            habit.habit.tags.containsAll(filterTags)
+        }
+    }
+
+    private fun List<HabitWithRelations>.filterByTimeInterval(
+        timeInterval: DayTimeInterval,
+    ): List<HabitWithRelations> {
+        if (timeInterval == DayTimeInterval.ALL) return this
+
+        val today = LocalDate.now()
+
+        val targetDate =
+            when (timeInterval) {
+                DayTimeInterval.TODAY -> today
+                DayTimeInterval.TOMORROW -> today.plusDays(1)
+                DayTimeInterval.ALL -> return this
+            }
+
+        return filter { habit ->
+            habit.habit.recurrence.occursInRange(
+                start = targetDate,
+                end = targetDate,
+            )
+        }
+    }
+
+    private fun List<HabitWithRelations>.filterByDateRange(
+        dateRange: DateRange,
+    ): List<HabitWithRelations> {
+        val start = dateRange.start ?: return this
+        val end = dateRange.end ?: return this
+
+        return filter { habit ->
+            habit.habit.recurrence.occursInRange(
+                start = start,
+                end = end,
+            )
+        }
+    }
 
     override suspend fun getHabitWithRelations(habitId: Long): HabitWithRelations? =
         relationDao.getHabitWithPlantAndReminders(habitId)?.let { habitInfo ->

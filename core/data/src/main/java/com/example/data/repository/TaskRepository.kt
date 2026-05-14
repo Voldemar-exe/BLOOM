@@ -3,6 +3,7 @@ package com.example.data.repository
 import com.example.data.util.asEntity
 import com.example.data.util.asModel
 import com.example.data.util.asTaskEntity
+import com.example.data.util.occursInRange
 import com.example.database.dao.SubtaskDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
@@ -12,6 +13,8 @@ import com.example.database.model.SyncStatus
 import com.example.database.model.SyncTypes
 import com.example.database.model.relationships.TaskWithSubtasks
 import com.example.database.util.SyncTracker
+import com.example.model.DateRange
+import com.example.model.DayTimeInterval
 import com.example.model.Reminder
 import com.example.model.Subtask
 import com.example.model.Tag
@@ -19,6 +22,8 @@ import com.example.model.Task
 import com.example.model.TaskWithRelations
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.LocalDate
+import java.time.ZoneId
 
 interface TaskRepository {
     fun getTasks(): Flow<List<Task>>
@@ -26,6 +31,8 @@ interface TaskRepository {
     fun searchTasksWithRelations(
         query: String,
         filterTags: Set<Tag>,
+        timeInterval: DayTimeInterval,
+        dateRange: DateRange,
     ): Flow<List<TaskWithRelations>>
 
     suspend fun getTaskWithSubtasks(taskId: Long): TaskWithSubtasks?
@@ -64,19 +71,77 @@ internal class TaskRepositoryImpl(
     override fun searchTasksWithRelations(
         query: String,
         filterTags: Set<Tag>,
+        timeInterval: DayTimeInterval,
+        dateRange: DateRange,
     ): Flow<List<TaskWithRelations>> =
         taskWithRelationDao
             .searchTasksWithRelations(query)
             .map { entities -> entities.map { it.asModel() } }
             .map { tasks ->
-                if (filterTags.isEmpty()) {
-                    tasks
-                } else {
-                    tasks.filter {
-                        it.task.tags.containsAll(filterTags)
-                    }
-                }
+                tasks
+                    .filterByTags(filterTags)
+                    .filterByTimeInterval(timeInterval)
+                    .filterByDateRange(dateRange)
             }
+
+    private fun List<TaskWithRelations>.filterByTags(
+        filterTags: Set<Tag>,
+    ): List<TaskWithRelations> {
+        if (filterTags.isEmpty()) return this
+
+        return filter { task ->
+            task.task.tags.containsAll(filterTags)
+        }
+    }
+
+    private fun TaskWithRelations.withDeadlineCheck(
+        start: LocalDate,
+        end: LocalDate,
+    ): Boolean {
+        val zone = ZoneId.systemDefault()
+
+        task.deadline?.let { deadlineMillis ->
+            val deadlineDate =
+                java.time.Instant
+                    .ofEpochMilli(deadlineMillis)
+                    .atZone(zone)
+                    .toLocalDate()
+
+            return deadlineDate in start..end
+        }
+
+        return task.recurrence.occursInRange(start, end)
+    }
+
+    private fun List<TaskWithRelations>.filterByTimeInterval(
+        timeInterval: DayTimeInterval,
+    ): List<TaskWithRelations> {
+        if (timeInterval == DayTimeInterval.ALL) return this
+
+        val today = LocalDate.now()
+
+        val targetDate =
+            when (timeInterval) {
+                DayTimeInterval.TODAY -> today
+                DayTimeInterval.TOMORROW -> today.plusDays(1)
+                DayTimeInterval.ALL -> return this
+            }
+
+        return filter { task ->
+            task.withDeadlineCheck(targetDate, targetDate)
+        }
+    }
+
+    private fun List<TaskWithRelations>.filterByDateRange(
+        dateRange: DateRange,
+    ): List<TaskWithRelations> {
+        val start = dateRange.start ?: return this
+        val end = dateRange.end ?: return this
+
+        return filter { task ->
+            task.withDeadlineCheck(start, end)
+        }
+    }
 
     override suspend fun getTaskWithSubtasks(taskId: Long): TaskWithSubtasks? =
         taskWithRelationDao.getTaskWithSubtasks(taskId)

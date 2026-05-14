@@ -53,7 +53,6 @@ import com.example.model.HabitWithRelations
 import com.example.model.Recurrence
 import com.example.model.RecurrenceType
 import com.example.plant.utils.PresetLibrary
-import com.example.plant.utils.Randomizer
 import com.example.ui.components.DayTimeTabs
 import com.example.ui.components.ListTopBar
 import org.koin.compose.viewmodel.koinViewModel
@@ -63,7 +62,7 @@ fun HabitScreen(
     viewModel: HabitViewModel = koinViewModel(),
     onOpenHabitSetup: (Long?) -> Unit,
 ) {
-    val state by viewModel.habitState.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     HabitScreen(
         state = state,
@@ -193,7 +192,7 @@ fun HabitItem(
                 ) {
                     PlantCanvas(
                         modifier = Modifier.fillMaxSize(),
-                        randomizer = Randomizer(plant.seed),
+                        seed = plant.seed,
                         variability = plant.variability,
                         config = plant.toPlantConfig(),
                         onAnimate = {},

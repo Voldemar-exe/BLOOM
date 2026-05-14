@@ -5,14 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.repository.TaskRepository
 import com.example.model.DateRange
 import com.example.model.DayTimeInterval
+import com.example.model.FilterParams
 import com.example.model.Tag
 import com.example.task.usecases.CompleteTaskUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
@@ -24,29 +26,36 @@ class TaskViewModel(
     private val taskRepository: TaskRepository,
     private val completeTaskUseCase: CompleteTaskUseCase,
 ) : ViewModel() {
-    private val _taskUiState = MutableStateFlow(TaskState())
-    val taskUiState: StateFlow<TaskState>
-        get() = _taskUiState.asStateFlow()
+    private val _state = MutableStateFlow(TaskState())
+    val state: StateFlow<TaskState>
+        get() = _state.asStateFlow()
 
-    private val searchQueryFlow = MutableStateFlow("")
-    private val filterTagsFlow = MutableStateFlow(emptySet<Tag>())
+    private val filtersFlow =
+        state
+            .map { state ->
+                FilterParams(
+                    query = state.searchQuery,
+                    tags = state.selectedFilterTags,
+                    tabTime = state.selectedTabTime,
+                    dateRange = state.selectedDate,
+                )
+            }.distinctUntilChanged()
 
     init {
-        Timber.d("Start with $taskUiState")
+        Timber.d("Start with $state")
+
         viewModelScope.launch {
-            searchQueryFlow
-                .combine(filterTagsFlow) { query, tags -> query to tags }
-                .flatMapLatest { (query, tags) ->
-                    _taskUiState.update {
-                        it.copy(
-                            searchQuery = query,
-                            selectedFilterTags = tags,
-                        )
-                    }
-                    taskRepository.searchTasksWithRelations(query, tags)
+            filtersFlow
+                .flatMapLatest { filters ->
+                    taskRepository.searchTasksWithRelations(
+                        query = filters.query,
+                        filterTags = filters.tags,
+                        timeInterval = filters.tabTime,
+                        dateRange = filters.dateRange,
+                    )
                 }.collect { tasks ->
                     Timber.d("Collected new tasks: $tasks")
-                    _taskUiState.update { it.copy(tasks = tasks) }
+                    _state.update { it.copy(tasks = tasks) }
                 }
         }
     }
@@ -65,7 +74,7 @@ class TaskViewModel(
     }
 
     private fun handleSelectTimeInterval(timeInterval: DayTimeInterval) {
-        _taskUiState.update { it.copy(selectedTabTime = timeInterval) }
+        _state.update { it.copy(selectedTabTime = timeInterval) }
     }
 
     private fun handleToggleTask(taskId: Long) {
@@ -88,14 +97,23 @@ class TaskViewModel(
     }
 
     private fun handleSearch(query: String) {
-        searchQueryFlow.value = query.trim()
+        _state.update { it.copy(searchQuery = query.trim()) }
     }
 
     private fun handleTagSelect(tag: Tag) {
-        filterTagsFlow.update { if (tag in it) it - tag else it + tag }
+        _state.update { state ->
+            state.copy(
+                selectedFilterTags =
+                    if (tag in state.selectedFilterTags) {
+                        state.selectedFilterTags - tag
+                    } else {
+                        state.selectedFilterTags + tag
+                    },
+            )
+        }
     }
 
     private fun handleDateSelection(dateRange: DateRange) {
-        _taskUiState.update { it.copy(selectedDate = dateRange) }
+        _state.update { it.copy(selectedDate = dateRange) }
     }
 }

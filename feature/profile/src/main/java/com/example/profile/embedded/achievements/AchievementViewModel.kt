@@ -5,8 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.repository.UserRepository
 import com.example.gamification.model.AchievementCondition
 import com.example.gamification.model.AchievementRegistry
+import com.example.gamification.model.CoinsCondition
+import com.example.gamification.model.HabitCompletedCondition
 import com.example.gamification.model.HabitCreatedCondition
+import com.example.gamification.model.LevelCondition
 import com.example.gamification.model.StreakCondition
+import com.example.gamification.model.TaskCompletedCondition
+import com.example.gamification.model.TaskCreatedCondition
 import com.example.model.SortType
 import com.example.model.UserStats
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,7 +68,7 @@ class AchievementViewModel(private val userRepository: UserRepository) : ViewMod
     }
 }
 
-private fun getProgress(
+internal fun getProgress(
     condition: AchievementCondition,
     userStats: UserStats,
 ) = when (condition) {
@@ -72,4 +77,19 @@ private fun getProgress(
 
     is StreakCondition ->
         condition.getProgress(userStats.longestStreak)
+
+    is HabitCompletedCondition ->
+        condition.getProgress(userStats.totalHabitsCompleted)
+
+    is TaskCreatedCondition ->
+        condition.getProgress(userStats.totalTasksCreated)
+
+    is TaskCompletedCondition ->
+        condition.getProgress(userStats.totalTasksCompleted)
+
+    is LevelCondition ->
+        condition.getProgress(userStats.level)
+
+    is CoinsCondition ->
+        condition.getProgress(userStats.currentCoinsAmount)
 }

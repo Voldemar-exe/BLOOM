@@ -45,6 +45,7 @@ fun DateRangePickerDialog(
     selected: DateRange,
     onChange: (DateRange) -> Unit,
     onDismiss: () -> Unit,
+    onClear: () -> Unit
 ) {
     if (!show) return
 
@@ -68,6 +69,12 @@ fun DateRangePickerDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
                 ) {
+                    TextButton(onClick = {
+                        onClear()
+                        onDismiss()
+                    }) {
+                        Text("Очистить")
+                    }
                     TextButton(onClick = onDismiss) {
                         Text("Отмена")
                     }

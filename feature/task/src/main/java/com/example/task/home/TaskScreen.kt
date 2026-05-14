@@ -53,7 +53,7 @@ fun TaskScreen(
     viewModel: TaskViewModel = koinViewModel(),
     onNavigate: (NavKey) -> Unit,
 ) {
-    val state by viewModel.taskUiState.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     TaskScreen(
         state = state,
