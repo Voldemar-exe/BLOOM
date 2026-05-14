@@ -192,11 +192,10 @@ fun HabitItem(
                 ) {
                     PlantCanvas(
                         modifier = Modifier.fillMaxSize(),
+                        progress = 1f, // TODO: Real progress
                         seed = plant.seed,
                         variability = plant.variability,
                         config = plant.toPlantConfig(),
-                        onAnimate = {},
-                        onStopAnimate = {},
                     )
                 }
 

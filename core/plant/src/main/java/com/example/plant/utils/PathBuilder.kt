@@ -16,6 +16,7 @@ data class BranchPath(
 
 data class LeafPath(
     val path: Path,
+    val branchId: Int
 )
 
 data class PlantPaths(
@@ -236,6 +237,6 @@ class PathBuilderImpl : PathBuilder {
             }
         }
 
-        return LeafPath(path)
+        return LeafPath(path, leaf.branchId)
     }
 }

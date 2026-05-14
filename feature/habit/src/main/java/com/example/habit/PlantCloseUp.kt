@@ -10,6 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,11 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.designsystem.picture.BloomIcons
 import com.example.plant.PlantConfig
-import com.example.plant.utils.Randomizer
-
-@Composable
-fun PlantItem() {
-}
+import kotlinx.coroutines.delay
 
 @Composable
 fun PlantCloseUp(
@@ -31,6 +33,24 @@ fun PlantCloseUp(
     plantConfig: PlantConfig,
     extraButton: @Composable (() -> Unit),
 ) {
+    var isPlaying by remember { mutableStateOf(false) }
+    var progress by remember { mutableFloatStateOf(1f) }
+    var animatedProgress by remember { mutableFloatStateOf(0f) }
+
+    LaunchedEffect(isPlaying) {
+        if (!isPlaying) return@LaunchedEffect
+
+        val start = animatedProgress
+        val duration = 5000L
+        val startTime = System.currentTimeMillis()
+
+        while (isPlaying && animatedProgress <= 1f) {
+            val t = (System.currentTimeMillis() - startTime) / duration.toFloat()
+            animatedProgress = (start + t).coerceIn(0f, 1f)
+            delay(16)
+        }
+    }
+
     Row(
         modifier =
             Modifier
@@ -46,28 +66,41 @@ fun PlantCloseUp(
                     .border(1.dp, Color.Gray),
         ) {
             PlantCanvas(
+                progress =
+                    if ((!isPlaying && animatedProgress != 0f) || isPlaying) {
+                        animatedProgress
+                    } else {
+                        progress
+                    },
                 seed = seed,
                 variability = variability,
                 config = plantConfig,
-                onAnimate = {},
-                onStopAnimate = {},
             )
         }
 
         Column {
-            FilledIconButton(onClick = {}) {
+            FilledIconButton(onClick = { isPlaying = !isPlaying }) {
                 Icon(
-                    painter = painterResource(BloomIcons.Play),
-                    contentDescription = "play",
+                    painter =
+                        painterResource(
+                            if (isPlaying) BloomIcons.Pause else BloomIcons.Play,
+                        ),
+                    contentDescription = null,
                 )
             }
-            FilledIconButton(onClick = {}) {
+            FilledIconButton(
+                onClick = {
+                    isPlaying = false
+                    animatedProgress = 0f
+                },
+            ) {
                 Icon(
                     painter = painterResource(BloomIcons.Stop),
                     contentDescription = "stop",
                 )
             }
-            extraButton()
+            // TODO: Add extra functional
+//            extraButton()
         }
     }
 }

@@ -19,31 +19,30 @@ data class Branch(
     val parentId: Int? = null,
     val parentPointIndex: Int? = null,
     val points: List<BranchPoint> = emptyList(),
-    val order: Int = 1
+    val order: Int = 1,
 )
 
 data class BranchPoint(
     val x: Float,
     val y: Float,
     val angle: Double,
-    val radius: Float
+    val radius: Float,
 ) {
-    fun getOffset(): Offset {
-        return Offset(x, y)
-    }
+    fun getOffset(): Offset = Offset(x, y)
 }
 
 data class LeafPrimitive(
     val position: Offset,
     val angle: Double,
     val length: Float,
-    val type: LeafType
+    val type: LeafType,
+    val branchId: Int,
 )
 
 data class PlantGeometry(
     val branches: List<Branch>,
     val leaves: List<LeafPrimitive>,
-    val bounds: Rect
+    val bounds: Rect,
 )
 
 interface LSystemInterpreter {
@@ -53,19 +52,18 @@ interface LSystemInterpreter {
         variability: Float,
         branchConfig: BranchConfig,
         leafConfig: LeafConfig,
-        randomizer: Randomizer
+        randomizer: Randomizer,
     ): PlantGeometry
 }
 
 class LSystemInterpreterImpl : LSystemInterpreter {
-
     override fun generatePoints(
         lSystemSentence: String,
         offset: Offset,
         variability: Float,
         branchConfig: BranchConfig,
         leafConfig: LeafConfig,
-        randomizer: Randomizer
+        randomizer: Randomizer,
     ): PlantGeometry {
         val branches = mutableListOf<Branch>()
         val leaves = mutableListOf<LeafPrimitive>()
@@ -93,10 +91,11 @@ class LSystemInterpreterImpl : LSystemInterpreter {
             when (c) {
                 'F' -> {
                     val startWidth = width
-                    val endWidth = max(
-                        startWidth * falloff.pow(0.1f) / currentBranch.order,
-                        branchConfig.minWidth
-                    )
+                    val endWidth =
+                        max(
+                            startWidth * falloff.pow(0.1f) / currentBranch.order,
+                            branchConfig.minWidth,
+                        )
                     width = endWidth
                     val lengthChange = randomizer.nextFloatAround(1f, variability)
                     val length = branchConfig.baseLength * lengthChange
@@ -136,7 +135,7 @@ class LSystemInterpreterImpl : LSystemInterpreter {
                             id = currentBranchId,
                             parentId = stack.last().id,
                             parentPointIndex = stack.last().points.size - 1,
-                            order = stack.size
+                            order = stack.size,
                         )
                 }
 
@@ -167,10 +166,12 @@ class LSystemInterpreterImpl : LSystemInterpreter {
                             position = pos,
                             angle = angle,
                             length = leafLength,
-                            type = leafConfig.type
-                        )
+                            type = leafConfig.type,
+                            currentBranch.id,
+                        ),
                     )
                 }
+
                 else -> {
                     throw UnknownLSystemCommand("Command $c")
                 }
@@ -181,12 +182,13 @@ class LSystemInterpreterImpl : LSystemInterpreter {
             branches.add(currentBranch.copy(points = currentBranchPoints.toList()))
         }
 
-        val bounds = Rect(
-            minX - (leafConfig.length + variability),
-            minY - (leafConfig.length + variability),
-            maxX + (leafConfig.length + variability),
-            maxY
-        )
+        val bounds =
+            Rect(
+                minX - (leafConfig.length + variability),
+                minY - (leafConfig.length + variability),
+                maxX + (leafConfig.length + variability),
+                maxY,
+            )
 
         return PlantGeometry(branches, leaves, bounds)
     }
