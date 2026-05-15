@@ -73,7 +73,7 @@ fun DateRangePickerDialog(
                         onClear()
                         onDismiss()
                     }) {
-                        Text("Очистить")
+                        Text("Очистить", color = MaterialTheme.colorScheme.error)
                     }
                     TextButton(onClick = onDismiss) {
                         Text("Отмена")

@@ -9,6 +9,7 @@ import com.example.designsystem.picture.BloomColors
 import com.example.model.CustomizationItem
 import com.example.model.CustomizationType
 import com.example.model.User
+import com.example.model.UserStats
 import com.example.profile.home.ProfileEvent.NavigateTo
 import com.example.profile.navigation.AchievementsNavKey
 import com.example.profile.navigation.AvatarChoiceNavKey
@@ -99,6 +100,18 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                                 ),
                         ),
                     )
+                    userRepository.updateStats(
+                        UserStats.default().copy(
+                            totalTasksCreated = 3,
+                            totalHabitsCreated = 4,
+                            totalHabitsCompleted = 10,
+                            totalTasksCompleted = 15,
+                            currentCoinsAmount = 130,
+                            maxCoinsAmount = 250,
+                            currentStreak = 4,
+                            longestStreak = 8,
+                        ),
+                    )
                 }
 
                 is ProfileAction.OnUserUpdate -> {
@@ -111,6 +124,10 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                     if (action.password.isNotEmpty()) {
                         userRepository.updatePassword(action.password)
                     }
+                }
+
+                ProfileAction.OnExitClick -> {
+                    userRepository.clearAll()
                 }
             }
         }

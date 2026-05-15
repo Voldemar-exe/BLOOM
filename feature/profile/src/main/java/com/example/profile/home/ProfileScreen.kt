@@ -19,11 +19,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
@@ -152,8 +152,11 @@ internal fun ProfileScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Notifications */ }) {
+                    /*IconButton(onClick = { *//* Notifications *//* }) {
                         Icon(Icons.Default.Notifications, contentDescription = "notifications")
+                    }*/
+                    IconButton(onClick = { onAction(ProfileAction.OnExitClick) }) {
+                        Icon(Icons.AutoMirrored.Default.ExitToApp, contentDescription = "settings")
                     }
                     IconButton(onClick = { onAction(ProfileAction.OnSettingsClick) }) {
                         Icon(Icons.Default.Settings, contentDescription = "settings")

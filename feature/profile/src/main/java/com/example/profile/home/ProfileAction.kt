@@ -21,4 +21,6 @@ sealed interface ProfileAction {
 
     // TODO: Remove later
     object TestActionSetUser : ProfileAction
+
+    object OnExitClick : ProfileAction
 }

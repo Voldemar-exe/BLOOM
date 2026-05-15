@@ -241,7 +241,7 @@ fun HabitItem(
                                     Icons.Outlined.AddCircle
                                 },
                             contentDescription = "toggle",
-                            tint = MaterialTheme.colorScheme.onPrimary,
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }

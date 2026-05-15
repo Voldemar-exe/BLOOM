@@ -40,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.designsystem.picture.BloomAvatars
 import com.example.designsystem.picture.BloomBackgrounds
 import com.example.designsystem.picture.BloomColors
 import com.example.designsystem.picture.BloomIcons
@@ -123,6 +124,24 @@ fun StoreScreen(
                         painter = painterResource(BloomIcons.Circle),
                         tint = BloomColors.resolve(storeItem.item.key),
                         contentDescription = null,
+                    )
+                }
+            }
+
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                SectionTitle("Аватар")
+            }
+            items(state.avatars, key = { it.item.key }) { storeItem ->
+                ShopGridItem(
+                    item = storeItem,
+                    isPurchased = storeItem.isPurchased,
+                    onClick = { onAction(StoreAction.PurchaseAvatar(storeItem.item.key)) },
+                ) {
+                    Image(
+                        modifier = Modifier.size(56.dp),
+                        painter = painterResource(BloomAvatars.resolve(storeItem.item.key)),
+                        contentDescription = null,
+                        contentScale = ContentScale.FillBounds,
                     )
                 }
             }

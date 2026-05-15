@@ -154,10 +154,11 @@ fun AchievementItem(
                 modifier = Modifier.weight(1f, fill = false),
             ) {
                 if (isCompleted) {
-                    val baseColor = getColorFromId(
-                        achievement.id,
-                        MaterialTheme.colorScheme.primaryContainer
-                    )
+                    val baseColor =
+                        getColorFromId(
+                            achievement.id,
+                            MaterialTheme.colorScheme.primaryContainer,
+                        )
                     AchievementBadge(baseColor = baseColor)
                 } else {
                     Box(
