@@ -152,3 +152,45 @@ fun TaskCompletionDAO.toDto() =
         createdAt = createdAt,
     )
 
+fun UserDAO.toProfileDto(
+    achievements: Set<Int> = emptySet(),
+    items: List<CustomizationItemDto> = emptyList(),
+): UserProfileDto =
+    UserProfileDto(
+        id = id.value,
+        email = email,
+        username = nickname,
+        avatarKey = avatar,
+        backgroundKey = background,
+        colorKey = color,
+        ownedAchievements = achievements,
+        ownedItems = items,
+        updatedAt = updatedAt,
+    )
+
+fun UserStatsDAO.toDto(): UserStatsDto =
+    UserStatsDto(
+        level = level,
+        currentExperience = currentExperience,
+        currentCoinsAmount = currentCoinsAmount,
+        maxCoinsAmount = maxCoinsAmount,
+        totalHabitsCreated = totalHabitsCreated,
+        totalHabitsCompleted = totalHabitsCompleted,
+        totalTasksCreated = totalTasksCreated,
+        totalTasksCompleted = totalTasksCompleted,
+        currentStreak = currentStreak,
+        longestStreak = longestStreak,
+        updatedAt = updatedAt,
+    )
+
+fun AppSettingsDAO.toDto(): AppSettingsDto =
+    AppSettingsDto(
+        theme = theme,
+        weeklyGoal = weeklyGoal,
+        streakTarget = streakTarget,
+        emailEnabled = emailEnabled,
+        pushEnabled = pushEnabled,
+        habitRemindersEnabled = habitRemindersEnabled,
+        taskRemindersEnabled = taskRemindersEnabled,
+        updatedAt = updatedAt,
+    )

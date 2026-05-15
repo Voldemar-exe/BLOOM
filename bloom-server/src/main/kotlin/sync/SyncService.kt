@@ -4,7 +4,13 @@ import com.example.db.daos.*
 import com.example.db.tables.*
 import com.example.model.*
 import com.example.utils.toDto
+import com.example.utils.toProfileDto
+import db.daos.UserAchievementDAO
+import db.daos.UserCustomizationDAO
+import db.tables.UserAchievementsTable
+import db.tables.UserCustomizationsTable
 import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greater
 import org.jetbrains.exposed.v1.core.inList
@@ -37,6 +43,13 @@ class SyncServiceImpl : SyncService {
             syncStatsLogs(userId, request.statsLogs)
             syncHabitCompletions(request.habitCompletions)
             syncTaskCompletions(request.taskCompletions)
+
+            syncUserProfile(userId, request.user)
+            syncUserAchievements(userId, request.user!!.ownedAchievements)
+            syncUserCustomizations(userId, request.user.ownedItems)
+            syncUserStats(userId, request.userStats)
+            syncAppSettings(userId, request.appSettings)
+
             Result.success(Unit)
         }
 
@@ -79,6 +92,38 @@ class SyncServiceImpl : SyncService {
                             userId,
                             lastSyncTimestamp,
                         ).map { it.toDto() },
+                user =
+                    UserDAO
+                        .findUpdatedSince(
+                            userId,
+                            lastSyncTimestamp,
+                        )?.toProfileDto(
+                            achievements =
+                                UserAchievementDAO
+                                    .findUpdatedSince(
+                                        userId,
+                                    ).map { it.achievementId }
+                                    .toSet(),
+                            items =
+                                UserCustomizationDAO.findUpdatedSince(userId).map {
+                                    CustomizationItemDto(
+                                        key = it.key,
+                                        type = it.type,
+                                    )
+                                },
+                        ),
+                userStats =
+                    UserStatsDAO
+                        .findUpdatedSince(
+                            userId,
+                            lastSyncTimestamp,
+                        )?.toDto(),
+                appSettings =
+                    AppSettingsDAO
+                        .findUpdatedSince(
+                            userId,
+                            lastSyncTimestamp,
+                        )?.toDto(),
                 serverTimestamp = serverTimestamp,
             )
         }
@@ -236,6 +281,98 @@ class SyncServiceImpl : SyncService {
             TaskCompletionDAO.create(dto.taskId, dto)
         }
     }
+
+    private fun syncUserProfile(
+        userId: Long,
+        dto: UserProfileDto?,
+    ) {
+        if (dto == null) return
+
+        require(UserDAO.findById(userId) != null) { "User does not exist." }
+
+        val existing = UserDAO.findById(userId)!!
+
+        if (existing.updatedAt <= dto.updatedAt) return
+
+        existing.updateFrom(dto)
+    }
+
+    private fun syncUserStats(
+        userId: Long,
+        dto: UserStatsDto?,
+    ) {
+        if (dto == null) return
+
+        require(UserDAO.findById(userId) != null) { "User does not exist." }
+        val existing = UserStatsDAO.find { UserStatsTable.userId eq userId }.firstOrNull()!!
+
+        if (existing.updatedAt <= dto.updatedAt) return
+
+        existing.updateFrom(dto)
+    }
+
+    private fun syncAppSettings(
+        userId: Long,
+        dto: AppSettingsDto?,
+    ) {
+        if (dto == null) return
+
+        require(UserDAO.findById(userId) != null) { "User does not exist." }
+
+        val existing = AppSettingsDAO.find { AppSettingsTable.userId eq userId }.firstOrNull()!!
+
+        if (existing.updatedAt <= dto.updatedAt) return
+
+        existing.updateFrom(dto)
+    }
+
+    private fun syncUserAchievements(
+        userId: Long,
+        achievementIds: Set<Int>,
+    ) {
+        if (achievementIds.isEmpty()) return
+
+        val existing =
+            UserAchievementDAO
+                .find { UserAchievementsTable.userId eq userId }
+                .map { it.achievementId }
+                .toSet()
+
+        val toInsert = achievementIds - existing
+
+        toInsert.forEach { id ->
+            UserAchievementDAO.new {
+                this.userId = EntityID(userId, UsersTable)
+                this.achievementId = id
+            }
+        }
+    }
+
+    private fun syncUserCustomizations(
+        userId: Long,
+        items: List<CustomizationItemDto>,
+    ) {
+        if (items.isEmpty()) return
+
+        val existing =
+            UserCustomizationDAO
+                .find { UserCustomizationsTable.userId eq userId }
+                .map { it.key to it.type }
+                .toSet()
+
+        items.forEach { item ->
+            val key = item.key
+            val type = item.type
+
+            if (existing.contains(key to type)) return@forEach
+
+            UserCustomizationDAO.new {
+                this.userId = EntityID(userId, UsersTable)
+                this.key = key
+                this.type = type
+            }
+        }
+    }
 }
 
 private fun HabitDAO.Companion.findUpdatedSince(
@@ -304,3 +441,36 @@ private fun TaskCompletionDAO.Companion.findCreatedSince(
                 (TasksTable.userId eq userId)
         }.withDistinct(),
 )
+
+private fun UserDAO.Companion.findUpdatedSince(
+    userId: Long,
+    ts: Long,
+) = find {
+    (UsersTable.id eq userId) and (UsersTable.updatedAt greater ts)
+}.firstOrNull()
+
+private fun UserStatsDAO.Companion.findUpdatedSince(
+    userId: Long,
+    ts: Long,
+) = find {
+    (UserStatsTable.userId eq userId) and
+        (UserStatsTable.updatedAt greater ts)
+}.firstOrNull()
+
+private fun AppSettingsDAO.Companion.findUpdatedSince(
+    userId: Long,
+    ts: Long,
+) = find {
+    (AppSettingsTable.userId eq userId) and
+        (AppSettingsTable.updatedAt greater ts)
+}.firstOrNull()
+
+private fun UserAchievementDAO.Companion.findUpdatedSince(userId: Long) =
+    find {
+        (UserAchievementsTable.userId eq userId)
+    }.toSet()
+
+private fun UserCustomizationDAO.Companion.findUpdatedSince(userId: Long) =
+    find {
+        (UserCustomizationsTable.userId eq userId)
+    }.toList()

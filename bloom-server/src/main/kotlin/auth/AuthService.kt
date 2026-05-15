@@ -1,7 +1,11 @@
 package com.example.auth
 
+import com.example.db.daos.AppSettingsDAO
 import com.example.db.daos.UserDAO
+import com.example.db.daos.UserStatsDAO
 import com.example.db.tables.UsersTable
+import db.daos.UserCustomizationDAO
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 
@@ -43,6 +47,10 @@ class AuthServiceImpl : AuthService {
                         this.updatedAt = System.currentTimeMillis()
                     }
 
+                createDefaultUserStats(user.id)
+                createDefaultAppSettings(user.id)
+                createDefaultCustomizations(user.id)
+
                 Result.success(JwtConfig.generateToken(user.id.value.toString()))
             } catch (e: Exception) {
                 Result.failure(AuthError.InternalError(e))
@@ -80,4 +88,52 @@ sealed class AuthError : Exception() {
     class InvalidCredentials : AuthError()
 
     data class InternalError(override val cause: Throwable) : AuthError()
+}
+
+private fun createDefaultUserStats(userId: EntityID<Long>) {
+    UserStatsDAO.new {
+        this.userId = userId
+        level = 1
+        currentExperience = 0
+        currentCoinsAmount = 0
+        maxCoinsAmount = 0
+        totalHabitsCreated = 0
+        totalHabitsCompleted = 0
+        totalTasksCreated = 0
+        totalTasksCompleted = 0
+        currentStreak = 0
+        longestStreak = 0
+        updatedAt = System.currentTimeMillis()
+    }
+}
+
+private fun createDefaultAppSettings(userId: EntityID<Long>) {
+    AppSettingsDAO.new {
+        this.userId = userId
+        theme = "SYSTEM"
+        weeklyGoal = 5
+        streakTarget = 7
+        emailEnabled = true
+        pushEnabled = true
+        habitRemindersEnabled = true
+        taskRemindersEnabled = true
+        updatedAt = System.currentTimeMillis()
+    }
+}
+
+private fun createDefaultCustomizations(userId: EntityID<Long>) {
+    val defaults =
+        listOf(
+            "JUST_GUY" to "AVATAR",
+            "BLACK_SAND" to "BACKGROUND",
+            "GREEN" to "COLOR",
+        )
+
+    defaults.forEach { (key, type) ->
+        UserCustomizationDAO.new {
+            this.userId = userId
+            this.key = key
+            this.type = type
+        }
+    }
 }

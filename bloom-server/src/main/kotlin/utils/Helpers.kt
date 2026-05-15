@@ -1,5 +1,8 @@
 package utils
 
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import org.jetbrains.exposed.v1.dao.LongEntity
 
 fun <DTO, DAO : LongEntity> syncEntities(
@@ -25,3 +28,11 @@ fun <DTO, DAO : LongEntity> syncEntities(
         }
     }
 }
+
+fun ApplicationCall.userId(): Long =
+    principal<JWTPrincipal>()
+        ?.payload
+        ?.getClaim("userId")
+        ?.asString()
+        ?.toLong()
+        ?: error("Unauthorized")

@@ -22,7 +22,7 @@ fun Application.configureAuthRouting() {
                 onSuccess = { call.respond(LoginResponse(it)) },
                 onFailure = {
                     call.respond(
-                        HttpStatusCode.Unauthorized,
+                        HttpStatusCode.InternalServerError,
                         it.toString(),
                     )
                 },
@@ -34,7 +34,7 @@ fun Application.configureAuthRouting() {
             result.fold(
                 onSuccess = { call.respond(LoginResponse(it)) },
                 onFailure = {
-                    call.respond(HttpStatusCode.Unauthorized, it.toString())
+                    call.respond(HttpStatusCode.InternalServerError, it.toString())
                 },
             )
         }

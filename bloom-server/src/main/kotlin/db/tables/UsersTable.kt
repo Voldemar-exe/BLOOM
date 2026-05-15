@@ -9,6 +9,7 @@ object UsersTable : LongIdTable("users") {
     val nickname = text("nickname")
     val avatar = text("avatar").default("JUST_GUY")
     val background = text("background").default("BLACK_SAND")
+    val color = text("color").default("GREEN")
     val createdAt = long("created_at")
     val updatedAt = long("updated_at")
 }

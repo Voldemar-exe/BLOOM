@@ -6,6 +6,7 @@ import com.example.plugins.configureHttp
 import com.example.plugins.configureKoin
 import com.example.plugins.configureSerialization
 import com.example.routing.configureAuthRouting
+import com.example.routing.configureSocialRouting
 import com.example.routing.configureSyncRouting
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.server.application.*
@@ -49,4 +50,5 @@ fun Application.module() {
     configureSecurity()
     configureAuthRouting()
     configureSyncRouting()
+    configureSocialRouting()
 }

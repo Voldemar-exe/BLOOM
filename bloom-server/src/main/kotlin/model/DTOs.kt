@@ -121,3 +121,46 @@ data class TaskCompletionDto(
     val coinsEarned: Int,
     val createdAt: Long,
 )
+
+@Serializable
+data class UserStatsDto(
+    val level: Int,
+    val currentExperience: Int,
+    val currentCoinsAmount: Int,
+    val maxCoinsAmount: Int,
+    val totalHabitsCreated: Int,
+    val totalHabitsCompleted: Int,
+    val totalTasksCreated: Int,
+    val totalTasksCompleted: Int,
+    val currentStreak: Int,
+    val longestStreak: Int,
+    val updatedAt: Long
+)
+
+@Serializable
+data class AppSettingsDto(
+    val theme: String,
+    val weeklyGoal: Int,
+    val streakTarget: Int,
+    val emailEnabled: Boolean,
+    val pushEnabled: Boolean,
+    val habitRemindersEnabled: Boolean,
+    val taskRemindersEnabled: Boolean,
+    val updatedAt: Long
+)
+
+@Serializable
+data class UserProfileDto(
+    val id: Long,
+    val email: String,
+    val username: String,
+    val avatarKey: String,
+    val backgroundKey: String,
+    val colorKey: String,
+    val ownedAchievements: Set<Int> = emptySet(),
+    val ownedItems: List<CustomizationItemDto> = emptyList(),
+    val updatedAt: Long
+)
+
+@Serializable
+data class CustomizationItemDto(val key: String, val type: String)

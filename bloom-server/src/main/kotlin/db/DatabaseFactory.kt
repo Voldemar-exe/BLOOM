@@ -3,6 +3,8 @@ package com.example.db
 import com.example.db.tables.*
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import db.tables.UserAchievementsTable
+import db.tables.UserCustomizationsTable
 import io.ktor.server.config.*
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
@@ -43,6 +45,10 @@ object DatabaseFactory {
         suspendTransaction {
             SchemaUtils.create(
                 UsersTable,
+                UserStatsTable,
+                AppSettingsTable,
+                UserCustomizationsTable,
+                UserAchievementsTable,
                 HabitsTable,
                 HabitPlantsTable,
                 HabitRemindersTable,
