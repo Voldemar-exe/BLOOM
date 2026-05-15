@@ -29,6 +29,9 @@ interface GamificationDao {
     @Query("SELECT * FROM habit_completions WHERE habitId = :habitId ORDER BY completedAt DESC")
     fun observeHabitCompletions(habitId: Long): Flow<List<HabitCompletionEntity>>
 
+    @Query("SELECT * FROM habit_completions")
+    fun observeHabitsCompletions(): Flow<List<HabitCompletionEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTaskCompletion(entity: TaskCompletionEntity): Long
 

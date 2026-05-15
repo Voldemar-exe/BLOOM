@@ -28,7 +28,7 @@ fun PlantCanvas(
     progress: Float,
     seed: Long,
     variability: Float,
-    config: PlantConfig
+    config: PlantConfig,
 ) {
     val randomizer = remember { Randomizer(seed) }
     val lSystemInterpreter = remember { LSystemInterpreterImpl() }

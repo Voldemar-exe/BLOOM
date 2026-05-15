@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 object HabitNavKey : NavKey
 
 @Serializable
-data class HabitItemNavKey(val habitId: Long?) : NavKey
+data class HabitItemNavKey(val habitId: Long?, val progress: Float) : NavKey
 
 @Serializable
 data class HabitPlantNavKey(val initialPlant: HabitPlant) : NavKey
@@ -21,8 +21,8 @@ data class HabitPlantNavKey(val initialPlant: HabitPlant) : NavKey
 fun EntryProviderScope<NavKey>.habitEntry(navigator: Navigator) {
     entry<HabitNavKey> {
         HabitScreen(
-            onOpenHabitSetup = {
-                navigator.navigate(HabitItemNavKey(it))
+            onOpenHabitSetup = { habitId, progress ->
+                navigator.navigate(HabitItemNavKey(habitId, progress))
             },
         )
     }
@@ -30,6 +30,7 @@ fun EntryProviderScope<NavKey>.habitEntry(navigator: Navigator) {
         val plant = navigator.consumeResult<HabitPlant>("plant_result")
         HabitItemScreen(
             habitId = navKey.habitId,
+            progress = navKey.progress,
             plant = plant,
             onBack = { navigator.goBack() },
             onOpenPlantSetup = {
@@ -41,7 +42,9 @@ fun EntryProviderScope<NavKey>.habitEntry(navigator: Navigator) {
         PlantSetupScreen(
             initialPlant = navKey.initialPlant,
             onBack = { resultPlant ->
-                navigator.setResult("plant_result", resultPlant)
+                resultPlant?.let {
+                    navigator.setResult("plant_result", resultPlant)
+                }
                 navigator.goBack()
             },
         )

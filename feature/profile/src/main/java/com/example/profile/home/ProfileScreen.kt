@@ -52,20 +52,26 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bloom.feature.profile.R
+import com.example.designsystem.model.AppTheme
 import com.example.designsystem.picture.BloomAvatars
 import com.example.designsystem.picture.BloomBackgrounds
 import com.example.designsystem.picture.BloomColors
 import com.example.designsystem.picture.BloomIcons
+import com.example.designsystem.theme.BLOOMTheme
+import com.example.gamification.model.Rank
 import com.example.model.util.XpRules
 import com.example.ui.logic.CollectOneShotEffect
 import org.koin.compose.viewmodel.koinViewModel
@@ -220,7 +226,6 @@ internal fun ProfileScreen(
 fun UserProfile(
     username: String,
     email: String,
-//    rankTitle: String,
     level: Int,
     experience: Int,
     coins: Int,
@@ -229,16 +234,25 @@ fun UserProfile(
     color: String,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        val rank = Rank.fromLevel(level)
+        val rankTheme = rank.getTheme(MaterialTheme.colorScheme)
         // TODO: Maybe move in TopBar
         Row(
             modifier =
                 Modifier
-                    .background(color = Color.Red, shape = ShapeDefaults.Medium)
-                    .fillMaxWidth(),
+                    .background(
+                        brush = Brush.horizontalGradient(rankTheme.gradient),
+                        shape = MaterialTheme.shapes.medium,
+                    ).fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
         ) {
-            // TODO: Add Rank Title ENUM based on level
-            Text(modifier = Modifier.padding(16.dp), text = "Звание")
+            Text(
+                modifier = Modifier.padding(16.dp),
+                text = rank.ru,
+                style = MaterialTheme.typography.titleMedium,
+                color = rankTheme.contentColor,
+                fontWeight = FontWeight.SemiBold,
+            )
         }
 
         ProfileAvatarBox(
@@ -290,8 +304,7 @@ fun UserProfile(
                         .background(
                             color = MaterialTheme.colorScheme.secondaryContainer,
                             shape = ShapeDefaults.Medium,
-                        )
-                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                        ).padding(horizontal = 8.dp, vertical = 6.dp)
                         .wrapContentSize(),
             ) {
                 Icon(
@@ -539,4 +552,46 @@ fun EditProfileDialog(
             }
         },
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun RankPreview(
+    @PreviewParameter(RankThemePreviewProvider::class)
+    data: Pair<Rank, AppTheme>,
+) {
+    val (rank, appTheme) = data
+    BLOOMTheme(appTheme = appTheme) {
+        val rankTheme = rank.getTheme(MaterialTheme.colorScheme)
+
+        Row(
+            modifier =
+                Modifier
+                    .background(
+                        brush = Brush.horizontalGradient(rankTheme.gradient),
+                        shape = MaterialTheme.shapes.medium,
+                    ).fillMaxWidth()
+                    .padding(16.dp),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            Text(
+                text = rank.ru,
+                style = MaterialTheme.typography.titleMedium,
+                color = rankTheme.contentColor,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+    }
+}
+
+class RankThemePreviewProvider : PreviewParameterProvider<Pair<Rank, AppTheme>> {
+    override val values: Sequence<Pair<Rank, AppTheme>> =
+        sequence {
+            val themes = AppTheme.entries.asSequence()
+            for (theme in themes) {
+                for (rank in Rank.entries) {
+                    yield(rank to theme)
+                }
+            }
+        }
 }

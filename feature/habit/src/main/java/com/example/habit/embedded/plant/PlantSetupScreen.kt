@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -45,7 +46,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun PlantSetupScreen(
     initialPlant: HabitPlant,
-    onBack: (HabitPlant) -> Unit,
+    onBack: (HabitPlant?) -> Unit,
     viewModel: PlantSetupViewModel = koinViewModel(),
 ) {
     LaunchedEffect(initialPlant) {
@@ -62,6 +63,7 @@ fun PlantSetupScreen(
 
     PlantSetupScreen(
         state = state,
+        onBack = { onBack(null) },
         onAction = viewModel::onAction,
     )
 }
@@ -69,12 +71,21 @@ fun PlantSetupScreen(
 @Composable
 fun PlantSetupScreen(
     state: PlantSetupState,
+    onBack: () -> Unit,
     onAction: (PlantSetupAction) -> Unit,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Настрой свое растение") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = "back",
+                        )
+                    }
+                },
                 actions = {
                     IconButton(onClick = { onAction(PlantSetupAction.Undo) }) {
                         Icon(
@@ -102,6 +113,7 @@ fun PlantSetupScreen(
             item {
                 PlantCloseUp(
                     seed = state.plant.seed,
+                    realProgress = 1f,
                     variability = state.plant.variability,
                     plantConfig = state.plant.toPlantConfig(),
                     extraButton = {

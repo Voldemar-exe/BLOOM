@@ -14,7 +14,7 @@ data class HabitSetupState(
     val id: Long = 0,
     val title: String = "",
     val description: String = "",
-    val recurrence: Recurrence = Recurrence(RecurrenceType.WEEK, emptySet()),
+    val recurrence: Recurrence = Recurrence(RecurrenceType.DAY, emptySet()),
     val tags: Set<Tag> = emptySet(),
     val steps: List<String> = emptyList(),
     val checkedSteps: Set<Int> = emptySet(),

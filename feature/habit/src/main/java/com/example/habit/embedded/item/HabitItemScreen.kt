@@ -54,6 +54,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun HabitItemScreen(
     habitId: Long?,
+    progress: Float,
     plant: HabitPlant?,
     onBack: () -> Unit,
     onOpenPlantSetup: (HabitPlant) -> Unit,
@@ -76,6 +77,7 @@ fun HabitItemScreen(
 
     HabitItemScreen(
         state = state,
+        progress = progress,
         onAction = viewModel::onAction,
         onBack = onBack,
         onOpenPlantSetup = onOpenPlantSetup,
@@ -85,6 +87,7 @@ fun HabitItemScreen(
 @Composable
 internal fun HabitItemScreen(
     state: HabitSetupState,
+    progress: Float,
     onAction: (HabitSetupAction) -> Unit,
     onBack: () -> Unit,
     onOpenPlantSetup: (HabitPlant) -> Unit,
@@ -116,6 +119,7 @@ internal fun HabitItemScreen(
                 // TODO: It draw differently. I don't know why
                 PlantCloseUp(
                     seed = state.plant.seed,
+                    realProgress = progress,
                     variability = state.plant.variability,
                     plantConfig = state.plant.toPlantConfig(),
                     extraButton = {

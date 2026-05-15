@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.HabitRepository
 import com.example.habit.usecases.CompleteHabitUseCase
+import com.example.habit.usecases.GetHabitsCompletionsUseCase
 import com.example.model.DateRange
 import com.example.model.DayTimeInterval
 import com.example.model.FilterParams
@@ -25,6 +26,7 @@ import timber.log.Timber
 class HabitViewModel(
     private val habitRepository: HabitRepository,
     private val completeHabitUseCase: CompleteHabitUseCase,
+    private val getHabitsCompletionsUseCase: GetHabitsCompletionsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(HabitState())
     val state: StateFlow<HabitState>
@@ -60,6 +62,11 @@ class HabitViewModel(
                         it.copy(habits = habits)
                     }
                 }
+        }
+        viewModelScope.launch {
+            getHabitsCompletionsUseCase()
+                .distinctUntilChanged()
+                .collect { completions -> _state.update { it.copy(completions = completions) } }
         }
     }
 

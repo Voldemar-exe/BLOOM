@@ -60,7 +60,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun HabitScreen(
     viewModel: HabitViewModel = koinViewModel(),
-    onOpenHabitSetup: (Long?) -> Unit,
+    onOpenHabitSetup: (Long?, Float) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -75,7 +75,7 @@ fun HabitScreen(
 fun HabitScreen(
     state: HabitState,
     onAction: (HabitAction) -> Unit,
-    onOpenHabitSetup: (Long?) -> Unit,
+    onOpenHabitSetup: (Long?, Float) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -87,7 +87,7 @@ fun HabitScreen(
                 onDateRangeSelect = { date ->
                     onAction(HabitAction.SelectDateRange(date))
                 },
-                onAddClick = { onOpenHabitSetup(null) },
+                onAddClick = { onOpenHabitSetup(null, 1f) },
                 searchQuery = state.searchQuery,
                 onSearch = { onAction(HabitAction.Search(it)) },
             )
@@ -115,9 +115,15 @@ fun HabitScreen(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 items(state.habits) { habitWithRelations ->
+
+                    val count = state.completionCounts[habitWithRelations.habit.id] ?: 0
+
+                    val progress = (count / 33.0).toFloat().coerceIn(0f, 1f)
+
                     HabitItem(
                         habit = habitWithRelations.habit,
                         plant = habitWithRelations.plant,
+                        progress = progress,
                         onToggle = {
                             onAction(
                                 HabitAction.ToggleHabit(habitWithRelations.habit.id),
@@ -128,7 +134,7 @@ fun HabitScreen(
                                 HabitAction.DeleteHabit(habitWithRelations.habit.id),
                             )
                         },
-                        onClick = { onOpenHabitSetup(habitWithRelations.habit.id) },
+                        onClick = { onOpenHabitSetup(habitWithRelations.habit.id, progress) },
                     )
                 }
             }
@@ -140,6 +146,7 @@ fun HabitScreen(
 fun HabitItem(
     habit: Habit,
     plant: HabitPlant,
+    progress: Float,
     onToggle: () -> Unit,
     onDelete: () -> Unit,
     onClick: () -> Unit,
@@ -192,7 +199,7 @@ fun HabitItem(
                 ) {
                     PlantCanvas(
                         modifier = Modifier.fillMaxSize(),
-                        progress = 1f, // TODO: Real progress
+                        progress = progress,
                         seed = plant.seed,
                         variability = plant.variability,
                         config = plant.toPlantConfig(),
@@ -311,7 +318,7 @@ private fun HabitPreview(
                         ),
                 ),
             onAction = {},
-            onOpenHabitSetup = {},
+            onOpenHabitSetup = { _, _ -> },
         )
     }
 }

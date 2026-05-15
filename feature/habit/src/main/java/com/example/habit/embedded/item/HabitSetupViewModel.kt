@@ -180,6 +180,14 @@ class HabitSetupViewModel(private val habitRepository: HabitRepository) : ViewMo
 
     private fun saveHabit() {
         viewModelScope.launch {
+            // TODO: Add snackbar effect
+            if (
+                _state.value.recurrence.type != RecurrenceType.DAY &&
+                _state.value.recurrence.values
+                    .isEmpty()
+            ) {
+                return@launch
+            }
             val habitId = habitRepository.saveHabit(stateToHabit(), _state.value.plant)
 
             _state.value.reminders.forEach {

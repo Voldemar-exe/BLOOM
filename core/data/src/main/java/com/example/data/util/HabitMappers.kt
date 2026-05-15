@@ -1,10 +1,12 @@
 package com.example.data.util
 
+import com.example.database.model.entities.HabitCompletionEntity
 import com.example.database.model.entities.HabitEntity
 import com.example.database.model.entities.HabitPlantEntity
 import com.example.database.model.entities.HabitReminderEntity
 import com.example.database.model.relationships.HabitWithPlantAndReminders
 import com.example.model.Habit
+import com.example.model.HabitCompletion
 import com.example.model.HabitPlant
 import com.example.model.HabitWithRelations
 import com.example.model.Reminder
@@ -99,4 +101,14 @@ fun HabitWithPlantAndReminders.asModel(): HabitWithRelations =
         habit = habit.asModel(),
         plant = plant.asModel(),
         reminders = habitReminders.map { it.asModel() },
+    )
+
+fun HabitCompletionEntity.asModel(): HabitCompletion =
+    HabitCompletion(
+        id = id,
+        habitId = habitId,
+        completedAt = completedAt,
+        experienceEarned = experienceEarned,
+        coinsEarned = coinsEarned,
+        createdAt = createdAt,
     )

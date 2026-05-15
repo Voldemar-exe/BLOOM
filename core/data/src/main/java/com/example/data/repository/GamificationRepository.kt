@@ -1,14 +1,20 @@
 package com.example.data.repository
 
+import com.example.data.util.asModel
 import com.example.database.dao.GamificationDao
 import com.example.database.model.StatsSourceType
 import com.example.database.model.entities.HabitCompletionEntity
 import com.example.database.model.entities.StatsLogEntity
 import com.example.database.model.entities.TaskCompletionEntity
 import com.example.database.util.SyncTracker
+import com.example.model.HabitCompletion
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
 interface GamificationRepository {
+    val habitsCompletions: Flow<List<HabitCompletion>>
+
     suspend fun recordHabitCompletion(
         habitId: Long,
         experienceEarned: Int,
@@ -30,6 +36,9 @@ internal class GamificationRepositoryImpl(
     private val dao: GamificationDao,
     private val tracker: SyncTracker,
 ) : GamificationRepository {
+    override val habitsCompletions: Flow<List<HabitCompletion>>
+        get() = dao.observeHabitsCompletions().map { entities -> entities.map { it.asModel() } }
+
     override suspend fun recordHabitCompletion(
         habitId: Long,
         experienceEarned: Int,
