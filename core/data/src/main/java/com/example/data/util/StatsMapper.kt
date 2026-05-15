@@ -1,6 +1,6 @@
 package com.example.data.util
 
-import com.example.database.dao.DailyLogAggregation
+import com.example.database.model.DailyLogAggregation
 import com.example.database.model.StatsSourceType
 import com.example.model.WeeklyActivityData
 import com.example.model.WeeklyBySource

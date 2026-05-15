@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(authState) {
                 if (authState is AuthState.Authorized) {
                     Timber.d("$authState")
+                    SyncScheduler.enqueueImmediateSync(application.applicationContext)
                     SyncScheduler.enqueuePeriodicSync(application.applicationContext)
                 }
             }

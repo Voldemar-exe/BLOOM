@@ -12,7 +12,14 @@ import com.example.database.model.entities.TaskCompletionEntity
 import com.example.database.model.entities.TaskEntity
 import com.example.database.model.entities.TaskReminderEntity
 import com.example.database.util.RecurrenceConverter
+import com.example.model.AppSettings
+import com.example.model.CustomizationItem
+import com.example.model.CustomizationType
 import com.example.model.Priority
+import com.example.model.User
+import com.example.model.UserStats
+import com.example.network.model.AppSettingsDto
+import com.example.network.model.CustomizationItemDto
 import com.example.network.model.HabitCompletionDto
 import com.example.network.model.HabitDto
 import com.example.network.model.HabitPlantDto
@@ -22,6 +29,8 @@ import com.example.network.model.SubtaskDto
 import com.example.network.model.TaskCompletionDto
 import com.example.network.model.TaskDto
 import com.example.network.model.TaskReminderDto
+import com.example.network.model.UserProfileDto
+import com.example.network.model.UserStatsDto
 
 fun HabitEntity.toDto(plantEntity: HabitPlantEntity) =
     HabitDto(
@@ -261,4 +270,93 @@ fun TaskCompletionDto.toEntity() =
         experienceEarned = experienceEarned,
         coinsEarned = coinsEarned,
         createdAt = createdAt,
+    )
+
+fun UserStats.toDto(lastSyncTimestamp: Long) =
+    UserStatsDto(
+        level = level,
+        currentExperience = currentExperience,
+        currentCoinsAmount = currentCoinsAmount,
+        maxCoinsAmount = maxCoinsAmount,
+        totalHabitsCreated = totalHabitsCreated,
+        totalHabitsCompleted = totalHabitsCompleted,
+        totalTasksCreated = totalTasksCreated,
+        totalTasksCompleted = totalTasksCompleted,
+        currentStreak = currentStreak,
+        longestStreak = longestStreak,
+        updatedAt = lastSyncTimestamp,
+    )
+
+fun UserStatsDto.toModel() =
+    UserStats(
+        level = level,
+        currentExperience = currentExperience,
+        currentCoinsAmount = currentCoinsAmount,
+        maxCoinsAmount = maxCoinsAmount,
+        totalHabitsCreated = totalHabitsCreated,
+        totalHabitsCompleted = totalHabitsCompleted,
+        totalTasksCreated = totalTasksCreated,
+        totalTasksCompleted = totalTasksCompleted,
+        currentStreak = currentStreak,
+        longestStreak = longestStreak,
+    )
+
+fun AppSettings.toDto(lastSyncTimestamp: Long) =
+    AppSettingsDto(
+        theme = theme,
+        weeklyGoal = weeklyGoal,
+        streakTarget = streakTarget,
+        emailEnabled = emailEnabled,
+        pushEnabled = pushEnabled,
+        habitRemindersEnabled = habitRemindersEnabled,
+        taskRemindersEnabled = taskRemindersEnabled,
+        updatedAt = lastSyncTimestamp,
+    )
+
+fun AppSettingsDto.toModel() =
+    AppSettings(
+        theme = theme,
+        weeklyGoal = weeklyGoal,
+        streakTarget = streakTarget,
+        emailEnabled = emailEnabled,
+        pushEnabled = pushEnabled,
+        habitRemindersEnabled = habitRemindersEnabled,
+        taskRemindersEnabled = taskRemindersEnabled,
+    )
+
+fun CustomizationItem.toDto() =
+    CustomizationItemDto(
+        key = key,
+        type = type.name,
+    )
+
+fun CustomizationItemDto.toModel() =
+    CustomizationItem(
+        key = key,
+        type = CustomizationType.valueOf(type),
+    )
+
+fun User.toDto(lastSyncTimestamp: Long) =
+    UserProfileDto(
+        id = userId,
+        email = email,
+        username = username,
+        avatarKey = avatarKey,
+        backgroundKey = backgroundKey,
+        colorKey = colorKey,
+        ownedAchievements = ownedAchievements,
+        ownedItems = ownedItems.map { it.toDto() },
+        updatedAt = lastSyncTimestamp,
+    )
+
+fun UserProfileDto.toModel() =
+    User(
+        userId = id,
+        email = email,
+        username = username,
+        avatarKey = avatarKey,
+        backgroundKey = backgroundKey,
+        colorKey = colorKey,
+        ownedAchievements = ownedAchievements,
+        ownedItems = ownedItems.map { it.toModel() },
     )

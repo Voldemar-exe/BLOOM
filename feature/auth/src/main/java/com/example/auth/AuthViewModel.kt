@@ -91,9 +91,7 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
         if (!validateInput(email, password)) return
 
         viewModelScope.launch {
-            viewModelScope.launch {
-                authRepository.register(login, email, password)
-            }
+            authRepository.register(login, email, password)
         }
     }
 

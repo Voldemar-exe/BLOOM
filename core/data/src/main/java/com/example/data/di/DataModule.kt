@@ -2,9 +2,8 @@ package com.example.data.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.data.repository.AuthRepository
 import com.example.data.repository.AuthRepositoryImpl
 import com.example.data.repository.GamificationRepository
@@ -45,6 +44,8 @@ import com.example.datastore.datastore.BloomPreferencesDataStore
 import com.example.network.api.AuthApi
 import com.example.network.api.SyncApi
 import org.koin.dsl.module
+
+private val Context.syncPreferencesDataStore by preferencesDataStore(name = "sync_preferences")
 
 val dataModule =
     module {
@@ -97,16 +98,15 @@ val dataModule =
             SyncRepositoryImpl(
                 get<SyncQueueDao>(),
                 get<SyncDao>(),
+                get<BloomPreferencesDataStore>(),
                 get<SyncApi>(),
                 get<TransactionRunner>(),
             )
         }
         single<DataStore<Preferences>> {
-            PreferenceDataStoreFactory.create {
-                get<Context>().preferencesDataStoreFile("sync_preferences")
-            }
+            get<Context>().syncPreferencesDataStore
         }
-        single<SyncMetadataRepository> { SyncMetadataRepositoryImpl(get()) }
+        single<SyncMetadataRepository> { SyncMetadataRepositoryImpl(get<DataStore<Preferences>>()) }
         single<StatsRepository> {
             StatsRepositoryImpl(
                 get<StatsDao>(),

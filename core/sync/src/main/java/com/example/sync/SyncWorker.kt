@@ -27,13 +27,13 @@ class SyncWorker(
             try {
                 Timber.d("SyncWorker: starting")
                 ensureActive()
+                val lastSync = syncMetadataRepository.getLastSyncTimestamp()
 
                 Timber.d("SyncWorker: pushChanges")
-                syncRepository.pushChanges().getOrThrow()
+                syncRepository.pushChanges(lastSync).getOrThrow()
                 ensureActive()
 
                 Timber.d("SyncWorker: pullChanges")
-                val lastSync = syncMetadataRepository.getLastSyncTimestamp()
                 val response =
                     withTimeoutOrNull(30_000) {
                         syncRepository.pullChanges(lastSync)

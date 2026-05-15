@@ -4,6 +4,7 @@ import com.example.data.model.SyncQueue
 import com.example.data.util.toDomain
 import com.example.data.util.toDto
 import com.example.data.util.toEntity
+import com.example.data.util.toModel
 import com.example.database.dao.SyncDao
 import com.example.database.dao.SyncQueueDao
 import com.example.database.model.SyncTimestamp
@@ -13,7 +14,9 @@ import com.example.database.model.entities.HabitPlantEntity
 import com.example.database.model.entities.SubtaskEntity
 import com.example.database.model.entities.TaskEntity
 import com.example.database.util.TransactionRunner
+import com.example.datastore.datastore.BloomPreferencesDataStore
 import com.example.network.api.SyncApi
+import com.example.network.model.AppSettingsDto
 import com.example.network.model.HabitCompletionDto
 import com.example.network.model.HabitDto
 import com.example.network.model.HabitReminderDto
@@ -23,7 +26,10 @@ import com.example.network.model.SyncPushRequest
 import com.example.network.model.TaskCompletionDto
 import com.example.network.model.TaskDto
 import com.example.network.model.TaskReminderDto
+import com.example.network.model.UserProfileDto
+import com.example.network.model.UserStatsDto
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
@@ -32,36 +38,38 @@ interface SyncRepository {
 
     suspend fun deleteByIds(ids: List<Long>)
 
-    suspend fun insert(entity: SyncQueue)
+    suspend fun insert(syncQueue: SyncQueue)
 
-    suspend fun pushChanges(): Result<Unit>
+    suspend fun pushChanges(lastSyncTimestamp: Long): Result<Unit>
 
     suspend fun pullChanges(lastSyncTimestamp: Long): Result<SyncPullResponse>
 }
 
 class SyncRepositoryImpl(
-    private val dao: SyncQueueDao,
+    private val syncQueueDao: SyncQueueDao,
     private val syncDao: SyncDao,
+    private val dataStore: BloomPreferencesDataStore,
     private val api: SyncApi,
     private val transactionRunner: TransactionRunner,
 ) : SyncRepository {
     override fun observePending(): Flow<List<SyncQueue>> =
-        dao.observeSyncQueue().map { entities -> entities.map { it.toDomain() } }
+        syncQueueDao.observeSyncQueue().map { entities -> entities.map { it.toDomain() } }
 
     override suspend fun deleteByIds(ids: List<Long>) {
-        dao.deleteByIds(ids)
+        syncQueueDao.deleteByIds(ids)
     }
 
-    override suspend fun insert(entity: SyncQueue) {
-        dao.insert(entity.toEntity())
+    override suspend fun insert(syncQueue: SyncQueue) {
+        syncQueueDao.insert(syncQueue.toEntity())
     }
 
-    override suspend fun pushChanges(): Result<Unit> {
-        val pendingEntities = dao.getPendingList()
+    override suspend fun pushChanges(lastSyncTimestamp: Long): Result<Unit> {
+        val pendingEntities = syncQueueDao.getPendingList()
         if (pendingEntities.isEmpty()) return Result.success(Unit)
+        if (dataStore.user.first() == null) return Result.success(Unit)
 
         val pending = pendingEntities.map { it.toDomain() }
-        val collection = collectPushData(pending)
+        val collection = collectPushData(pending, lastSyncTimestamp)
 
         if (collection.processedIds.isEmpty()) {
             return Result.success(Unit)
@@ -69,7 +77,7 @@ class SyncRepositoryImpl(
 
         return runCatching {
             api.push(collection.request).getOrThrow()
-            dao.deleteByIds(collection.processedIds)
+            syncQueueDao.deleteByIds(collection.processedIds)
         }.onFailure {
             Timber.e(it, "Sync push failed for ${collection.processedIds.size} items")
         }
@@ -84,7 +92,10 @@ class SyncRepositoryImpl(
             Timber.e(it, "Sync pull failed at timestamp $lastSyncTimestamp")
         }
 
-    private suspend fun collectPushData(pending: List<SyncQueue>): PushCollection {
+    private suspend fun collectPushData(
+        pending: List<SyncQueue>,
+        lastSyncTimestamp: Long,
+    ): PushCollection {
         val habits = mutableListOf<HabitDto>()
         val tasks = mutableListOf<TaskDto>()
         val habitReminders = mutableListOf<HabitReminderDto>()
@@ -92,6 +103,9 @@ class SyncRepositoryImpl(
         val statsLogs = mutableListOf<StatsLogDto>()
         val habitCompletions = mutableListOf<HabitCompletionDto>()
         val taskCompletions = mutableListOf<TaskCompletionDto>()
+        val userProfile: UserProfileDto? = dataStore.user.first()?.toDto(lastSyncTimestamp)
+        val userStats: UserStatsDto = dataStore.stats.first().toDto(lastSyncTimestamp)
+        val appSettings: AppSettingsDto = dataStore.settings.first().toDto(lastSyncTimestamp)
         val processedIds = mutableListOf<Long>()
 
         pending.forEach { item ->
@@ -186,6 +200,9 @@ class SyncRepositoryImpl(
                     statsLogs = statsLogs,
                     habitCompletions = habitCompletions,
                     taskCompletions = taskCompletions,
+                    user = userProfile,
+                    userStats = userStats,
+                    appSettings = appSettings,
                     lastSyncTimestamp = processedItems.maxOfOrNull { it.createdAt } ?: 0L,
                 ),
             processedIds = processedIds,
@@ -273,6 +290,10 @@ class SyncRepositoryImpl(
             syncDao.upsertStatsLogs(response.statsLogs.map { it.toEntity() })
             syncDao.upsertHabitCompletions(response.habitCompletions.map { it.toEntity() })
             syncDao.upsertTaskCompletions(response.taskCompletions.map { it.toEntity() })
+
+            response.user?.let { dataStore.setUser(it.toModel()) }
+            response.userStats?.let { dataStore.setStats(it.toModel()) }
+            response.appSettings?.let { dataStore.setSettings(it.toModel()) }
         }
     }
 

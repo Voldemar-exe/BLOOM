@@ -2,13 +2,7 @@ package com.example.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.example.database.model.StatsSourceType
-
-data class DailyLogAggregation(
-    val sourceType: StatsSourceType,
-    val count: Int,
-    val createdAt: Long,
-)
+import com.example.database.model.DailyLogAggregation
 
 @Dao
 interface StatsDao {

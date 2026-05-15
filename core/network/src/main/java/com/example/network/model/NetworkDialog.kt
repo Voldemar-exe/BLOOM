@@ -24,6 +24,9 @@ data class SyncPushRequest(
     val statsLogs: List<StatsLogDto> = emptyList(),
     val habitCompletions: List<HabitCompletionDto> = emptyList(),
     val taskCompletions: List<TaskCompletionDto> = emptyList(),
+    val user: UserProfileDto? = null,
+    val userStats: UserStatsDto? = null,
+    val appSettings: AppSettingsDto? = null,
     val lastSyncTimestamp: Long = 0L,
 )
 
@@ -36,5 +39,8 @@ data class SyncPullResponse(
     val statsLogs: List<StatsLogDto> = emptyList(),
     val habitCompletions: List<HabitCompletionDto> = emptyList(),
     val taskCompletions: List<TaskCompletionDto> = emptyList(),
+    val user: UserProfileDto? = null,
+    val userStats: UserStatsDto? = null,
+    val appSettings: AppSettingsDto? = null,
     val serverTimestamp: Long,
 )
