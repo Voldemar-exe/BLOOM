@@ -15,6 +15,8 @@ import com.example.data.repository.NotificationRepository
 import com.example.data.repository.NotificationRepositoryImpl
 import com.example.data.repository.SettingsRepository
 import com.example.data.repository.SettingsRepositoryImpl
+import com.example.data.repository.StatsRepository
+import com.example.data.repository.StatsRepositoryImpl
 import com.example.data.repository.SyncMetadataRepository
 import com.example.data.repository.SyncMetadataRepositoryImpl
 import com.example.data.repository.SyncRepository
@@ -30,6 +32,7 @@ import com.example.database.dao.HabitDao
 import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
 import com.example.database.dao.HabitWithRelationDao
+import com.example.database.dao.StatsDao
 import com.example.database.dao.SubtaskDao
 import com.example.database.dao.SyncDao
 import com.example.database.dao.SyncQueueDao
@@ -104,4 +107,10 @@ val dataModule =
             }
         }
         single<SyncMetadataRepository> { SyncMetadataRepositoryImpl(get()) }
+        single<StatsRepository> {
+            StatsRepositoryImpl(
+                get<StatsDao>(),
+                get<BloomPreferencesDataStore>(),
+            )
+        }
     }

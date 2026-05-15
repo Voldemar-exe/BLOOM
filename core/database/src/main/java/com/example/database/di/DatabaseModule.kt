@@ -7,6 +7,7 @@ import com.example.database.dao.HabitDao
 import com.example.database.dao.HabitPlantDao
 import com.example.database.dao.HabitReminderDao
 import com.example.database.dao.HabitWithRelationDao
+import com.example.database.dao.StatsDao
 import com.example.database.dao.SubtaskDao
 import com.example.database.dao.SyncDao
 import com.example.database.dao.SyncQueueDao
@@ -39,6 +40,7 @@ val databaseModule =
         single<GamificationDao> { get<BloomDatabase>().gamificationDao() }
         single<SyncQueueDao> { get<BloomDatabase>().syncQueueDao() }
         single<SyncDao> { get<BloomDatabase>().syncDao() }
+        single<StatsDao> { get<BloomDatabase>().statsDao() }
         single<SyncTracker> { SyncTracker(get<SyncQueueDao>()) }
         single<TransactionRunner> { RoomTransactionRunner(get<BloomDatabase>()) }
     }
