@@ -11,6 +11,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -50,8 +51,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.bloom.feature.auth.R
 import com.example.designsystem.component.AnimatedText
-import com.example.designsystem.component.ImagePlaceholder
 import com.example.designsystem.picture.BloomIcons
+import com.example.designsystem.picture.BloomImages
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -82,11 +83,13 @@ internal fun AuthScreen(
                 .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        ImagePlaceholder(
+        Image(
             modifier =
                 Modifier
                     .size(200.dp)
-                    .padding(bottom = 4.dp),
+                    .padding(4.dp),
+            painter = painterResource(BloomImages.resolve(BloomImages.LOGO.name)),
+            contentDescription = null
         )
 
         AnimatedContent(

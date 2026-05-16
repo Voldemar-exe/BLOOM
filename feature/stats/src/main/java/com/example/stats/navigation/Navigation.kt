@@ -2,8 +2,8 @@ package com.example.stats.navigation
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.example.stats.StatsScreen
 import com.example.navigation.Navigator
+import com.example.stats.StatsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable

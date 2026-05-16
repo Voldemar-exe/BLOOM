@@ -1,9 +1,11 @@
 package com.example.designsystem.picture
 
+import com.example.bloom.core.designsystem.R
+
 enum class BloomPlants {
     SAKURA,
-    SIMPLE_TREE,
-    BINARY_TREE,
+    SIMPLE,
+    BINARY,
     ;
 
     companion object {
@@ -11,9 +13,9 @@ enum class BloomPlants {
 
         fun resolve(plantKey: String): Int =
             when (valueOf(plantKey)) {
-                SAKURA -> 0
-                SIMPLE_TREE -> 1
-                BINARY_TREE -> 2
+                SAKURA -> R.drawable.plant_sakura
+                SIMPLE -> R.drawable.plant_simple
+                BINARY -> R.drawable.plant_binary
             }
     }
 }
