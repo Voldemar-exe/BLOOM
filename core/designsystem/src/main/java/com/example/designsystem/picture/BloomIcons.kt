@@ -9,6 +9,7 @@ object BloomIcons {
     val PiggyBank = R.drawable.savings_24px
     val Customization = R.drawable.display_settings_24px
     val EditParameters = R.drawable.edit_attributes_24px
+    val Archive = R.drawable.archive_24px
     val Image = R.drawable.image_24px
     val ColorFill = R.drawable.format_color_fill_24px
     val Gamepad = R.drawable.stadia_controller_24px
@@ -23,6 +24,8 @@ object BloomIcons {
     val Play = R.drawable.play_arrow_24px
     val Pause = R.drawable.pause_24px
     val Stop = R.drawable.stop_24px
+    val AlarmPause = R.drawable.alarm_pause_24px
+    val AlarmOn = R.drawable.alarm_on_24px
     val Download = R.drawable.download_24px
     val Random = R.drawable.casino_24px
     val Undo = R.drawable.undo_24px

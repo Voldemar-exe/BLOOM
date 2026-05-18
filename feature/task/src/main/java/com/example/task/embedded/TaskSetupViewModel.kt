@@ -56,6 +56,8 @@ class TaskSetupViewModel(private val taskRepository: TaskRepository) : ViewModel
             is TaskSetupAction.LoadTask -> {
                 action.taskId?.let { loadTask(it) }
             }
+            TaskSetupAction.ToggleArchived -> _state.update { it.copy(isArchived = !it.isArchived) }
+            TaskSetupAction.ToggleMuted -> _state.update { it.copy(isMuted = !it.isMuted) }
         }
     }
 

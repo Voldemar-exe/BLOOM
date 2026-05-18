@@ -34,4 +34,8 @@ sealed interface HabitSetupAction {
     object OnSaveHabit : HabitSetupAction
 
     data class LoadHabit(val habitId: Long?) : HabitSetupAction
+
+    data object ToggleArchived : HabitSetupAction
+
+    data object ToggleMuted : HabitSetupAction
 }

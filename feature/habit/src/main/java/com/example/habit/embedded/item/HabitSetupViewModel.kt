@@ -60,6 +60,8 @@ class HabitSetupViewModel(private val habitRepository: HabitRepository) : ViewMo
             is HabitSetupAction.SetPlant -> _state.update { it.copy(plant = action.plant) }
             HabitSetupAction.OnSaveHabit -> saveHabit()
             is HabitSetupAction.LoadHabit -> action.habitId?.let { loadHabit(it) }
+            HabitSetupAction.ToggleArchived -> _state.update { it.copy(isArchived = !it.isArchived) }
+            HabitSetupAction.ToggleMuted -> _state.update { it.copy(isMuted = !it.isMuted) }
         }
     }
 

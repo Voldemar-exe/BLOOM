@@ -38,4 +38,8 @@ sealed interface TaskSetupAction {
     object OnSaveTask : TaskSetupAction
 
     data class LoadTask(val taskId: Long?) : TaskSetupAction
+
+    data object ToggleArchived : TaskSetupAction
+
+    data object ToggleMuted : TaskSetupAction
 }

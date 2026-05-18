@@ -17,12 +17,14 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -84,6 +86,7 @@ fun HabitItemScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun HabitItemScreen(
     state: HabitSetupState,
@@ -106,6 +109,39 @@ internal fun HabitItemScreen(
                     }
                 },
                 actions = {
+                    ToggleButton(
+                        checked = state.isArchived,
+                        onCheckedChange = {
+                            onAction(
+                                HabitSetupAction.ToggleArchived,
+                            )
+                        },
+                    ) {
+                        Icon(
+                            painter = painterResource(BloomIcons.Archive),
+                            contentDescription = "archive",
+                        )
+                    }
+                    ToggleButton(
+                        checked = state.isMuted,
+                        onCheckedChange = {
+                            onAction(
+                                HabitSetupAction.ToggleMuted,
+                            )
+                        },
+                    ) {
+                        Icon(
+                            painter =
+                                painterResource(
+                                    if (state.isMuted) {
+                                        BloomIcons.AlarmPause
+                                    } else {
+                                        BloomIcons.AlarmOn
+                                    },
+                                ),
+                            contentDescription = "mute",
+                        )
+                    }
                     IconButton(onClick = { onAction(HabitSetupAction.OnSaveHabit) }) {
                         Icon(Icons.Default.Check, contentDescription = "save")
                     }

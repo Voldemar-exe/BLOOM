@@ -22,12 +22,14 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,6 +85,7 @@ fun TaskItemScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun TaskItemScreen(
     state: TaskSetupState,
@@ -102,6 +106,39 @@ internal fun TaskItemScreen(
                     }
                 },
                 actions = {
+                    ToggleButton(
+                        checked = state.isArchived,
+                        onCheckedChange = {
+                            onAction(
+                                TaskSetupAction.ToggleArchived,
+                            )
+                        },
+                    ) {
+                        Icon(
+                            painter = painterResource(BloomIcons.Archive),
+                            contentDescription = "archive",
+                        )
+                    }
+                    ToggleButton(
+                        checked = state.isMuted,
+                        onCheckedChange = {
+                            onAction(
+                                TaskSetupAction.ToggleMuted,
+                            )
+                        },
+                    ) {
+                        Icon(
+                            painter =
+                                painterResource(
+                                    if (state.isMuted) {
+                                        BloomIcons.AlarmPause
+                                    } else {
+                                        BloomIcons.AlarmOn
+                                    },
+                                ),
+                            contentDescription = "mute",
+                        )
+                    }
                     IconButton(
                         onClick = {
                             onAction(TaskSetupAction.OnSaveTask)
