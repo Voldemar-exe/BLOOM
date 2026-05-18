@@ -1,9 +1,7 @@
 package com.example.data.di
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import com.example.data.repository.AuthRepository
 import com.example.data.repository.AuthRepositoryImpl
 import com.example.data.repository.GamificationRepository
@@ -14,6 +12,8 @@ import com.example.data.repository.NotificationRepository
 import com.example.data.repository.NotificationRepositoryImpl
 import com.example.data.repository.SettingsRepository
 import com.example.data.repository.SettingsRepositoryImpl
+import com.example.data.repository.SocialRepository
+import com.example.data.repository.SocialRepositoryImpl
 import com.example.data.repository.StatsRepository
 import com.example.data.repository.StatsRepositoryImpl
 import com.example.data.repository.SyncMetadataRepository
@@ -41,11 +41,11 @@ import com.example.database.dao.TaskWithRelationDao
 import com.example.database.util.SyncTracker
 import com.example.database.util.TransactionRunner
 import com.example.datastore.datastore.BloomPreferencesDataStore
+import com.example.datastore.datastore.LeaderboardDataStore
 import com.example.network.api.AuthApi
+import com.example.network.api.SocialApi
 import com.example.network.api.SyncApi
 import org.koin.dsl.module
-
-private val Context.syncPreferencesDataStore by preferencesDataStore(name = "sync_preferences")
 
 val dataModule =
     module {
@@ -103,14 +103,17 @@ val dataModule =
                 get<TransactionRunner>(),
             )
         }
-        single<DataStore<Preferences>> {
-            get<Context>().syncPreferencesDataStore
-        }
         single<SyncMetadataRepository> { SyncMetadataRepositoryImpl(get<DataStore<Preferences>>()) }
         single<StatsRepository> {
             StatsRepositoryImpl(
                 get<StatsDao>(),
                 get<BloomPreferencesDataStore>(),
+            )
+        }
+        single<SocialRepository> {
+            SocialRepositoryImpl(
+                get<SocialApi>(),
+                get<LeaderboardDataStore>(),
             )
         }
     }

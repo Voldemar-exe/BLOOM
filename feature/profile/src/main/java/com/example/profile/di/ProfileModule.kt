@@ -1,9 +1,11 @@
 package com.example.profile.di
 
+import com.example.data.repository.SocialRepository
 import com.example.data.repository.ThemeRepository
 import com.example.data.repository.UserRepository
 import com.example.profile.embedded.achievements.AchievementViewModel
 import com.example.profile.embedded.avatar.AvatarCustomizeViewModel
+import com.example.profile.embedded.leaderboard.LeaderboardViewModel
 import com.example.profile.embedded.settings.SettingsViewModel
 import com.example.profile.embedded.store.StoreViewModel
 import com.example.profile.embedded.theme.ThemeChoiceViewModel
@@ -30,5 +32,8 @@ val profileModule =
         }
         viewModel<SettingsViewModel> {
             SettingsViewModel(get<UserRepository>())
+        }
+        viewModel<LeaderboardViewModel> {
+            LeaderboardViewModel(get<SocialRepository>())
         }
     }

@@ -5,6 +5,8 @@ import com.example.datastore.datastore.BloomPreferencesDataStore
 import com.example.network.HttpClientProvider
 import com.example.network.api.AuthApi
 import com.example.network.api.AuthApiImpl
+import com.example.network.api.SocialApi
+import com.example.network.api.SocialApiImpl
 import com.example.network.api.SyncApi
 import com.example.network.api.SyncApiImpl
 import io.ktor.client.HttpClient
@@ -30,4 +32,5 @@ val networkModule =
         }
         single<AuthApi> { AuthApiImpl(get<HttpClient>()) }
         single<SyncApi> { SyncApiImpl(get<HttpClient>()) }
+        single<SocialApi> { SocialApiImpl(get<HttpClient>()) }
     }

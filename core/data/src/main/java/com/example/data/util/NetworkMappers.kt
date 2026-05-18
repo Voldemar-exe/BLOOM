@@ -15,6 +15,7 @@ import com.example.database.util.RecurrenceConverter
 import com.example.model.AppSettings
 import com.example.model.CustomizationItem
 import com.example.model.CustomizationType
+import com.example.model.LeaderboardUser
 import com.example.model.Priority
 import com.example.model.User
 import com.example.model.UserStats
@@ -24,6 +25,7 @@ import com.example.network.model.HabitCompletionDto
 import com.example.network.model.HabitDto
 import com.example.network.model.HabitPlantDto
 import com.example.network.model.HabitReminderDto
+import com.example.network.model.LeaderboardUserDto
 import com.example.network.model.StatsLogDto
 import com.example.network.model.SubtaskDto
 import com.example.network.model.TaskCompletionDto
@@ -359,4 +361,12 @@ fun UserProfileDto.toModel() =
         colorKey = colorKey,
         ownedAchievements = ownedAchievements,
         ownedItems = ownedItems.map { it.toModel() },
+    )
+
+fun LeaderboardUserDto.toModel() =
+    LeaderboardUser(
+        id = id,
+        name = name,
+        avatarKey = avatarKey,
+        score = score,
     )

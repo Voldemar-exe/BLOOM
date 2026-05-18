@@ -44,6 +44,7 @@ import com.example.designsystem.picture.BloomAvatars
 import com.example.designsystem.picture.BloomBackgrounds
 import com.example.designsystem.picture.BloomColors
 import com.example.designsystem.picture.BloomIcons
+import com.example.designsystem.picture.BloomPlants
 import com.example.gamification.model.StoreItem
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -173,7 +174,12 @@ fun StoreScreen(
                     isPurchased = storeItem.isPurchased,
                     onClick = { onAction(StoreAction.PurchasePlant(storeItem.item.key)) },
                 ) {
-                    Text(text = storeItem.item.key)
+                    Image(
+                        modifier = Modifier.size(56.dp),
+                        painter = painterResource(BloomPlants.resolve(storeItem.item.key)),
+                        contentDescription = null,
+                        contentScale = ContentScale.FillBounds,
+                    )
                 }
             }
         }

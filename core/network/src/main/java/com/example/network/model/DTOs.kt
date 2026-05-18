@@ -164,3 +164,11 @@ data class UserProfileDto(
 
 @Serializable
 data class CustomizationItemDto(val key: String, val type: String)
+
+@Serializable
+data class LeaderboardUserDto(
+    val id: Long,
+    val name: String,
+    val avatarKey: String,
+    val score: Long,
+)
