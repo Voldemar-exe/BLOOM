@@ -21,6 +21,8 @@ interface AuthRepository {
     ): Result<Unit>
 
     suspend fun logout()
+
+    suspend fun deleteAccount(): Result<Boolean>
 }
 
 class AuthRepositoryImpl(
@@ -53,4 +55,6 @@ class AuthRepositoryImpl(
     override suspend fun logout() {
         dataStore.clearToken()
     }
+
+    override suspend fun deleteAccount(): Result<Boolean> = authApi.deleteAccount()
 }

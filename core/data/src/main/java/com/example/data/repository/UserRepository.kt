@@ -1,5 +1,6 @@
 package com.example.data.repository
 
+import com.example.data.util.UserGarbageCollector
 import com.example.datastore.datastore.BloomPreferencesDataStore
 import com.example.model.AppSettings
 import com.example.model.CustomizationItem
@@ -47,11 +48,16 @@ interface UserRepository {
     suspend fun clearUser()
 
     suspend fun clearAll()
+
+    suspend fun deleteAccount(): Result<Boolean>
 }
 
 @Singleton
-internal class UserRepositoryImpl(private val dataSource: BloomPreferencesDataStore) :
-    UserRepository {
+internal class UserRepositoryImpl(
+    private val dataSource: BloomPreferencesDataStore,
+    private val authRepository: AuthRepository,
+    private val garbageCollector: UserGarbageCollector,
+) : UserRepository {
     override val user = dataSource.user
     override val stats = dataSource.stats
     override val settings = dataSource.settings
@@ -146,6 +152,8 @@ internal class UserRepositoryImpl(private val dataSource: BloomPreferencesDataSt
     }
 
     override suspend fun clearAll() {
-        dataSource.clearAll()
+        garbageCollector.clearAll()
     }
+
+    override suspend fun deleteAccount() = authRepository.deleteAccount()
 }

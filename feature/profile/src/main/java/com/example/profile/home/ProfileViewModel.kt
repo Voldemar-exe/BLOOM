@@ -129,6 +129,12 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                 ProfileAction.OnExitClick -> {
                     userRepository.clearAll()
                 }
+
+                ProfileAction.DeleteAccount -> {
+                    userRepository.deleteAccount().onSuccess {
+                        userRepository.clearAll()
+                    }
+                }
             }
         }
     }

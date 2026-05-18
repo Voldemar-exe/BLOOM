@@ -26,6 +26,7 @@ import com.example.data.repository.ThemeRepository
 import com.example.data.repository.ThemeRepositoryImpl
 import com.example.data.repository.UserRepository
 import com.example.data.repository.UserRepositoryImpl
+import com.example.data.util.UserGarbageCollector
 import com.example.database.dao.GamificationDao
 import com.example.database.dao.HabitDao
 import com.example.database.dao.HabitPlantDao
@@ -38,6 +39,7 @@ import com.example.database.dao.SyncQueueDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
+import com.example.database.util.DatabaseCleaner
 import com.example.database.util.SyncTracker
 import com.example.database.util.TransactionRunner
 import com.example.datastore.datastore.BloomPreferencesDataStore
@@ -69,7 +71,11 @@ val dataModule =
         }
 
         single<UserRepository> {
-            UserRepositoryImpl(get<BloomPreferencesDataStore>())
+            UserRepositoryImpl(
+                get<BloomPreferencesDataStore>(),
+                get<AuthRepository>(),
+                get<UserGarbageCollector>(),
+            )
         }
 
         single<ThemeRepository> {
@@ -114,6 +120,12 @@ val dataModule =
             SocialRepositoryImpl(
                 get<SocialApi>(),
                 get<LeaderboardDataStore>(),
+            )
+        }
+        single<UserGarbageCollector> {
+            UserGarbageCollector(
+                get<DatabaseCleaner>(),
+                get<BloomPreferencesDataStore>(),
             )
         }
     }

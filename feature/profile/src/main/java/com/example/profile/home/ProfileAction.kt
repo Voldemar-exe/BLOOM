@@ -23,4 +23,6 @@ sealed interface ProfileAction {
     object TestActionSetUser : ProfileAction
 
     object OnExitClick : ProfileAction
+
+    object DeleteAccount : ProfileAction
 }

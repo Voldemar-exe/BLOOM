@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -59,6 +60,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -137,6 +139,7 @@ internal fun ProfileScreen(
                             onUsernameChange = { username = it },
                             onEmailChange = { email = it },
                             onPasswordChange = { password = it },
+                            onDeleteAccount = { onAction(ProfileAction.DeleteAccount) },
                             onDismiss = { showDialog = false },
                             onSaveClick = {
                                 onAction(
@@ -152,9 +155,6 @@ internal fun ProfileScreen(
                     }
                 },
                 actions = {
-                    /*IconButton(onClick = { *//* Notifications *//* }) {
-                        Icon(Icons.Default.Notifications, contentDescription = "notifications")
-                    }*/
                     IconButton(onClick = { onAction(ProfileAction.OnExitClick) }) {
                         Icon(Icons.AutoMirrored.Default.ExitToApp, contentDescription = "settings")
                     }
@@ -239,7 +239,6 @@ fun UserProfile(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         val rank = Rank.fromLevel(level)
         val rankTheme = rank.getTheme(MaterialTheme.colorScheme)
-        // TODO: Maybe move in TopBar
         Row(
             modifier =
                 Modifier
@@ -461,10 +460,33 @@ private data class MenuItem(
 
 @Composable
 fun EnterAccountPlaceholder(onAction: (ProfileAction) -> Unit) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            // TODO: Navigate to :feature:auth
-            Button(onClick = { onAction(ProfileAction.TestActionSetUser) }) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(horizontal = 24.dp),
+        ) {
+            Text(
+                text = "Профиль",
+                style = MaterialTheme.typography.headlineMedium,
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                text =
+                    "Войдите или создайте аккаунт,\n" +
+                        "чтобы отслеживать прогресс и синхронизировать данные",
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(16.dp))
+            Button(
+                onClick = { onAction(ProfileAction.OnExitClick) },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
                 Text("Создать аккаунт")
             }
         }
@@ -480,6 +502,7 @@ fun EditProfileDialog(
     onUsernameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
+    onDeleteAccount: () -> Unit,
     onDismiss: () -> Unit,
     onSaveClick: () -> Unit,
 ) {
@@ -542,6 +565,35 @@ fun EditProfileDialog(
                         )
                     },
                 )
+                var isDelete by remember { mutableStateOf(false) }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Absolute.SpaceBetween,
+                ) {
+                    Text(
+                        text =
+                            if (!isDelete) {
+                                "Удалить аккаунт?"
+                            } else {
+                                " ТОЧНО УДАЛИТЬ АККАУНТ?"
+                            },
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                    IconButton(onClick = {
+                        if (isDelete) {
+                            onDeleteAccount()
+                        } else {
+                            isDelete = true
+                        }
+                    }) {
+                        Icon(
+                            Icons.Default.Delete,
+                            tint = MaterialTheme.colorScheme.error,
+                            contentDescription = null,
+                        )
+                    }
+                }
             }
         },
         confirmButton = {

@@ -1,5 +1,6 @@
 package com.example.database.di
 
+import android.content.Context
 import androidx.room.Room
 import com.example.database.BloomDatabase
 import com.example.database.dao.GamificationDao
@@ -14,6 +15,8 @@ import com.example.database.dao.SyncQueueDao
 import com.example.database.dao.TaskDao
 import com.example.database.dao.TaskReminderDao
 import com.example.database.dao.TaskWithRelationDao
+import com.example.database.util.DatabaseCleaner
+import com.example.database.util.DatabaseCleanerImpl
 import com.example.database.util.RoomTransactionRunner
 import com.example.database.util.SyncTracker
 import com.example.database.util.TransactionRunner
@@ -43,4 +46,5 @@ val databaseModule =
         single<StatsDao> { get<BloomDatabase>().statsDao() }
         single<SyncTracker> { SyncTracker(get<SyncQueueDao>()) }
         single<TransactionRunner> { RoomTransactionRunner(get<BloomDatabase>()) }
+        single<DatabaseCleaner> { DatabaseCleanerImpl(get<Context>(), get<BloomDatabase>()) }
     }
