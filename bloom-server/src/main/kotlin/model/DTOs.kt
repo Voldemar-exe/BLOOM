@@ -134,7 +134,7 @@ data class UserStatsDto(
     val totalTasksCompleted: Int,
     val currentStreak: Int,
     val longestStreak: Int,
-    val updatedAt: Long
+    val updatedAt: Long,
 )
 
 @Serializable
@@ -146,7 +146,7 @@ data class AppSettingsDto(
     val pushEnabled: Boolean,
     val habitRemindersEnabled: Boolean,
     val taskRemindersEnabled: Boolean,
-    val updatedAt: Long
+    val updatedAt: Long,
 )
 
 @Serializable
@@ -159,8 +159,16 @@ data class UserProfileDto(
     val colorKey: String,
     val ownedAchievements: Set<Int> = emptySet(),
     val ownedItems: List<CustomizationItemDto> = emptyList(),
-    val updatedAt: Long
+    val updatedAt: Long,
 )
 
 @Serializable
 data class CustomizationItemDto(val key: String, val type: String)
+
+@Serializable
+data class LeaderboardUserDto(
+    val id: Long,
+    val name: String,
+    val avatarKey: String,
+    val score: Long,
+)

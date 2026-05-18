@@ -4,6 +4,7 @@ import com.example.db.daos.AppSettingsDAO
 import com.example.db.daos.UserDAO
 import com.example.db.daos.UserStatsDAO
 import com.example.db.tables.UsersTable
+import com.example.model.AuthError
 import db.daos.UserCustomizationDAO
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.eq
@@ -78,16 +79,6 @@ class AuthServiceImpl : AuthService {
                 Result.failure(AuthError.InternalError(e))
             }
         }
-}
-
-sealed class AuthError : Exception() {
-    class LoginAlreadyExists : AuthError()
-
-    class EmailAlreadyExists : AuthError()
-
-    class InvalidCredentials : AuthError()
-
-    data class InternalError(override val cause: Throwable) : AuthError()
 }
 
 private fun createDefaultUserStats(userId: EntityID<Long>) {

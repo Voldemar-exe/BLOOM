@@ -1,10 +1,10 @@
 package com.example.routing
 
 import com.example.auth.AuthService
+import com.example.model.AuthError
 import com.example.model.LoginRequest
 import com.example.model.LoginResponse
 import com.example.model.RegisterRequest
-import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -18,23 +18,35 @@ fun Application.configureAuthRouting() {
         post("/login") {
             val request = call.receive<LoginRequest>()
             val result = authService.login(request.login, request.password)
+
             result.fold(
-                onSuccess = { call.respond(LoginResponse(it)) },
-                onFailure = {
+                onSuccess = { token ->
+                    call.respond(LoginResponse(token))
+                },
+                onFailure = { error ->
+                    val authError = error as? AuthError ?: AuthError.InternalError(error)
                     call.respond(
-                        HttpStatusCode.InternalServerError,
-                        it.toString(),
+                        status = authError.httpStatusCode,
+                        message = authError.message.toString(),
                     )
                 },
             )
         }
+
         post("/register") {
             val request = call.receive<RegisterRequest>()
             val result = authService.register(request.login, request.email, request.password)
+
             result.fold(
-                onSuccess = { call.respond(LoginResponse(it)) },
-                onFailure = {
-                    call.respond(HttpStatusCode.InternalServerError, it.toString())
+                onSuccess = { token ->
+                    call.respond(LoginResponse(token))
+                },
+                onFailure = { error ->
+                    val authError = error as? AuthError ?: AuthError.InternalError(error)
+                    call.respond(
+                        status = authError.httpStatusCode,
+                        message = authError.message.toString(),
+                    )
                 },
             )
         }

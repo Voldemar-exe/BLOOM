@@ -44,3 +44,9 @@ data class SyncPullResponse(
     val appSettings: AppSettingsDto? = null,
     val serverTimestamp: Long,
 )
+
+@Serializable
+data class LeaderboardResponse(
+    val users: List<LeaderboardUserDto>,
+    val serverTimestamp: Long = System.currentTimeMillis(),
+)
