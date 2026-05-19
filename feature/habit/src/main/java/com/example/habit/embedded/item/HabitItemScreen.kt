@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -154,18 +153,11 @@ internal fun HabitItemScreen(
             item {
                 // TODO: It draw differently. I don't know why
                 PlantCloseUp(
+                    modifier = Modifier.padding(16.dp),
                     seed = state.plant.seed,
                     realProgress = progress,
                     variability = state.plant.variability,
                     plantConfig = state.plant.toPlantConfig(),
-                    extraButton = {
-                        FilledIconButton(onClick = {}) {
-                            Icon(
-                                painter = painterResource(BloomIcons.Download),
-                                contentDescription = "download",
-                            )
-                        }
-                    },
                 )
             }
             item {
@@ -286,7 +278,7 @@ internal fun HabitItemScreen(
                     ) {
                         Icon(imageVector = Icons.Default.Add, contentDescription = "add")
                         Spacer(modifier = Modifier.height(0.dp))
-                        Text("Добавить этап")
+                        Text("Добавить этап привычки")
                     }
 
                     TextInputDialog(

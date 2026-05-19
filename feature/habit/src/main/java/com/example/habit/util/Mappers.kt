@@ -1,7 +1,7 @@
 package com.example.habit.util
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.fromColorLong
+import androidx.compose.ui.graphics.toArgb
 import com.example.model.HabitPlant
 import com.example.plant.BranchConfig
 import com.example.plant.LeafConfig
@@ -35,8 +35,8 @@ fun HabitPlant.toPlantConfig(): PlantConfig =
             ),
         renderConfig =
             RenderConfig(
-                branchColor = Color.fromColorLong(baseColor),
-                leafColor = Color.fromColorLong(petalColor),
+                branchColor = Color(baseColor),
+                leafColor = Color(petalColor),
                 leafAlpha = petalAlpha,
             ),
     )
@@ -67,10 +67,12 @@ fun PresetExample.toHabitPlant(): HabitPlant {
         petalLength = config.leafConfig.length,
         petalType = config.leafConfig.type.name,
         petalColor =
-            config.renderConfig.leafColor.value
+            config.renderConfig.leafColor
+                .toArgb()
                 .toLong(),
         baseColor =
-            config.renderConfig.branchColor.value
+            config.renderConfig.branchColor
+                .toArgb()
                 .toLong(),
         petalAlpha = config.renderConfig.leafAlpha,
     )

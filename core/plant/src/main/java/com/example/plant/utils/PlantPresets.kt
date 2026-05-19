@@ -51,8 +51,8 @@ object PresetLibrary {
                             ),
                         renderConfig =
                             RenderConfig(
-                                branchColor = parseColor("#504534"),
-                                leafColor = parseColor("#ff8fe7"),
+                                branchColor = Color(0xFF4E342E),
+                                leafColor = Color(0xFFFF8FE7),
                                 leafAlpha = 0.82f,
                             ),
                     )
@@ -82,8 +82,8 @@ object PresetLibrary {
                             ),
                         renderConfig =
                             RenderConfig(
-                                branchColor = parseColor("#6b5b4b"),
-                                leafColor = parseColor("#7cb342"),
+                                branchColor = Color(0xFF6D4C41),
+                                leafColor = Color(0xFF7CB342),
                                 leafAlpha = 0.88f,
                             ),
                     )
@@ -113,8 +113,8 @@ object PresetLibrary {
                             ),
                         renderConfig =
                             RenderConfig(
-                                branchColor = parseColor("#5d4037"),
-                                leafColor = parseColor("#4caf50"),
+                                branchColor = Color(0xFF5D4037),
+                                leafColor = Color(0xFF43A047),
                                 leafAlpha = 0.9f,
                             ),
                     )
@@ -144,8 +144,8 @@ object PresetLibrary {
                             ),
                         renderConfig =
                             RenderConfig(
-                                branchColor = parseColor("#795548"),
-                                leafColor = parseColor("#66bb6a"),
+                                branchColor = Color(0xFF8D6E63),
+                                leafColor = Color(0xFF66BB6A),
                                 leafAlpha = 0.8f,
                             ),
                     )

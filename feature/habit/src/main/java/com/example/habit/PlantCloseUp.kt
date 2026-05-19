@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +35,7 @@ fun PlantCloseUp(
     realProgress: Float,
     variability: Float,
     plantConfig: PlantConfig,
-    extraButton: @Composable (() -> Unit),
+    extraButton: @Composable (() -> Unit) = {},
 ) {
     var isPlaying by remember { mutableStateOf(false) }
     var isStopped by remember { mutableStateOf(false) }
@@ -75,17 +74,16 @@ fun PlantCloseUp(
 
     Row(
         modifier =
-            Modifier
+            modifier
                 .height(250.dp)
-                .fillMaxWidth()
-                .padding(16.dp),
+                .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier =
                 Modifier
                     .weight(1f)
-                    .border(1.dp, MaterialTheme.colorScheme.secondaryContainer),
+                    .border(1.dp, MaterialTheme.colorScheme.surfaceContainerHigh),
         ) {
             PlantCanvas(
                 progress =
@@ -116,8 +114,7 @@ fun PlantCloseUp(
                     contentDescription = "stop",
                 )
             }
-            // TODO: Add extra functional
-//            extraButton()
+            extraButton()
         }
     }
 }

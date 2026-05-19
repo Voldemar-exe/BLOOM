@@ -27,8 +27,6 @@ class PlantSetupViewModel : ViewModel() {
         )
     val effect: SharedFlow<PlantSetupEffect> = _effect
 
-    private val plantHistory = ArrayDeque<HabitPlant>()
-
     fun onAction(action: PlantSetupAction) {
         Timber.d("$action")
         when (action) {
@@ -89,6 +87,14 @@ class PlantSetupViewModel : ViewModel() {
                     )
                 }
 
+            is PlantSetupAction.SetPetalColor -> {
+                updatePlant { it.copy(petalColor = action.color) }
+            }
+
+            is PlantSetupAction.SetBaseColor -> {
+                updatePlant { it.copy(baseColor = action.color) }
+            }
+
             PlantSetupAction.Save -> save()
         }
     }
@@ -97,19 +103,21 @@ class PlantSetupViewModel : ViewModel() {
         _state.update { current ->
             current.copy(
                 plant = plant,
+                realPlant = plant,
             )
         }
     }
 
     private fun updatePlant(update: (HabitPlant) -> HabitPlant) {
-        plantHistory.addLast(_state.value.plant)
-        _state.update { it.copy(plant = update(it.plant)) }
-        if (plantHistory.size > 2) plantHistory.removeFirst()
+        _state.update {
+            it.copy(
+                plant = update(it.plant).normalize(),
+            )
+        }
     }
 
     private fun undo() {
-        val prev = plantHistory.removeLastOrNull() ?: return
-        _state.update { it.copy(plant = prev) }
+        _state.update { it.copy(plant = _state.value.realPlant.copy()) }
     }
 
     private fun save() {
@@ -117,4 +125,15 @@ class PlantSetupViewModel : ViewModel() {
             _effect.emit(PlantSetupEffect.Saved(_state.value.plant))
         }
     }
+
+    private fun Float.round2(): Float = (kotlin.math.round(this * 100f) / 100f)
+
+    private fun HabitPlant.normalize(): HabitPlant =
+        copy(
+            baseLength = baseLength.round2(),
+            baseAngle = baseAngle.round2(),
+            widthFalloff = widthFalloff.round2(),
+            baseWidth = baseWidth.round2(),
+            petalLength = petalLength.round2(),
+        )
 }

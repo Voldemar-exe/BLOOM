@@ -23,5 +23,6 @@ data class PlantSetupState(
             petalColor = 0L,
             baseColor = 0L,
             petalAlpha = 1f,
-        )
+        ),
+    val realPlant: HabitPlant = plant.copy(),
 )

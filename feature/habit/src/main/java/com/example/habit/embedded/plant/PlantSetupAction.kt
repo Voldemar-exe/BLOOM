@@ -25,7 +25,9 @@ sealed interface PlantSetupAction {
 
     data class SetPetalLength(val value: Float) : PlantSetupAction
 
-    object Save : PlantSetupAction
+    data class SetPetalColor(val color: Long) : PlantSetupAction
 
-    // TODO: Add coloring
+    data class SetBaseColor(val color: Long) : PlantSetupAction
+
+    object Save : PlantSetupAction
 }
