@@ -6,6 +6,6 @@ object HabitRemindersTable : LongIdTable("habit_reminders") {
     val habitId = reference("habit_id", HabitsTable.id).index()
     val reminderTime = varchar("reminder_time", 5)
     val isEnabled = bool("is_enabled").default(true)
-    val createdAt = long("created_at")
+    val createdAt = long("created_at").index()
     val updatedAt = long("updated_at")
 }

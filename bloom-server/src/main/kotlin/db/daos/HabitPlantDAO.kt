@@ -1,7 +1,6 @@
 package com.example.db.daos
 
 import com.example.db.tables.HabitPlantsTable
-import com.example.db.tables.HabitsTable
 import com.example.model.HabitPlantDto
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
@@ -38,11 +37,11 @@ fun HabitPlantDAO.Companion.findByIdAndHabit(
     find { HabitPlantsTable.id eq id and (HabitPlantsTable.habitId eq habitId) }.firstOrNull()
 
 fun HabitPlantDAO.Companion.create(
-    habitId: Long,
+    habitId: EntityID<Long>,
     dto: HabitPlantDto,
 ): HabitPlantDAO =
-    HabitPlantDAO.new(dto.id.takeIf { it > 0 }) {
-        this.habitId = EntityID(habitId, HabitsTable)
+    HabitPlantDAO.new {
+        this.habitId = habitId
         updateFrom(dto)
         createdAt = dto.createdAt
     }

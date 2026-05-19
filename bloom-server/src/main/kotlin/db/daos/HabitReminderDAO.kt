@@ -1,7 +1,6 @@
 package com.example.db.daos
 
 import com.example.db.tables.HabitRemindersTable
-import com.example.db.tables.HabitsTable
 import com.example.model.HabitReminderDto
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.LongEntity
@@ -18,11 +17,11 @@ class HabitReminderDAO(id: EntityID<Long>) : LongEntity(id) {
 }
 
 fun HabitReminderDAO.Companion.create(
-    habitId: Long,
+    habitId: EntityID<Long>,
     dto: HabitReminderDto,
 ): HabitReminderDAO =
-    HabitReminderDAO.new(dto.id.takeIf { it > 0 }) {
-        this.habitId = EntityID(habitId, HabitsTable)
+    HabitReminderDAO.new {
+        this.habitId = habitId
         updateFrom(dto)
         createdAt = dto.createdAt
     }

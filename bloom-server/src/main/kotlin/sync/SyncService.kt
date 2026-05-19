@@ -15,6 +15,7 @@ import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greater
 import org.jetbrains.exposed.v1.core.inList
 import org.jetbrains.exposed.v1.jdbc.select
+import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import utils.syncEntities
 
@@ -35,14 +36,14 @@ class SyncServiceImpl : SyncService {
         userId: Long,
         request: SyncPushRequest,
     ): Result<Unit> =
-        transaction {
+        suspendTransaction {
             syncHabits(userId, request.habits)
             syncTasks(userId, request.tasks)
             syncHabitReminders(userId, request.habitReminders)
             syncTaskReminders(userId, request.taskReminders)
             syncStatsLogs(userId, request.statsLogs)
-            syncHabitCompletions(request.habitCompletions)
-            syncTaskCompletions(request.taskCompletions)
+            syncHabitCompletions(userId, request.habitCompletions)
+            syncTaskCompletions(userId, request.taskCompletions)
 
             syncUserProfile(userId, request.user)
             if (request.user != null) {
@@ -139,14 +140,14 @@ class SyncServiceImpl : SyncService {
             extractId = { it.id },
             loadExisting = { ids ->
                 HabitDAO
-                    .find { (HabitsTable.userId eq userId) and (HabitsTable.id inList ids) }
-                    .associateBy { it.id.value }
+                    .find { (HabitsTable.userId eq userId) and (HabitsTable.localId inList ids) }
+                    .associateBy { it.localId }
             },
             shouldUpdate = { dto, dao -> dto.updatedAt > dao.updatedAt },
             create = { dto ->
                 HabitDAO.create(userId, dto).also { dao ->
                     dto.plantDto.takeIf { it.id > 0 }?.let { plant ->
-                        HabitPlantDAO.create(dao.id.value, plant)
+                        HabitPlantDAO.create(dao.id, plant)
                     }
                 }
             },
@@ -154,9 +155,10 @@ class SyncServiceImpl : SyncService {
                 dao.updateFrom(dto)
                 dto.plantDto.takeIf { it.id > 0 }?.let { plant ->
                     HabitPlantDAO
-                        .findByIdAndHabit(plant.id, dao.id.value)
+                        .find { HabitPlantsTable.habitId eq dao.localId }
+                        .firstOrNull()
                         ?.updateFrom(plant)
-                        ?: HabitPlantDAO.create(dao.id.value, plant)
+                        ?: HabitPlantDAO.create(dao.id, plant)
                 }
             },
         )
@@ -171,14 +173,14 @@ class SyncServiceImpl : SyncService {
             extractId = { it.id },
             loadExisting = { ids ->
                 TaskDAO
-                    .find { (TasksTable.userId eq userId) and (TasksTable.id inList ids) }
-                    .associateBy { it.id.value }
+                    .find { (TasksTable.userId eq userId) and (TasksTable.localId inList ids) }
+                    .associateBy { it.localId }
             },
             shouldUpdate = { dto, dao -> dto.updatedAt > dao.updatedAt },
             create = { dto ->
                 TaskDAO.create(userId, dto).also { dao ->
                     dto.subtasks.forEach { sub ->
-                        SubtaskDAO.create(dao.id.value, sub)
+                        SubtaskDAO.create(dao.id, sub)
                     }
                 }
             },
@@ -186,10 +188,10 @@ class SyncServiceImpl : SyncService {
                 dao.updateFrom(dto)
                 dto.subtasks.forEach { sub ->
                     SubtaskDAO
-                        .find { SubtasksTable.taskId eq dao.id.value }
+                        .find { SubtasksTable.taskId eq dao.localId }
                         .firstOrNull()
                         ?.updateFrom(sub)
-                        ?: SubtaskDAO.create(dao.id.value, sub)
+                        ?: SubtaskDAO.create(dao.id, sub)
                 }
             },
         )
@@ -199,50 +201,80 @@ class SyncServiceImpl : SyncService {
         userId: Long,
         dtos: List<HabitReminderDto>,
     ) {
-        syncEntities(
-            incoming = dtos,
-            extractId = { it.id },
-            loadExisting = { ids ->
-                HabitReminderDAO
-                    .wrapRows(
-                        HabitRemindersTable
-                            .innerJoin(HabitsTable)
-                            .select(HabitRemindersTable.columns)
-                            .where {
-                                (HabitRemindersTable.id inList ids) and
-                                    (HabitsTable.userId eq userId)
-                            }.withDistinct(),
-                    ).associateBy { it.id.value }
-            },
-            shouldUpdate = { dto, dao -> dto.updatedAt > dao.updatedAt },
-            create = { dto -> HabitReminderDAO.create(dto.habitId, dto) },
-            update = { dto, dao -> dao.updateFrom(dto) },
-        )
+        if (dtos.isEmpty()) return
+
+        val createdAtSet = dtos.map { it.createdAt }.toSet()
+
+        val habitIds = dtos.map { it.habitId }.toSet()
+
+        val habitsIds =
+            HabitDAO
+                .find {
+                    (HabitsTable.localId inList habitIds) and
+                        (HabitsTable.userId eq userId)
+                }.associateBy { it.localId }
+
+        val existing =
+            HabitReminderDAO
+                .wrapRows(
+                    HabitRemindersTable
+                        .innerJoin(HabitsTable)
+                        .select(HabitRemindersTable.columns)
+                        .where {
+                            (HabitsTable.userId eq userId) and
+                                (HabitRemindersTable.createdAt inList createdAtSet)
+                        },
+                ).map { it.habitId to it.createdAt }
+                .toHashSet()
+
+        dtos.forEach { dto ->
+            val habit = habitsIds[dto.habitId] ?: return@forEach
+
+            val key = habit.id to dto.createdAt
+            if (key !in existing) {
+                HabitReminderDAO.create(habit.id, dto)
+            }
+        }
     }
 
     private fun syncTaskReminders(
         userId: Long,
         dtos: List<TaskReminderDto>,
     ) {
-        syncEntities(
-            incoming = dtos,
-            extractId = { it.id },
-            loadExisting = { ids ->
-                TaskReminderDAO
-                    .wrapRows(
-                        TaskRemindersTable
-                            .innerJoin(TasksTable)
-                            .select(TaskRemindersTable.columns)
-                            .where {
-                                (TaskRemindersTable.id inList ids) and
-                                    (TasksTable.userId eq userId)
-                            }.withDistinct(),
-                    ).associateBy { it.id.value }
-            },
-            shouldUpdate = { dto, dao -> dto.updatedAt > dao.updatedAt },
-            create = { dto -> TaskReminderDAO.create(dto.taskId, dto) },
-            update = { dto, dao -> dao.updateFrom(dto) },
-        )
+        if (dtos.isEmpty()) return
+
+        val createdAtSet = dtos.map { it.createdAt }.toSet()
+
+        val taskIds = dtos.map { it.taskId }.toSet()
+
+        val tasksIds =
+            TaskDAO
+                .find {
+                    (TasksTable.localId inList taskIds) and
+                        (TasksTable.userId eq userId)
+                }.associateBy { it.localId }
+
+        val existing =
+            TaskReminderDAO
+                .wrapRows(
+                    TaskRemindersTable
+                        .innerJoin(TasksTable)
+                        .select(TaskRemindersTable.columns)
+                        .where {
+                            (TasksTable.userId eq userId) and
+                                (TaskRemindersTable.createdAt inList createdAtSet)
+                        },
+                ).map { it.taskId to it.createdAt }
+                .toHashSet()
+
+        dtos.forEach { dto ->
+            val task = tasksIds[dto.taskId] ?: return@forEach
+
+            val key = task.id to dto.createdAt
+            if (key !in existing) {
+                TaskReminderDAO.create(task.id, dto)
+            }
+        }
     }
 
     private fun syncStatsLogs(
@@ -260,27 +292,81 @@ class SyncServiceImpl : SyncService {
         }
     }
 
-    private fun syncHabitCompletions(dtos: List<HabitCompletionDto>) {
-        val existingIds =
-            HabitCompletionDAO
-                .find { HabitCompletionsTable.id inList dtos.map { it.id } }
-                .map { it.id.value }
-                .toSet()
+    private fun syncHabitCompletions(
+        userId: Long,
+        dtos: List<HabitCompletionDto>,
+    ) {
+        if (dtos.isEmpty()) return
 
-        dtos.filter { it.id !in existingIds }.forEach { dto ->
-            HabitCompletionDAO.create(dto.habitId, dto)
+        val habitIds = dtos.map { it.habitId }.toSet()
+        val createdAtSet = dtos.map { it.createdAt }.toSet()
+
+        val habitsIds =
+            HabitDAO
+                .find {
+                    (HabitsTable.localId inList habitIds) and
+                        (HabitsTable.userId eq userId)
+                }.associateBy { it.localId }
+
+        val existing =
+            HabitCompletionDAO
+                .wrapRows(
+                    HabitCompletionsTable
+                        .innerJoin(HabitsTable)
+                        .select(HabitCompletionsTable.columns)
+                        .where {
+                            (HabitsTable.userId eq userId) and
+                                (HabitCompletionsTable.createdAt inList createdAtSet)
+                        },
+                ).map { it.habitId to it.createdAt }
+                .toHashSet()
+
+        dtos.forEach { dto ->
+            val habit = habitsIds[dto.habitId] ?: return@forEach
+
+            val key = habit.id to dto.createdAt
+            if (key !in existing) {
+                HabitCompletionDAO.create(habit.id, dto)
+            }
         }
     }
 
-    private fun syncTaskCompletions(dtos: List<TaskCompletionDto>) {
-        val existingIds =
-            TaskCompletionDAO
-                .find { TaskCompletionsTable.id inList dtos.map { it.id } }
-                .map { it.id.value }
-                .toSet()
+    private fun syncTaskCompletions(
+        userId: Long,
+        dtos: List<TaskCompletionDto>,
+    ) {
+        if (dtos.isEmpty()) return
 
-        dtos.filter { it.id !in existingIds }.forEach { dto ->
-            TaskCompletionDAO.create(dto.taskId, dto)
+        val taskIds = dtos.map { it.taskId }.toSet()
+        val createdAtSet = dtos.map { it.createdAt }.toSet()
+
+        val tasksIds =
+            TaskDAO
+                .find {
+                    (TasksTable.localId inList taskIds) and
+                        (TasksTable.userId eq userId)
+                }.associateBy { it.localId }
+
+        val existing =
+            TaskCompletionDAO
+                .wrapRows(
+                    TaskCompletionsTable
+                        .innerJoin(TasksTable)
+                        .select(TaskCompletionsTable.columns)
+                        .where {
+                            (TasksTable.userId eq userId) and
+                                (TaskCompletionsTable.createdAt inList createdAtSet)
+                        },
+                ).map { it.taskId to it.createdAt }
+                .toHashSet()
+
+        dtos.forEach { dto ->
+            val task = tasksIds[dto.taskId] ?: return@forEach
+
+            val key = task.id to dto.createdAt
+            if (key !in existing) {
+                TaskCompletionDAO.create(task.id, dto)
+            }
         }
     }
 

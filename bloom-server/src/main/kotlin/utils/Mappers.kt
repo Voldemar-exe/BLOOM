@@ -2,13 +2,16 @@ package com.example.utils
 
 import com.example.db.daos.*
 import com.example.db.tables.HabitPlantsTable
+import com.example.db.tables.HabitsTable
 import com.example.db.tables.SubtasksTable
+import com.example.db.tables.TasksTable
 import com.example.model.*
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.eq
 
 fun HabitDAO.toDto() =
     HabitDto(
-        id = id.value,
+        id = localId,
         title = title,
         description = description,
         recurrence = recurrence,
@@ -29,8 +32,7 @@ fun HabitDAO.toDto() =
 
 fun HabitPlantDAO.toDto() =
     HabitPlantDto(
-        id = id.value,
-        habitId = habitId.value,
+        habitId = HabitDAO.findByEntityId(habitId),
         presetId = presetId,
         iterations = iterations,
         variability = variability,
@@ -75,7 +77,7 @@ fun HabitPlantDto.Companion.defaultForHabit(
 
 fun TaskDAO.toDto() =
     TaskDto(
-        id = id.value,
+        id = localId,
         title = title,
         description = description,
         recurrence = recurrence,
@@ -93,8 +95,7 @@ fun TaskDAO.toDto() =
 
 fun SubtaskDAO.toDto() =
     SubtaskDto(
-        id = id.value,
-        taskId = taskId.value,
+        taskId = TaskDAO.findByEntityId(taskId),
         title = title,
         isChecked = isChecked,
         createdAt = createdAt,
@@ -103,8 +104,7 @@ fun SubtaskDAO.toDto() =
 
 fun HabitReminderDAO.toDto() =
     HabitReminderDto(
-        id = id.value,
-        habitId = habitId.value,
+        habitId = HabitDAO.findByEntityId(habitId),
         reminderTime = reminderTime,
         isEnabled = isEnabled,
         createdAt = createdAt,
@@ -113,8 +113,7 @@ fun HabitReminderDAO.toDto() =
 
 fun TaskReminderDAO.toDto() =
     TaskReminderDto(
-        id = id.value,
-        taskId = taskId.value,
+        taskId = TaskDAO.findByEntityId(taskId),
         reminderTime = reminderTime,
         isEnabled = isEnabled,
         createdAt = createdAt,
@@ -134,8 +133,7 @@ fun StatsLogDAO.toDto() =
 
 fun HabitCompletionDAO.toDto() =
     HabitCompletionDto(
-        id = id.value,
-        habitId = habitId.value,
+        habitId = HabitDAO.findByEntityId(habitId),
         completedAt = completedAt,
         experienceEarned = experienceEarned,
         coinsEarned = coinsEarned,
@@ -144,8 +142,7 @@ fun HabitCompletionDAO.toDto() =
 
 fun TaskCompletionDAO.toDto() =
     TaskCompletionDto(
-        id = id.value,
-        taskId = taskId.value,
+        taskId = TaskDAO.findByEntityId(taskId),
         completedAt = completedAt,
         experienceEarned = experienceEarned,
         coinsEarned = coinsEarned,
@@ -194,3 +191,9 @@ fun AppSettingsDAO.toDto(): AppSettingsDto =
         taskRemindersEnabled = taskRemindersEnabled,
         updatedAt = updatedAt,
     )
+
+fun HabitDAO.Companion.findByEntityId(id: EntityID<Long>) =
+    HabitDAO.find { HabitsTable.id eq id }.firstOrNull()!!.localId
+
+fun TaskDAO.Companion.findByEntityId(id: EntityID<Long>) =
+    TaskDAO.find { TasksTable.id eq id }.firstOrNull()!!.localId

@@ -11,6 +11,7 @@ import org.jetbrains.exposed.v1.dao.LongEntityClass
 class TaskDAO(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<TaskDAO>(TasksTable)
 
+    var localId by TasksTable.localId
     var userId by TasksTable.userId
     var title by TasksTable.title
     var description by TasksTable.description
@@ -31,7 +32,8 @@ fun TaskDAO.Companion.create(
     userId: Long,
     dto: TaskDto,
 ): TaskDAO =
-    TaskDAO.new(dto.id.takeIf { it > 0 }) {
+    TaskDAO.new {
+        this.localId = dto.id
         this.userId = EntityID(userId, UsersTable)
         updateFrom(dto)
         createdAt = dto.createdAt

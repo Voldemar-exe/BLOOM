@@ -1,7 +1,6 @@
 package com.example.db.daos
 
 import com.example.db.tables.TaskCompletionsTable
-import com.example.db.tables.TasksTable
 import com.example.model.TaskCompletionDto
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.LongEntity
@@ -18,11 +17,11 @@ class TaskCompletionDAO(id: EntityID<Long>) : LongEntity(id) {
 }
 
 fun TaskCompletionDAO.Companion.create(
-    taskId: Long,
+    taskId: EntityID<Long>,
     dto: TaskCompletionDto,
 ): TaskCompletionDAO =
-    TaskCompletionDAO.new(dto.id.takeIf { it > 0 }) {
-        this.taskId = EntityID(taskId, TasksTable)
+    TaskCompletionDAO.new {
+        this.taskId = taskId
         completedAt = dto.completedAt
         experienceEarned = dto.experienceEarned
         coinsEarned = dto.coinsEarned

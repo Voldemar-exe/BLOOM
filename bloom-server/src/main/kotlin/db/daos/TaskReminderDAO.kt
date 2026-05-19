@@ -1,7 +1,6 @@
 package com.example.db.daos
 
 import com.example.db.tables.TaskRemindersTable
-import com.example.db.tables.TasksTable
 import com.example.model.TaskReminderDto
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.LongEntity
@@ -18,11 +17,11 @@ class TaskReminderDAO(id: EntityID<Long>) : LongEntity(id) {
 }
 
 fun TaskReminderDAO.Companion.create(
-    taskId: Long,
+    taskId: EntityID<Long>,
     dto: TaskReminderDto,
 ): TaskReminderDAO =
-    TaskReminderDAO.new(dto.id.takeIf { it > 0 }) {
-        this.taskId = EntityID(taskId, TasksTable)
+    TaskReminderDAO.new {
+        this.taskId = taskId
         updateFrom(dto)
         createdAt = dto.createdAt
     }

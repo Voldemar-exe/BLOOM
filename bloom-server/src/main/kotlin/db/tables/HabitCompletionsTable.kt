@@ -7,5 +7,5 @@ object HabitCompletionsTable : LongIdTable("habit_completions") {
     val completedAt = long("completed_at")
     val experienceEarned = integer("experience_earned")
     val coinsEarned = integer("coins_earned")
-    val createdAt = long("created_at")
+    val createdAt = long("created_at").index()
 }

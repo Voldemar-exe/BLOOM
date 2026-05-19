@@ -18,6 +18,6 @@ object HabitPlantsTable : LongIdTable("habit_plants") {
     val petalColor = long("petal_color")
     val baseColor = long("base_color")
     val petalAlpha = float("petal_alpha")
-    val createdAt = long("created_at")
+    val createdAt = long("created_at").index()
     val updatedAt = long("updated_at")
 }

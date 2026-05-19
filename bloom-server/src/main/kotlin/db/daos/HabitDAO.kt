@@ -11,6 +11,7 @@ import org.jetbrains.exposed.v1.dao.LongEntityClass
 class HabitDAO(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<HabitDAO>(HabitsTable)
 
+    var localId by HabitsTable.localId
     var userId by HabitsTable.userId
     var title by HabitsTable.title
     var description by HabitsTable.description
@@ -33,6 +34,7 @@ fun HabitDAO.Companion.create(
     dto: HabitDto,
 ): HabitDAO =
     HabitDAO.new {
+        this.localId = dto.id
         this.userId = EntityID(userId, UsersTable)
         updateFrom(dto)
         createdAt = dto.createdAt

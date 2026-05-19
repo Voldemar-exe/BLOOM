@@ -1,7 +1,6 @@
 package com.example.db.daos
 
 import com.example.db.tables.SubtasksTable
-import com.example.db.tables.TasksTable
 import com.example.model.SubtaskDto
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.LongEntity
@@ -18,11 +17,11 @@ class SubtaskDAO(id: EntityID<Long>) : LongEntity(id) {
 }
 
 fun SubtaskDAO.Companion.create(
-    taskId: Long,
+    taskId: EntityID<Long>,
     dto: SubtaskDto,
 ): SubtaskDAO =
-    SubtaskDAO.new(dto.id.takeIf { it > 0 }) {
-        this.taskId = EntityID(taskId, TasksTable)
+    SubtaskDAO.new {
+        this.taskId = taskId
         updateFrom(dto)
         createdAt = dto.createdAt
     }
