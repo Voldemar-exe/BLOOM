@@ -1,9 +1,15 @@
 package com.example.database.model.entities
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "habit_completions")
+@Entity(
+    tableName = "habit_completions",
+    indices = [
+        Index(value = ["habitId", "createdAt"], unique = true),
+    ],
+)
 data class HabitCompletionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

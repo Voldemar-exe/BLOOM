@@ -1,10 +1,16 @@
 package com.example.database.model.entities
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlin.time.Clock
 
-@Entity(tableName = "habit_reminders")
+@Entity(
+    tableName = "habit_reminders",
+    indices = [
+        Index(value = ["habitId", "createdAt"], unique = true),
+    ],
+)
 data class HabitReminderEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long,

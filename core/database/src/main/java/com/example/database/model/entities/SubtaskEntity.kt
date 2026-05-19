@@ -1,10 +1,16 @@
 package com.example.database.model.entities
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlin.time.Clock
 
-@Entity(tableName = "subtasks")
+@Entity(
+    tableName = "subtasks",
+    indices = [
+        Index(value = ["taskId", "createdAt"], unique = true),
+    ],
+)
 data class SubtaskEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
