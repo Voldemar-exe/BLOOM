@@ -54,34 +54,34 @@ interface UserRepository {
 
 @Singleton
 internal class UserRepositoryImpl(
-    private val dataSource: BloomPreferencesDataStore,
+    private val dataStore: BloomPreferencesDataStore,
     private val authRepository: AuthRepository,
     private val garbageCollector: UserGarbageCollector,
 ) : UserRepository {
-    override val user = dataSource.user
-    override val stats = dataSource.stats
-    override val settings = dataSource.settings
+    override val user = dataStore.user
+    override val stats = dataStore.stats
+    override val settings = dataStore.settings
 
     override suspend fun updateUser(user: User) {
-        dataSource.setUser(user)
+        dataStore.setUser(user)
     }
 
     override suspend fun updateStats(stats: UserStats) {
-        dataSource.setStats(stats)
+        dataStore.setStats(stats)
     }
 
     override suspend fun updateSettings(settings: AppSettings) {
-        dataSource.setSettings(settings)
+        dataStore.setSettings(settings)
     }
 
     override suspend fun updateUsername(username: String) {
         val current = user.first() ?: return
-        dataSource.setUser(current.copy(username = username))
+        dataStore.setUser(current.copy(username = username))
     }
 
     override suspend fun updateEmail(email: String) {
         val current = user.first() ?: return
-        dataSource.setUser(current.copy(email = email))
+        dataStore.setUser(current.copy(email = email))
     }
 
     override suspend fun updatePassword(password: String) {
@@ -95,15 +95,15 @@ internal class UserRepositoryImpl(
         val current = user.first() ?: return
         when (type) {
             CustomizationType.AVATAR -> {
-                dataSource.setUser(user = current.copy(avatarKey = key))
+                dataStore.setUser(user = current.copy(avatarKey = key))
             }
 
             CustomizationType.BACKGROUND -> {
-                dataSource.setUser(user = current.copy(backgroundKey = key))
+                dataStore.setUser(user = current.copy(backgroundKey = key))
             }
 
             CustomizationType.COLOR -> {
-                dataSource.setUser(user = current.copy(colorKey = key))
+                dataStore.setUser(user = current.copy(colorKey = key))
             }
 
             else -> {
@@ -113,11 +113,11 @@ internal class UserRepositoryImpl(
     }
 
     override suspend fun addAchievement(id: Int) {
-        dataSource.addAchievement(id)
+        dataStore.addAchievement(id)
     }
 
     override suspend fun removeAchievement(id: Int) {
-        dataSource.removeAchievement(id)
+        dataStore.removeAchievement(id)
     }
 
     override suspend fun addPurchase(
@@ -128,14 +128,14 @@ internal class UserRepositoryImpl(
         val currentUser = user.first() ?: return
         val currentStats = stats.first()
 
-        dataSource.addPurchase(key, type.name)
-        dataSource.setStats(
+        dataStore.addPurchase(key, type.name)
+        dataStore.setStats(
             currentStats.copy(
                 currentCoinsAmount =
                     currentStats.currentCoinsAmount - price,
             ),
         )
-        dataSource.setUser(
+        dataStore.setUser(
             currentUser.copy(
                 ownedItems =
                     currentUser.ownedItems +
@@ -148,7 +148,7 @@ internal class UserRepositoryImpl(
     }
 
     override suspend fun clearUser() {
-        dataSource.clearUser()
+        dataStore.clearUser()
     }
 
     override suspend fun clearAll() {

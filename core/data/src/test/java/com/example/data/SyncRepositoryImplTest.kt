@@ -3,8 +3,13 @@ package com.example.data
 import com.example.data.repository.SyncRepositoryImpl
 import com.example.database.dao.SyncDao
 import com.example.database.dao.SyncQueueDao
+import com.example.database.model.SyncTypes
 import com.example.database.model.entities.SyncQueueEntity
 import com.example.database.util.TransactionRunner
+import com.example.datastore.datastore.BloomPreferencesDataStore
+import com.example.model.AppSettings
+import com.example.model.User
+import com.example.model.UserStats
 import com.example.network.api.SyncApi
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -25,13 +30,21 @@ class SyncRepositoryImplTest {
     private val queueDao = mockk<SyncQueueDao>(relaxed = true)
     private val syncDao = mockk<SyncDao>(relaxed = true)
     private val api = mockk<SyncApi>(relaxed = true)
+    private val dataStore = mockk<BloomPreferencesDataStore>(relaxed = true)
     private val transactionRunner =
         mockk<TransactionRunner>(relaxed = true)
     private lateinit var repository: SyncRepositoryImpl
 
     @Before
     fun setUp() {
-        repository = SyncRepositoryImpl(queueDao, syncDao, api, transactionRunner)
+        repository =
+            SyncRepositoryImpl(
+                queueDao,
+                syncDao,
+                dataStore,
+                api,
+                transactionRunner,
+            )
     }
 
     @Test
@@ -56,13 +69,16 @@ class SyncRepositoryImplTest {
             val item =
                 mockk<SyncQueueEntity>(relaxed = true) {
                     every { entityType } returns
-                        com.example.database.model.SyncTypes.HABIT
+                        SyncTypes.HABIT
                     every { entityId } returns 1L
                     every {
                         id
                     } returns 100L
                     every { createdAt } returns 1000L
                 }
+            coEvery { dataStore.user } returns flowOf(mockk<User>(relaxed = true))
+            coEvery { dataStore.stats } returns flowOf(mockk<UserStats>(relaxed = true))
+            coEvery { dataStore.settings } returns flowOf(mockk<AppSettings>(relaxed = true))
             coEvery { queueDao.getPendingList() } returns listOf(item)
             coEvery { syncDao.getHabitById(1L) } returns mockk(relaxed = true)
             coEvery { syncDao.getHabitPlantByHabitId(1L) } returns mockk(relaxed = true)

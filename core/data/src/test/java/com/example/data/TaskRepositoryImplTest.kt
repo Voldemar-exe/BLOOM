@@ -11,6 +11,8 @@ import com.example.database.model.entities.SubtaskEntity
 import com.example.database.model.entities.TaskEntity
 import com.example.database.model.relationships.TaskWithSubtasksAndReminders
 import com.example.database.util.SyncTracker
+import com.example.model.DateRange
+import com.example.model.DayTimeInterval
 import com.example.model.Tag
 import com.example.model.TaskWithRelations
 import io.mockk.coEvery
@@ -56,7 +58,14 @@ class TaskRepositoryImplTest {
             val taskEntity = mockk<TaskWithSubtasksAndReminders>(relaxed = true)
             every { task.task.tags } returns setOf(tag)
             every { relationDao.searchTasksWithRelations(any()) } returns flowOf(listOf(taskEntity))
-            val res = repository.searchTasksWithRelations("q", setOf(mockk(relaxed = true))).first()
+            val res =
+                repository
+                    .searchTasksWithRelations(
+                        "q",
+                        setOf(tag),
+                        DayTimeInterval.TODAY,
+                        DateRange(null, null),
+                    ).first()
             assertTrue(res.isEmpty())
         }
 

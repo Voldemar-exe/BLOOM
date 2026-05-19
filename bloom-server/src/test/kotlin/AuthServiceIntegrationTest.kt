@@ -1,8 +1,8 @@
 package com.example
 
-import com.example.auth.AuthError
 import com.example.auth.AuthService
 import com.example.auth.AuthServiceImpl
+import com.example.model.AuthError
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert

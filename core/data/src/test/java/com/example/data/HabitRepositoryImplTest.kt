@@ -8,6 +8,8 @@ import com.example.database.dao.HabitWithRelationDao
 import com.example.database.model.entities.HabitEntity
 import com.example.database.model.relationships.HabitWithPlantAndReminders
 import com.example.database.util.SyncTracker
+import com.example.model.DateRange
+import com.example.model.DayTimeInterval
 import com.example.model.HabitWithRelations
 import com.example.model.Tag
 import io.mockk.coEvery
@@ -61,7 +63,14 @@ class HabitRepositoryImplTest {
             every { habit.habit.tags } returns setOf(tag)
             every { relationDao.searchHabitsWithRelations(any()) } returns
                 flowOf(listOf(habitEntity))
-            val result = repository.searchHabitsWithRelations("q", setOf(tag)).first()
+            val result =
+                repository
+                    .searchHabitsWithRelations(
+                        "q",
+                        setOf(tag),
+                        DayTimeInterval.TODAY,
+                        DateRange(null, null),
+                    ).first()
             assertTrue(result.isEmpty())
         }
 
@@ -73,7 +82,14 @@ class HabitRepositoryImplTest {
                     relaxed = true,
                 )
             coEvery { relationDao.searchHabitsWithRelations(any()) } returns flowOf(listOf(habit))
-            val result = repository.searchHabitsWithRelations("q", emptySet()).first()
+            val result =
+                repository
+                    .searchHabitsWithRelations(
+                        "q",
+                        emptySet(),
+                        DayTimeInterval.TODAY,
+                        DateRange(null, null),
+                    ).first()
             assertEquals(1, result.size)
         }
 

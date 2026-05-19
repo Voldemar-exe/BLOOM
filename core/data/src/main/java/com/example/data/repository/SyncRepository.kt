@@ -40,9 +40,9 @@ interface SyncRepository {
 
     suspend fun insert(syncQueue: SyncQueue)
 
-    suspend fun pushChanges(lastSyncTimestamp: Long): Result<Unit>
+    suspend fun pushChanges(lastSyncTimestamp: Long = 0L): Result<Unit>
 
-    suspend fun pullChanges(lastSyncTimestamp: Long): Result<SyncPullResponse>
+    suspend fun pullChanges(lastSyncTimestamp: Long = 0L): Result<SyncPullResponse>
 }
 
 class SyncRepositoryImpl(

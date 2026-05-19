@@ -45,8 +45,10 @@ class SyncServiceImpl : SyncService {
             syncTaskCompletions(request.taskCompletions)
 
             syncUserProfile(userId, request.user)
-            syncUserAchievements(userId, request.user!!.ownedAchievements)
-            syncUserCustomizations(userId, request.user.ownedItems)
+            if (request.user != null) {
+                syncUserAchievements(userId, request.user.ownedAchievements)
+                syncUserCustomizations(userId, request.user.ownedItems)
+            }
             syncUserStats(userId, request.userStats)
             syncAppSettings(userId, request.appSettings)
 

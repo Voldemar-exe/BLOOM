@@ -1,7 +1,5 @@
 package com.example.data.di
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import com.example.data.repository.AuthRepository
 import com.example.data.repository.AuthRepositoryImpl
 import com.example.data.repository.GamificationRepository
@@ -47,6 +45,7 @@ import com.example.datastore.datastore.LeaderboardDataStore
 import com.example.network.api.AuthApi
 import com.example.network.api.SocialApi
 import com.example.network.api.SyncApi
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val dataModule =
@@ -109,7 +108,7 @@ val dataModule =
                 get<TransactionRunner>(),
             )
         }
-        single<SyncMetadataRepository> { SyncMetadataRepositoryImpl(get<DataStore<Preferences>>()) }
+        single<SyncMetadataRepository> { SyncMetadataRepositoryImpl(get(named("sync_preferences"))) }
         single<StatsRepository> {
             StatsRepositoryImpl(
                 get<StatsDao>(),

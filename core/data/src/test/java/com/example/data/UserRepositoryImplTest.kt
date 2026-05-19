@@ -1,6 +1,8 @@
 package com.example.data
 
+import com.example.data.repository.AuthRepository
 import com.example.data.repository.UserRepositoryImpl
+import com.example.data.util.UserGarbageCollector
 import com.example.datastore.datastore.BloomPreferencesDataStore
 import com.example.model.CustomizationType
 import com.example.model.User
@@ -20,11 +22,13 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class UserRepositoryImplTest {
     private val dataStore = mockk<BloomPreferencesDataStore>(relaxed = true)
+    private val authRepository = mockk<AuthRepository>(relaxed = true)
+    private val garbageCollector = mockk<UserGarbageCollector>(relaxed = true)
     private lateinit var repository: UserRepositoryImpl
 
     @Before
     fun setUp() {
-        repository = UserRepositoryImpl(dataStore)
+        repository = UserRepositoryImpl(dataStore, authRepository, garbageCollector)
     }
 
     @Test
@@ -32,7 +36,7 @@ class UserRepositoryImplTest {
         runTest {
             val u = mockk<User>(relaxed = true)
             every { dataStore.user } returns flowOf(u)
-            repository = UserRepositoryImpl(dataStore)
+            repository = UserRepositoryImpl(dataStore, authRepository, garbageCollector)
             assertEquals(u, repository.user.first())
         }
 
@@ -58,7 +62,7 @@ class UserRepositoryImplTest {
             val current =
                 mockk<User>(relaxed = true) { every { username } returns "old" }
             every { dataStore.user } returns flowOf(current)
-            repository = UserRepositoryImpl(dataStore)
+            repository = UserRepositoryImpl(dataStore, authRepository, garbageCollector)
             repository.updateUsername("new")
             coVerify { dataStore.setUser(any()) }
         }
@@ -67,7 +71,7 @@ class UserRepositoryImplTest {
     fun `updateUsername does nothing if null`() =
         runTest {
             every { dataStore.user } returns flowOf(null)
-            repository = UserRepositoryImpl(dataStore)
+            repository = UserRepositoryImpl(dataStore, authRepository, garbageCollector)
             repository.updateUsername("new")
             coVerify(exactly = 0) { dataStore.setUser(any()) }
         }
@@ -78,7 +82,7 @@ class UserRepositoryImplTest {
             val current =
                 mockk<User>(relaxed = true) { every { avatarKey } returns "old" }
             every { dataStore.user } returns flowOf(current)
-            repository = UserRepositoryImpl(dataStore)
+            repository = UserRepositoryImpl(dataStore, authRepository, garbageCollector)
             repository.updateCustomization("newAv", CustomizationType.AVATAR)
             coVerify { dataStore.setUser(any()) }
         }
@@ -105,7 +109,7 @@ class UserRepositoryImplTest {
                 }
             every { dataStore.user } returns flowOf(u)
             every { dataStore.stats } returns flowOf(s)
-            repository = UserRepositoryImpl(dataStore)
+            repository = UserRepositoryImpl(dataStore, authRepository, garbageCollector)
             repository.addPurchase("item", CustomizationType.AVATAR, 20)
             coVerify { dataStore.addPurchase("item", "AVATAR") }
             coVerify { dataStore.setStats(any()) }
@@ -113,9 +117,9 @@ class UserRepositoryImplTest {
         }
 
     @Test
-    fun `clearAll calls dataSource`() =
+    fun `clearAll calls garbageCollector`() =
         runTest {
             repository.clearAll()
-            coVerify { dataStore.clearAll() }
+            coVerify { garbageCollector.clearAll() }
         }
 }
