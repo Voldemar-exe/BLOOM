@@ -207,7 +207,7 @@ class BloomPreferencesDataStore(private val preferences: DataStore<UserPreferenc
         try {
             preferences.updateData { current ->
                 current.copy {
-                    clearToken()
+                    clearAuthToken()
                 }
             }
         } catch (ioException: IOException) {

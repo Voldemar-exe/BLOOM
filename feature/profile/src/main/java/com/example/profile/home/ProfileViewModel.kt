@@ -135,6 +135,10 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                         userRepository.clearAll()
                     }
                 }
+
+                ProfileAction.ToAuth -> {
+                    userRepository.clearUser()
+                }
             }
         }
     }

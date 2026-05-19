@@ -149,6 +149,7 @@ internal class UserRepositoryImpl(
 
     override suspend fun clearUser() {
         dataStore.clearUser()
+        dataStore.clearToken()
     }
 
     override suspend fun clearAll() {

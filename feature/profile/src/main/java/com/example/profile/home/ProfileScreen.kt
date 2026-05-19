@@ -484,7 +484,7 @@ fun EnterAccountPlaceholder(onAction: (ProfileAction) -> Unit) {
             )
             Spacer(Modifier.height(16.dp))
             Button(
-                onClick = { onAction(ProfileAction.OnExitClick) },
+                onClick = { onAction(ProfileAction.ToAuth) },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Создать аккаунт")
