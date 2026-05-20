@@ -14,6 +14,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.bloom.navigation.TOP_LEVEL_NAV_ITEMS
@@ -46,12 +47,14 @@ fun BloomApp() {
                         NavigationBarItem(
                             icon = {
                                 Icon(
-                                    imageVector =
-                                        if (selected) {
-                                            navItem.selectedIcon
-                                        } else {
-                                            navItem.unselectedIcon
-                                        },
+                                    painter =
+                                        painterResource(
+                                            if (selected) {
+                                                navItem.selectedIcon
+                                            } else {
+                                                navItem.unselectedIcon
+                                            },
+                                        ),
                                     contentDescription = navItem.iconTextId,
                                 )
                             },

@@ -31,4 +31,13 @@ object BloomIcons {
     val Undo = R.drawable.undo_24px
     val Circle = R.drawable.circle_24px
     val Palette = R.drawable.palette_24px
+
+    val Habits = R.drawable.dashboard_customize_24px
+    val HabitsFill = R.drawable.dashboard_customize_fill_24px
+    val Tasks = R.drawable.add_task_24px
+    val TasksFill = R.drawable.add_task_24px
+    val Stats = R.drawable.leaderboard_24px
+    val StatsFill = R.drawable.leaderboard_fill_24px
+    val Profile = R.drawable.user_attributes_24px
+    val ProfileFill = R.drawable.user_attributes_fill_24px
 }
