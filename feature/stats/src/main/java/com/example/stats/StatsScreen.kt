@@ -137,7 +137,7 @@ private fun MetricCard(
             ),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
@@ -176,7 +176,7 @@ private fun CoinCard(
             ),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
@@ -193,7 +193,7 @@ private fun CoinCard(
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = "из $max",
+                text = "макс: $max",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
             )

@@ -48,6 +48,7 @@ import com.example.habit.PlantCanvas
 import com.example.habit.util.toHabitPlant
 import com.example.habit.util.toPlantConfig
 import com.example.model.Habit
+import com.example.model.HabitCompletion
 import com.example.model.HabitPlant
 import com.example.model.HabitWithRelations
 import com.example.model.Recurrence
@@ -73,7 +74,7 @@ fun HabitScreen(
 
 @Composable
 fun HabitScreen(
-    state: HabitState,
+    state: HabitsState,
     onAction: (HabitAction) -> Unit,
     onOpenHabitSetup: (Long?, Float) -> Unit,
 ) {
@@ -261,7 +262,7 @@ private fun HabitPreview(
     BLOOMTheme(appTheme = appTheme) {
         HabitScreen(
             state =
-                HabitState(
+                HabitsState(
                     habits =
                         listOf(
                             HabitWithRelations(
@@ -316,6 +317,17 @@ private fun HabitPreview(
                                 reminders = emptyList(),
                             ),
                         ),
+                    completions =
+                        List(90) { index ->
+                            HabitCompletion(
+                                id = index.toLong(),
+                                habitId = (index % 4).toLong(),
+                                completedAt = 0L,
+                                experienceEarned = 0,
+                                coinsEarned = 0,
+                                createdAt = 0L,
+                            )
+                        },
                 ),
             onAction = {},
             onOpenHabitSetup = { _, _ -> },

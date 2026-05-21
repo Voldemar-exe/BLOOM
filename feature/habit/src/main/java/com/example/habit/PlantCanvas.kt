@@ -18,6 +18,7 @@ import com.example.plant.PlantConfig
 import com.example.plant.utils.LSystemInterpreterImpl
 import com.example.plant.utils.PathBuilderImpl
 import com.example.plant.utils.PlantGeometry
+import com.example.plant.utils.PlantPaths
 import com.example.plant.utils.PlantRendererImpl
 import com.example.plant.utils.Randomizer
 
@@ -62,6 +63,13 @@ fun PlantCanvas(
             }
         }
 
+    val cachedBranches by remember(plantPaths) {
+        derivedStateOf { plantPaths?.let { paths -> paths.branchesPaths.sortedBy { it.id } } }
+    }
+    val cachedLeaves by remember(plantPaths) {
+        derivedStateOf { plantPaths?.let { paths -> paths.leavesPaths.sortedBy { it.branchId } } }
+    }
+
     Canvas(
         modifier
             .fillMaxSize()
@@ -85,7 +93,7 @@ fun PlantCanvas(
                 }) {
                     plantRenderer.drawPlant(
                         drawScope = this,
-                        plantPaths = paths,
+                        plantPaths = PlantPaths(cachedBranches!!, cachedLeaves!!),
                         renderConfig = config.renderConfig,
                         progress = progress,
                     )

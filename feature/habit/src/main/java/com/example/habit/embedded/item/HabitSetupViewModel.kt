@@ -3,6 +3,7 @@ package com.example.habit.embedded.item
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.HabitRepository
+import com.example.habit.usecases.UpdateHabitCreationUseCase
 import com.example.model.Habit
 import com.example.model.RecurrenceType
 import com.example.model.Reminder
@@ -20,7 +21,10 @@ import timber.log.Timber
 import java.time.LocalTime
 
 @KoinViewModel
-class HabitSetupViewModel(private val habitRepository: HabitRepository) : ViewModel() {
+class HabitSetupViewModel(
+    private val habitRepository: HabitRepository,
+    private val updateHabitCreationUseCase: UpdateHabitCreationUseCase,
+) : ViewModel() {
     private val _state = MutableStateFlow(HabitSetupState())
     val state: StateFlow<HabitSetupState> = _state.asStateFlow()
 
@@ -189,6 +193,9 @@ class HabitSetupViewModel(private val habitRepository: HabitRepository) : ViewMo
                     .isEmpty()
             ) {
                 return@launch
+            }
+            if (_state.value.id == 0L) {
+                updateHabitCreationUseCase.invoke()
             }
             val habitId = habitRepository.saveHabit(stateToHabit(), _state.value.plant)
 

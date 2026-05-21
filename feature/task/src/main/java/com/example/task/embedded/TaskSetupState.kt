@@ -14,7 +14,7 @@ data class TaskSetupState(
     val title: String = "",
     val description: String = "",
     val priority: Priority = Priority.MEDIUM,
-    val recurrence: Recurrence = Recurrence(RecurrenceType.WEEK, emptySet()),
+    val recurrence: Recurrence = Recurrence(RecurrenceType.DAY, emptySet()),
     val deadline: Long? = null,
     val reminders: List<Reminder> = emptyList(),
     val remindersToDelete: Set<Long> = emptySet(),

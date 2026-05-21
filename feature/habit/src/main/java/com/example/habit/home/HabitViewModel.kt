@@ -28,8 +28,8 @@ class HabitViewModel(
     private val completeHabitUseCase: CompleteHabitUseCase,
     private val getHabitsCompletionsUseCase: GetHabitsCompletionsUseCase,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(HabitState())
-    val state: StateFlow<HabitState>
+    private val _state = MutableStateFlow(HabitsState())
+    val state: StateFlow<HabitsState>
         get() = _state.asStateFlow()
 
     private val filtersFlow =
@@ -66,7 +66,10 @@ class HabitViewModel(
         viewModelScope.launch {
             getHabitsCompletionsUseCase()
                 .distinctUntilChanged()
-                .collect { completions -> _state.update { it.copy(completions = completions) } }
+                .collect { completions ->
+                    Timber.d("Collected completions: $completions")
+                    _state.update { it.copy(completions = completions) }
+                }
         }
     }
 

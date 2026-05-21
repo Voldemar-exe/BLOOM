@@ -30,6 +30,8 @@ interface GamificationRepository {
     suspend fun isHabitCompletedToday(habitId: Long): Boolean
 
     suspend fun isTaskCompletedToday(taskId: Long): Boolean
+
+    suspend fun getLastCompletedHabitTime(): Long
 }
 
 internal class GamificationRepositoryImpl(
@@ -115,6 +117,8 @@ internal class GamificationRepositoryImpl(
         val (start, end) = todayRange()
         return dao.hasTaskCompletionToday(taskId, start, end)
     }
+
+    override suspend fun getLastCompletedHabitTime(): Long = dao.getLastHabitCompletionTime() ?: 0L
 
     private fun todayRange(): Pair<Long, Long> {
         val msInDay = 86_400_000L

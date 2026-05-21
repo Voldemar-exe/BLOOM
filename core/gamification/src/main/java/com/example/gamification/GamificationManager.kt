@@ -31,6 +31,7 @@ class GamificationManager(
                         experienceEarned = baseReward.experience,
                         coinsEarned = baseReward.coins,
                     )
+                    updateStreaks(gamificationRepository.getLastCompletedHabitTime())
                     baseReward
                 }
 
@@ -55,11 +56,14 @@ class GamificationManager(
                 }
             }
 
-        applyReward(reward)
+        applyReward(event, reward)
         Timber.d("Processed $event → $reward")
     }
 
-    private suspend fun applyReward(reward: Reward) {
+    private suspend fun applyReward(
+        event: GamificationEvent,
+        reward: Reward,
+    ) {
         val currentStats = userRepository.stats.first()
         val newTotalXp = currentStats.currentExperience + reward.experience
         val currentLevel = XpRules.calculateLevel(newTotalXp)
@@ -78,9 +82,24 @@ class GamificationManager(
                     } else {
                         currentStats.maxCoinsAmount
                     },
+                totalTasksCompleted =
+                    currentStats.totalTasksCompleted +
+                        if (event is GamificationEvent.TaskCompleted && reward.experience > 0 &&
+                            reward.coins > 0
+                        ) {
+                            1
+                        } else {
+                            0
+                        },
                 totalHabitsCompleted =
                     currentStats.totalHabitsCompleted +
-                        if (reward.experience > 0 && reward.coins > 0) 1 else 0,
+                        if (event is GamificationEvent.HabitCompleted && reward.experience > 0 &&
+                            reward.coins > 0
+                        ) {
+                            1
+                        } else {
+                            0
+                        },
             )
 
         userRepository.updateStats(updatedStats)
@@ -94,6 +113,7 @@ class GamificationManager(
                 currentStreak = stats.currentStreak,
                 longestStreak = stats.longestStreak,
             )
+        Timber.d("$newCurrent and $newLongest")
         userRepository.updateStats(
             stats.copy(
                 currentStreak = newCurrent,

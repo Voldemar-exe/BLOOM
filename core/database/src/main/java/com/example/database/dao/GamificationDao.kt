@@ -91,4 +91,7 @@ interface GamificationDao {
         startOfDay: Long,
         endOfDay: Long,
     ): Boolean
+
+    @Query("SELECT completedAt FROM habit_completions ORDER BY completedAt DESC LIMIT 1")
+    suspend fun getLastHabitCompletionTime(): Long?
 }

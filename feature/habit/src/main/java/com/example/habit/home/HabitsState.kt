@@ -8,7 +8,7 @@ import com.example.model.HabitWithRelations
 import com.example.model.Tag
 
 @Immutable
-data class HabitState(
+data class HabitsState(
     val habits: List<HabitWithRelations> = emptyList(),
     val selectedTabTime: DayTimeInterval = DayTimeInterval.TODAY,
     val selectedDate: DateRange = DateRange(null, null),

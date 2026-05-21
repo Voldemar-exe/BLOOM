@@ -9,6 +9,7 @@ import com.example.model.Reminder
 import com.example.model.Subtask
 import com.example.model.Tag
 import com.example.model.Task
+import com.example.task.usecases.UpdateTaskCreationUseCase
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,10 @@ import timber.log.Timber
 import java.time.LocalTime
 
 @KoinViewModel
-class TaskSetupViewModel(private val taskRepository: TaskRepository) : ViewModel() {
+class TaskSetupViewModel(
+    private val taskRepository: TaskRepository,
+    private val updateTaskCreationUseCase: UpdateTaskCreationUseCase
+) : ViewModel() {
     private val _state = MutableStateFlow(TaskSetupState())
     val state: StateFlow<TaskSetupState> = _state.asStateFlow()
 
@@ -214,6 +218,14 @@ class TaskSetupViewModel(private val taskRepository: TaskRepository) : ViewModel
 
     private fun saveTask() {
         viewModelScope.launch {
+            if (
+                _state.value.recurrence.type != RecurrenceType.DAY &&
+                _state.value.recurrence.values
+                    .isEmpty()
+            ) {
+                return@launch
+            }
+            if (_state.value.id == 0L) updateTaskCreationUseCase.invoke()
             val taskId = taskRepository.saveTask(stateToTask())
             _state.value.reminders.forEach {
                 taskRepository.saveReminder(it.copy(parentId = taskId))

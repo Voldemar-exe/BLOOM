@@ -1,10 +1,10 @@
 package com.example.model.util
 
 import com.example.model.Reward
+import timber.log.Timber
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
 // TODO: Think about right amount of rewards
@@ -34,20 +34,27 @@ object StreakRules {
         currentStreak: Int,
         longestStreak: Int,
     ): Pair<Int, Int> {
+        Timber.d(
+            "Start: current=$currentStreak, longest=$longestStreak, ts=$lastCompletionTimestamp",
+        )
         if (lastCompletionTimestamp == null) return 1 to maxOf(currentStreak, 1)
 
-        val lastDate =
-            ZonedDateTime.ofInstant(
-                Instant.ofEpochMilli(lastCompletionTimestamp),
-                ZoneId.systemDefault(),
-            )
-        val today = LocalDate.now(ZoneId.systemDefault())
-        val daysDiff = ChronoUnit.DAYS.between(lastDate, today)
+        return try {
+            val lastDate =
+                Instant.ofEpochMilli(lastCompletionTimestamp).atZone(ZoneId.systemDefault())
+            val today = LocalDate.now(ZoneId.systemDefault())
+            val daysDiff = ChronoUnit.DAYS.between(lastDate.toLocalDate(), today)
 
-        return when {
-            daysDiff <= 1 -> (currentStreak + 1) to maxOf(longestStreak, currentStreak + 1)
-            daysDiff > 1 -> 1 to longestStreak
-            else -> currentStreak to longestStreak
+            Timber.d("Calculated diff: $daysDiff")
+
+            when {
+                daysDiff == 0L -> currentStreak to longestStreak
+                daysDiff == 1L -> (currentStreak + 1) to maxOf(longestStreak, currentStreak + 1)
+                else -> 1 to maxOf(longestStreak, 1)
+            }
+        } catch (e: Throwable) {
+            Timber.e(e, "Streak calculation failed")
+            1 to maxOf(longestStreak, 1)
         }
     }
 }
