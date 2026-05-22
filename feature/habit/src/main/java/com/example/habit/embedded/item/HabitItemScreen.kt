@@ -276,7 +276,7 @@ internal fun HabitItemScreen(
                                 .fillMaxWidth()
                                 .padding(16.dp),
                     ) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = "add")
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "add step")
                         Spacer(modifier = Modifier.height(0.dp))
                         Text("Добавить этап привычки")
                     }

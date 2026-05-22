@@ -1,13 +1,8 @@
 package com.example.plant.utils
 
-import android.graphics.PathMeasure
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.asAndroidPath
-import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import com.example.plant.RenderConfig
 
@@ -39,26 +34,52 @@ class PlantRendererImpl : PlantRenderer {
         renderConfig: RenderConfig,
         progress: Float,
     ) {
-        val branchPath = Path()
-        val leafPath = Path()
-
         val total = plantPaths.branchesPaths.size
-        val global = progress * total
+        if (total == 0) return
 
-        for (branch in plantPaths.branchesPaths.sortedBy { it.id }) {
-            val local = (global - branch.id).coerceIn(0f, 1f)
-            val eased = FastOutSlowInEasing.transform(local)
+        val branchesToDraw =
+            if (progress >= 1.0f) {
+                total
+            } else {
+                (progress * total).toInt().coerceIn(0, total - 1)
+            }
 
-            branchPath.addPath(branch.path.trimToProgress(eased))
+        val branchPath = Path()
+        val drawnBranchIds = mutableSetOf<Int>()
+
+        for ((index, branch) in plantPaths.branchesPaths.withIndex()) {
+            if (index < branchesToDraw) {
+                branchPath.addPath(branch.path)
+                drawnBranchIds.add(branch.id)
+            }
         }
-
         drawScope.drawPath(branchPath, renderConfig.branchColor)
 
-        for (leaf in plantPaths.leavesPaths.sortedBy { it.branchId }) {
-            val local = (global - leaf.branchId).coerceIn(0f, 1f)
-            val eased = LinearOutSlowInEasing.transform(local)
+        val leafPath = Path()
+        for (leaf in plantPaths.leavesPaths) {
+            if (leaf.branchId in drawnBranchIds) {
+                leafPath.addPath(leaf.path)
+            }
+        }
+        drawScope.drawPath(leafPath, renderConfig.leafColor)
+    }
 
-            leafPath.addPath(leaf.path.trimToProgress(eased))
+    private fun drawPlant(
+        drawScope: DrawScope,
+        plantPaths: PlantPaths,
+        renderConfig: RenderConfig,
+    ) {
+        val path = Path()
+        val leafPath = Path()
+
+        for (branch in plantPaths.branchesPaths.sortedBy { it.order }) {
+            path.addPath(branch.path)
+        }
+
+        drawScope.drawPath(path, renderConfig.branchColor)
+
+        for (leaf in plantPaths.leavesPaths) {
+            leafPath.addPath(leaf.path)
         }
 
         drawScope.drawPath(leafPath, renderConfig.leafColor)
@@ -101,18 +122,4 @@ class PlantRendererImpl : PlantRenderer {
             }
         }
     }
-}
-
-private fun Path.trimToProgress(progress: Float): Path {
-    val androidPath = this.asAndroidPath()
-    val measure = PathMeasure(androidPath, false)
-
-    val length = measure.length
-    val outPath = android.graphics.Path()
-
-    val stop = length * progress
-
-    measure.getSegment(0f, stop, outPath, true)
-
-    return outPath.asComposePath()
 }

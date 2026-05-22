@@ -95,7 +95,7 @@ private fun ReminderHeader(onAddClick: () -> Unit) {
         )
 
         IconButton(onClick = onAddClick) {
-            Icon(Icons.Default.Add, contentDescription = "add")
+            Icon(Icons.Default.Add, contentDescription = "add reminder")
         }
     }
 }

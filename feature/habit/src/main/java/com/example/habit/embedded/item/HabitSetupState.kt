@@ -20,7 +20,7 @@ data class HabitSetupState(
     val checkedSteps: Set<Int> = emptySet(),
     val reminders: List<Reminder> = emptyList(),
     val remindersToDelete: Set<Long> = emptySet(),
-    val plant: HabitPlant = PresetLibrary.getExamples()[0].toHabitPlant(),
+    val plant: HabitPlant = PresetLibrary.getExamples()[1].toHabitPlant(),
     val isArchived: Boolean = false,
     val isPaused: Boolean = false,
     val isMuted: Boolean = false,

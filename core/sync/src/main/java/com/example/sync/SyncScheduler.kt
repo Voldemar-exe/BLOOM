@@ -23,7 +23,7 @@ object SyncScheduler {
                 .build()
 
         val workRequest =
-            PeriodicWorkRequestBuilder<SyncWorker>(15, TimeUnit.MINUTES)
+            PeriodicWorkRequestBuilder<SyncWorker>(15, TimeUnit.SECONDS)
                 .setConstraints(constraints)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
                 .build()

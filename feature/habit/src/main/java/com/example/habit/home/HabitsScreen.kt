@@ -163,7 +163,7 @@ fun HabitItem(
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "delete",
-                    tint = MaterialTheme.colorScheme.onErrorContainer,
+                    tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(end = 16.dp),
                 )
             }

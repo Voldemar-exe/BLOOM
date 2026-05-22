@@ -142,6 +142,8 @@ class LSystemInterpreterImpl : LSystemInterpreter {
                 ']' -> {
                     if (currentBranchPoints.isNotEmpty()) {
                         branches.add(currentBranch.copy(points = currentBranchPoints.toList()))
+                    } else {
+                        currentBranchId -= 1
                     }
 
                     if (stack.isNotEmpty()) {
