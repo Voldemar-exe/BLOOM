@@ -156,7 +156,7 @@ internal fun ProfileScreen(
                 },
                 actions = {
                     IconButton(onClick = { onAction(ProfileAction.OnExitClick) }) {
-                        Icon(Icons.AutoMirrored.Default.ExitToApp, contentDescription = "settings")
+                        Icon(Icons.AutoMirrored.Default.ExitToApp, contentDescription = "exit")
                     }
                     IconButton(onClick = { onAction(ProfileAction.OnSettingsClick) }) {
                         Icon(Icons.Default.Settings, contentDescription = "settings")

@@ -15,6 +15,9 @@ import com.example.profile.di.profileModule
 import com.example.stats.di.statsModule
 import com.example.sync.di.syncModule
 import com.example.task.di.taskModule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.workmanager.koin.workManagerFactory
@@ -51,7 +54,21 @@ class BloomApplication : Application() {
         createNotificationChannel(applicationContext)
 
         if (BuildConfig.DEBUG) {
+            val initScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
             Timber.plant(Timber.DebugTree())
+            /*initScope.launch {
+                runCatching {
+                    val koin = getKoin()
+                    TestDataFactory(
+                        syncDao = koin.get<SyncDao>(),
+                        syncQueueDao = koin.get<SyncQueueDao>(),
+                        preferencesDataStore = koin.get<DataStore<UserPreferences>>(),
+                    ).setup()
+                    Timber.d("Test data loaded successfully")
+                }.onFailure {
+                    Timber.e(it, "Failed to load test data")
+                }
+            }*/
         }
     }
 }

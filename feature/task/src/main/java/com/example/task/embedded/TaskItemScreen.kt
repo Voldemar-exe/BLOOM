@@ -155,19 +155,23 @@ internal fun TaskItemScreen(
             contentPadding = PaddingValues(bottom = 100.dp),
         ) {
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    InputFieldWithClear(
+                        label = "Измените название",
+                        value = state.title,
+                        onValueChange = { onAction(TaskSetupAction.OnTitleChange(it)) },
+                    )
 
-                InputFieldWithClear(
-                    label = "Измените название",
-                    value = state.title,
-                    onValueChange = { onAction(TaskSetupAction.OnTitleChange(it)) },
-                )
-
-                InputFieldWithClear(
-                    label = "Измените описание",
-                    value = state.description,
-                    onValueChange = { onAction(TaskSetupAction.OnDescriptionChange(it)) },
-                )
+                    InputFieldWithClear(
+                        label = "Измените описание",
+                        value = state.description,
+                        onValueChange = { onAction(TaskSetupAction.OnDescriptionChange(it)) },
+                    )
+                }
             }
 
             item {
@@ -321,8 +325,7 @@ private fun SubtaskRow(
                 .background(
                     MaterialTheme.colorScheme.secondaryContainer,
                     RoundedCornerShape(12.dp),
-                )
-                .padding(12.dp),
+                ).padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Checkbox(
@@ -388,9 +391,10 @@ fun EndDateToggle(
     onToggle: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {

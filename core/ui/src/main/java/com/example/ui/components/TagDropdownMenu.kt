@@ -43,7 +43,7 @@ fun TagDropdownMenu(
         ) {
             Icon(
                 painter = painterResource(icon),
-                contentDescription = null,
+                contentDescription = "tag-control",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

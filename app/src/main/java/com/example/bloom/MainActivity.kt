@@ -61,6 +61,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                     is AuthState.Authorized -> {
+                        mainViewModel.observeSync()
                         NotificationPermissionRequester()
                         BloomApp()
                     }

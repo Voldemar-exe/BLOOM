@@ -4,6 +4,7 @@ import com.example.bloom.MainViewModel
 import com.example.data.repository.AuthRepository
 import com.example.data.repository.NotificationRepository
 import com.example.data.repository.SettingsRepository
+import com.example.data.repository.SyncRepository
 import com.example.notification.NotificationManager
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -15,6 +16,8 @@ val appModule =
                 get<SettingsRepository>(),
                 get<NotificationRepository>(),
                 get<NotificationManager>(),
+                get<SyncRepository>(),
+                get(),
                 get<AuthRepository>(),
             )
         }

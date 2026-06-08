@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.repository.HabitRepository
 import com.example.habit.usecases.UpdateHabitCreationUseCase
 import com.example.model.Habit
+import com.example.model.HabitPlant
 import com.example.model.RecurrenceType
 import com.example.model.Reminder
 import com.example.model.Tag
@@ -63,7 +64,7 @@ class HabitSetupViewModel(
             is HabitSetupAction.ToggleStep -> toggleStep(action.index)
             is HabitSetupAction.SetPlant -> _state.update { it.copy(plant = action.plant) }
             HabitSetupAction.OnSaveHabit -> saveHabit()
-            is HabitSetupAction.LoadHabit -> action.habitId?.let { loadHabit(it) }
+            is HabitSetupAction.LoadHabit -> action.habitId?.let { loadHabit(it, action.plant) }
             HabitSetupAction.ToggleArchived -> _state.update { it.copy(isArchived = !it.isArchived) }
             HabitSetupAction.ToggleMuted -> _state.update { it.copy(isMuted = !it.isMuted) }
         }
@@ -210,7 +211,10 @@ class HabitSetupViewModel(
         }
     }
 
-    private fun loadHabit(habitId: Long) {
+    private fun loadHabit(
+        habitId: Long,
+        plant: HabitPlant?,
+    ) {
         viewModelScope.launch {
             habitRepository.getHabitWithRelations(habitId)?.let { info ->
                 _state.update {
@@ -222,7 +226,7 @@ class HabitSetupViewModel(
                         tags = info.habit.tags,
                         steps = info.habit.steps,
                         reminders = info.reminders,
-                        plant = info.plant,
+                        plant = plant ?: info.plant,
                         isArchived = info.habit.isArchived,
                         isPaused = info.habit.isPaused,
                         isMuted = info.habit.isMuted,

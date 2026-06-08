@@ -318,7 +318,7 @@ private fun HabitPreview(
                             ),
                         ),
                     completions =
-                        List(90) { index ->
+                        List(160) { index ->
                             HabitCompletion(
                                 id = index.toLong(),
                                 habitId = (index % 4).toLong(),

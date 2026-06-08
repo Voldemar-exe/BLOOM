@@ -68,7 +68,7 @@ fun AvatarCustomizeScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
+                            contentDescription = "Назад",
                         )
                     }
                 },
@@ -207,14 +207,14 @@ private fun CustomizationCard(
                 CustomizationType.AVATAR -> {
                     Image(
                         painter = painterResource(BloomAvatars.resolve(item.key)),
-                        contentDescription = null,
+                        contentDescription = "avatar",
                     )
                 }
 
                 CustomizationType.BACKGROUND -> {
                     Image(
                         painter = painterResource(BloomBackgrounds.resolve(item.key)),
-                        contentDescription = null,
+                        contentDescription = "background",
                         contentScale = ContentScale.Crop,
                     )
                 }

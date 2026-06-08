@@ -128,3 +128,91 @@ private fun createDefaultCustomizations(userId: EntityID<Long>) {
         }
     }
 }
+
+suspend fun createDemoUser() {
+    suspendTransaction {
+        val login = "demo"
+
+        if (UserDAO.find { UsersTable.login eq login }.firstOrNull() != null) {
+            return@suspendTransaction
+        }
+
+        val user = UserDAO.new {
+            this.login = login
+            this.email = "demo@yandex.ru"
+            this.passwordHash = PasswordHasher.hash("demo123")
+            this.nickname = "Voldemar"
+            this.createdAt = System.currentTimeMillis()
+            this.updatedAt = System.currentTimeMillis()
+        }
+
+        createDemoStats(user.id)
+        createDemoSettings(user.id)
+        createDemoCustomizations(user.id)
+        createDemoHabits(user.id)
+        createDemoTasks(user.id)
+    }
+}
+
+private fun createDemoStats(userId: EntityID<Long>) {
+    UserStatsDAO.new {
+        this.userId = userId
+
+        level = 12
+        currentExperience = 2350
+
+        currentCoinsAmount = 480
+        maxCoinsAmount = 1250
+
+        totalHabitsCreated = 8
+        totalHabitsCompleted = 143
+
+        totalTasksCreated = 57
+        totalTasksCompleted = 48
+
+        currentStreak = 12
+        longestStreak = 27
+
+        updatedAt = System.currentTimeMillis()
+    }
+}
+
+private fun createDemoSettings(userId: EntityID<Long>) {
+    AppSettingsDAO.new {
+        this.userId = userId
+
+        theme = "DARK"
+        weeklyGoal = 7
+        streakTarget = 14
+
+        emailEnabled = true
+        pushEnabled = true
+
+        habitRemindersEnabled = true
+        taskRemindersEnabled = true
+
+        updatedAt = System.currentTimeMillis()
+    }
+}
+
+private fun createDemoCustomizations(userId: EntityID<Long>) {
+    listOf(
+        "FOCUSED_GUY" to "AVATAR",
+        "DUBAI_DOWNTOWN" to "BACKGROUND",
+        "CYAN" to "COLOR",
+    ).forEach { (key, type) ->
+        UserCustomizationDAO.new {
+            this.userId = userId
+            this.key = key
+            this.type = type
+        }
+    }
+}
+
+private fun createDemoHabits(userId: EntityID<Long>) {
+
+}
+
+private fun createDemoTasks(userId: EntityID<Long>) {
+
+}

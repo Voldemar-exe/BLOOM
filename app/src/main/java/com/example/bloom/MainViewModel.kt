@@ -1,11 +1,14 @@
 package com.example.bloom
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.AuthRepository
 import com.example.data.repository.NotificationRepository
 import com.example.data.repository.SettingsRepository
+import com.example.data.repository.SyncRepository
 import com.example.notification.NotificationManager
+import com.example.sync.SyncScheduler
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,6 +31,8 @@ class MainViewModel(
     private val settingsRepository: SettingsRepository,
     private val notificationRepository: NotificationRepository,
     private val notificationManager: NotificationManager,
+    private val syncRepository: SyncRepository,
+    private val appContext: Context,
     private val authRepository: AuthRepository,
 ) : ViewModel() {
     val authState: StateFlow<AuthState> =
@@ -65,6 +70,14 @@ class MainViewModel(
                         reminders = reminders,
                     )
                 }
+        }
+    }
+
+    fun observeSync() {
+        viewModelScope.launch {
+            syncRepository.observePending().collect {
+                SyncScheduler.enqueueImmediateSync(appContext)
+            }
         }
     }
 }

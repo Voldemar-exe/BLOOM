@@ -117,7 +117,7 @@ fun PlantSetupScreen(
                     IconButton(onClick = { onAction(PlantSetupAction.Save) }) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = "undo",
+                            contentDescription = "save",
                         )
                     }
                 },

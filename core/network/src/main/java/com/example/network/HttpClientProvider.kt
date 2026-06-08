@@ -39,7 +39,7 @@ class HttpClientProvider(
                             Timber.d("Ktor: $message")
                         }
                     }
-                level = LogLevel.INFO
+                level = LogLevel.BODY
             }
 
             install(Auth) {

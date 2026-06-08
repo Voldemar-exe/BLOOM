@@ -23,7 +23,7 @@ fun StatsLogDAO.Companion.create(
     userId: Long,
     dto: StatsLogDto,
 ): StatsLogDAO =
-    StatsLogDAO.new(dto.id.takeIf { it > 0 }) {
+    StatsLogDAO.new {
         this.userId = EntityID(userId, UsersTable)
         eventId = dto.eventId
         sourceType = dto.sourceType

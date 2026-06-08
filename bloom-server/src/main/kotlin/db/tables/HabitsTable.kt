@@ -4,7 +4,7 @@ import com.example.model.SyncStatus
 import org.jetbrains.exposed.v1.core.dao.id.LongIdTable
 
 object HabitsTable : LongIdTable("habits") {
-    val localId = long("local_id").uniqueIndex()
+    val localId = long("local_id").index()
     val userId = reference("user_id", UsersTable.id).index()
     val title = text("title")
     val description = text("description").nullable()

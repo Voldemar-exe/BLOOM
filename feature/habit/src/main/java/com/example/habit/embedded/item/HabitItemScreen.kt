@@ -2,6 +2,8 @@ package com.example.habit.embedded.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,6 +53,7 @@ import com.example.ui.components.ReminderSection
 import com.example.ui.components.TextInputDialog
 import com.example.ui.logic.CollectOneShotEffect
 import org.koin.compose.viewmodel.koinViewModel
+import timber.log.Timber
 
 @Composable
 fun HabitItemScreen(
@@ -62,7 +65,7 @@ fun HabitItemScreen(
     viewModel: HabitSetupViewModel = koinViewModel(),
 ) {
     LaunchedEffect(habitId) {
-        habitId?.let { viewModel.onAction(HabitSetupAction.LoadHabit(it)) }
+        habitId?.let { viewModel.onAction(HabitSetupAction.LoadHabit(it, plant)) }
     }
     LaunchedEffect(plant) {
         plant?.let { viewModel.onAction(HabitSetupAction.SetPlant(it)) }
@@ -152,6 +155,7 @@ internal fun HabitItemScreen(
         LazyColumn(modifier = modifier.padding(padding)) {
             item {
                 // TODO: It draw differently. I don't know why
+                Timber.d("${state.plant}")
                 PlantCloseUp(
                     modifier = Modifier.padding(16.dp),
                     seed = state.plant.seed,
@@ -173,17 +177,23 @@ internal fun HabitItemScreen(
             }
 
             item {
-                InputFieldWithClear(
-                    label = "Измените название",
-                    value = state.title,
-                    onValueChange = { onAction(HabitSetupAction.OnTitleChange(it)) },
-                )
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    InputFieldWithClear(
+                        label = "Измените название",
+                        value = state.title,
+                        onValueChange = { onAction(HabitSetupAction.OnTitleChange(it)) },
+                    )
 
-                InputFieldWithClear(
-                    label = "Измените описание",
-                    value = state.description,
-                    onValueChange = { onAction(HabitSetupAction.OnDescriptionChange(it)) },
-                )
+                    InputFieldWithClear(
+                        label = "Измените описание",
+                        value = state.description,
+                        onValueChange = { onAction(HabitSetupAction.OnDescriptionChange(it)) },
+                    )
+                }
             }
 
             item {
