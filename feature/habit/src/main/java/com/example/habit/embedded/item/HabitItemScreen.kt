@@ -19,13 +19,13 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -88,7 +88,7 @@ fun HabitItemScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HabitItemScreen(
     state: HabitSetupState,
@@ -111,7 +111,7 @@ internal fun HabitItemScreen(
                     }
                 },
                 actions = {
-                    ToggleButton(
+                    IconToggleButton(
                         checked = state.isArchived,
                         onCheckedChange = {
                             onAction(
@@ -124,7 +124,7 @@ internal fun HabitItemScreen(
                             contentDescription = "archive",
                         )
                     }
-                    ToggleButton(
+                    IconToggleButton(
                         checked = state.isMuted,
                         onCheckedChange = {
                             onAction(

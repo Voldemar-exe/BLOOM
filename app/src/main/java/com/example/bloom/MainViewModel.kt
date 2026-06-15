@@ -20,9 +20,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 sealed interface AuthState {
-    object Loading : AuthState
+    data object Loading : AuthState
 
-    object Authorized : AuthState
+    data object Authorized : AuthState
 
     data class Unauthorized(val isSkipped: Boolean) : AuthState
 }

@@ -1,11 +1,10 @@
 package com.example.stats.di
 
-import com.example.data.repository.StatsRepository
 import com.example.stats.StatsViewModel
-import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import org.koin.plugin.module.dsl.viewModel
 
 val statsModule =
     module {
-        viewModel<StatsViewModel> { StatsViewModel(get<StatsRepository>()) }
+        viewModel<StatsViewModel>()
     }

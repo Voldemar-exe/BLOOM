@@ -1,8 +1,5 @@
 package com.example.profile.di
 
-import com.example.data.repository.SocialRepository
-import com.example.data.repository.ThemeRepository
-import com.example.data.repository.UserRepository
 import com.example.profile.embedded.achievements.AchievementViewModel
 import com.example.profile.embedded.avatar.AvatarCustomizeViewModel
 import com.example.profile.embedded.leaderboard.LeaderboardViewModel
@@ -10,30 +7,16 @@ import com.example.profile.embedded.settings.SettingsViewModel
 import com.example.profile.embedded.store.StoreViewModel
 import com.example.profile.embedded.theme.ThemeChoiceViewModel
 import com.example.profile.home.ProfileViewModel
-import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import org.koin.plugin.module.dsl.viewModel
 
 val profileModule =
     module {
-        viewModel<ProfileViewModel> {
-            ProfileViewModel(get<UserRepository>())
-        }
-        viewModel<AvatarCustomizeViewModel> {
-            AvatarCustomizeViewModel(get<UserRepository>())
-        }
-        viewModel<ThemeChoiceViewModel> {
-            ThemeChoiceViewModel(get<ThemeRepository>())
-        }
-        viewModel<AchievementViewModel> {
-            AchievementViewModel(get<UserRepository>())
-        }
-        viewModel<StoreViewModel> {
-            StoreViewModel(get<UserRepository>())
-        }
-        viewModel<SettingsViewModel> {
-            SettingsViewModel(get<UserRepository>())
-        }
-        viewModel<LeaderboardViewModel> {
-            LeaderboardViewModel(get<SocialRepository>())
-        }
+        viewModel<ProfileViewModel>()
+        viewModel<AvatarCustomizeViewModel>()
+        viewModel<ThemeChoiceViewModel>()
+        viewModel<AchievementViewModel>()
+        viewModel<StoreViewModel>()
+        viewModel<SettingsViewModel>()
+        viewModel<LeaderboardViewModel>()
     }
